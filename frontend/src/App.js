@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './lib/auth';
+import { ThemeProvider } from './lib/theme';
 import { Toaster } from './components/ui/sonner';
 import LoginPage from './pages/LoginPage';
 import CalendarPage from './pages/CalendarPage';
@@ -15,7 +16,7 @@ const ProtectedRoute = ({ children }) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -34,7 +35,7 @@ const PublicRoute = ({ children }) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -97,20 +98,17 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-        <Toaster 
-          position="top-right"
-          toastOptions={{
-            className: 'glass border-white/10',
-            style: {
-              background: 'rgba(18, 18, 18, 0.9)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              color: '#fff',
-            },
-          }}
-        />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <AppRoutes />
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              className: 'glass',
+            }}
+          />
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }
