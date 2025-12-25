@@ -363,6 +363,9 @@ code, .mono {
   margin-left: 280px;
   min-height: 100vh;
   padding: 2rem;
+  margin-right: 320px;
+  position: relative;
+  z-index: 10;
 }
 
 /* Right panel */
