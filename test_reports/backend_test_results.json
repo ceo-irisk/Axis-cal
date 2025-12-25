@@ -1,9 +1,9 @@
 {
-  "timestamp": "2025-12-25T18:38:56.215217",
+  "timestamp": "2025-12-25T18:39:54.052889",
   "total_tests": 28,
-  "passed_tests": 25,
-  "failed_tests": 3,
-  "success_rate": 89.28571428571429,
+  "passed_tests": 28,
+  "failed_tests": 0,
+  "success_rate": 100.0,
   "test_results": [
     {
       "test": "Health - Root endpoint",
@@ -61,8 +61,8 @@
     },
     {
       "test": "Ratings - Create day rating",
-      "success": false,
-      "details": "Failed to create rating: {'detail': [{'type': 'missing', 'loc': ['query', 'rating'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}, {'type': 'missing', 'loc': ['query', 'date'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}]}",
+      "success": true,
+      "details": "",
       "response_data": null
     },
     {
@@ -85,8 +85,8 @@
     },
     {
       "test": "Survey - Submit response",
-      "success": false,
-      "details": "Failed to submit response: {'detail': [{'type': 'missing', 'loc': ['query', 'date'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}]}",
+      "success": true,
+      "details": "",
       "response_data": null
     },
     {
@@ -133,8 +133,8 @@
     },
     {
       "test": "Admin - Create survey question",
-      "success": false,
-      "details": "Failed to create question: {'detail': [{'type': 'missing', 'loc': ['query', 'question'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}, {'type': 'list_type', 'loc': ['body'], 'msg': 'Input should be a valid list', 'input': {'question': 'How was your focus today?', 'question_type': 'scale', 'options': ['1', '2', '3', '4', '5']}, 'url': 'https://errors.pydantic.dev/2.12/v/list_type'}]}",
+      "success": true,
+      "details": "",
       "response_data": null
     },
     {
