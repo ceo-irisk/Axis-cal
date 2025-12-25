@@ -1,0 +1,177 @@
+{
+  "timestamp": "2025-12-25T18:38:56.215217",
+  "total_tests": 28,
+  "passed_tests": 25,
+  "failed_tests": 3,
+  "success_rate": 89.28571428571429,
+  "test_results": [
+    {
+      "test": "Health - Root endpoint",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Health - Health endpoint",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Auth - Admin login",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Auth - Get current user",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Auth - Invalid login rejection",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Events - Get events list",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Events - Create event",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Events - Get specific event",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Events - Update event",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Ratings - Create day rating",
+      "success": false,
+      "details": "Failed to create rating: {'detail': [{'type': 'missing', 'loc': ['query', 'rating'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}, {'type': 'missing', 'loc': ['query', 'date'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}]}",
+      "response_data": null
+    },
+    {
+      "test": "Ratings - Get ratings list",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Ratings - Get specific date rating",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Survey - Get questions",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Survey - Submit response",
+      "success": false,
+      "details": "Failed to submit response: {'detail': [{'type': 'missing', 'loc': ['query', 'date'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}]}",
+      "response_data": null
+    },
+    {
+      "test": "Survey - Get responses",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Rules - Get rules list",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Rules - Check day rules",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Admin - Get users list",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Admin - Create user",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Admin - Get specific user",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Admin - Toggle user active",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Admin - Create survey question",
+      "success": false,
+      "details": "Failed to create question: {'detail': [{'type': 'missing', 'loc': ['query', 'question'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}, {'type': 'list_type', 'loc': ['body'], 'msg': 'Input should be a valid list', 'input': {'question': 'How was your focus today?', 'question_type': 'scale', 'options': ['1', '2', '3', '4', '5']}, 'url': 'https://errors.pydantic.dev/2.12/v/list_type'}]}",
+      "response_data": null
+    },
+    {
+      "test": "Templates - Get templates list",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Templates - Create template",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Analytics - Get overloaded days",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Cleanup - Delete test event",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Cleanup - Delete test user",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Cleanup - Delete test template",
+      "success": true,
+      "details": "",
+      "response_data": null
+    }
+  ]
+}
