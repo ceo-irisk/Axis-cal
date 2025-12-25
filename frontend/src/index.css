@@ -452,6 +452,7 @@ code, .mono {
   
   .main-content {
     margin-left: 80px;
+    margin-right: 0;
   }
   
   .right-panel {
