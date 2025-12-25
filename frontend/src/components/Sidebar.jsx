@@ -6,9 +6,11 @@ import { useState } from 'react';
 
 export const Sidebar = ({ isOpen, onClose, currentView, onViewChange }) => {
   const { user, logout, isAdmin } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  
+  const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
   const handleLogout = () => {
     logout();
