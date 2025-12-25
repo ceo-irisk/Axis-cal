@@ -47,25 +47,25 @@ export const RightPanel = ({
     <aside className="right-panel" data-testid="right-panel">
       {/* Date header */}
       <div className="mb-6">
-        <h2 className="text-xl font-semibold tracking-tight">
+        <h2 className="text-xl font-semibold tracking-tight text-[var(--primary-text)]">
           {format(selectedDate, 'd MMMM', { locale: ru })}
         </h2>
-        <p className="text-secondary-text text-sm">
+        <p className="text-[var(--secondary-text)] text-sm">
           {format(selectedDate, 'EEEE', { locale: ru })}
         </p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <div className="p-4 rounded-xl bg-white/5">
-          <p className="text-2xl font-semibold">{events.length}</p>
-          <p className="text-xs text-secondary-text">Событий</p>
+        <div className="p-4 rounded-xl bg-[var(--accent-secondary)]">
+          <p className="text-2xl font-semibold text-[var(--primary-text)]">{events.length}</p>
+          <p className="text-xs text-[var(--secondary-text)]">Событий</p>
         </div>
-        <div className="p-4 rounded-xl bg-white/5">
-          <p className="text-2xl font-semibold font-mono">
+        <div className="p-4 rounded-xl bg-[var(--accent-secondary)]">
+          <p className="text-2xl font-semibold font-mono text-[var(--primary-text)]">
             {totalHours}:{String(remainingMinutes).padStart(2, '0')}
           </p>
-          <p className="text-xs text-secondary-text">Часов</p>
+          <p className="text-xs text-[var(--secondary-text)]">Часов</p>
         </div>
       </div>
 
@@ -73,12 +73,12 @@ export const RightPanel = ({
       {violations?.violations?.length > 0 && (
         <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20" data-testid="rule-violations">
           <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle className="w-4 h-4 text-red-400" />
-            <h3 className="text-sm font-medium text-red-400">Нарушения правил</h3>
+            <AlertTriangle className="w-4 h-4 text-red-500" />
+            <h3 className="text-sm font-medium text-red-500">Нарушения правил</h3>
           </div>
           <div className="space-y-2">
             {violations.violations.map((v, idx) => (
-              <p key={idx} className="text-xs text-red-300">
+              <p key={idx} className="text-xs text-red-600 dark:text-red-400">
                 {v.message}
               </p>
             ))}
@@ -87,11 +87,11 @@ export const RightPanel = ({
       )}
 
       {/* Day rating */}
-      <div className="mb-6 p-4 rounded-xl bg-white/5" data-testid="day-rating">
+      <div className="mb-6 p-4 rounded-xl bg-[var(--accent-secondary)]" data-testid="day-rating">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-medium">Оценка дня</h3>
+          <h3 className="text-sm font-medium text-[var(--primary-text)]">Оценка дня</h3>
           {rating?.rating && (
-            <span className="text-xs text-secondary-text">
+            <span className="text-xs text-[var(--secondary-text)]">
               Оценено: {rating.rating}/5
             </span>
           )}
@@ -110,7 +110,7 @@ export const RightPanel = ({
                 className={`w-6 h-6 ${
                   star <= (hoveredStar || rating?.rating || 0)
                     ? 'fill-amber-400 text-amber-400'
-                    : 'text-secondary-text'
+                    : 'text-[var(--secondary-text)]'
                 }`}
                 strokeWidth={1.5}
               />
@@ -129,10 +129,10 @@ export const RightPanel = ({
 
       {/* Events list */}
       <div className="mb-6">
-        <h3 className="text-sm font-medium mb-3">События дня</h3>
+        <h3 className="text-sm font-medium mb-3 text-[var(--primary-text)]">События дня</h3>
         <div className="space-y-2 max-h-[300px] overflow-y-auto">
           {events.length === 0 ? (
-            <p className="text-sm text-secondary-text py-4 text-center">
+            <p className="text-sm text-[var(--secondary-text)] py-4 text-center">
               Нет событий на этот день
             </p>
           ) : (
@@ -141,20 +141,20 @@ export const RightPanel = ({
                 key={event.id}
                 onClick={() => onEventClick(event)}
                 className={`
-                  w-full text-left p-3 rounded-xl bg-white/5 
-                  border-l-2 hover:bg-white/10 transition-colors
+                  w-full text-left p-3 rounded-xl bg-[var(--accent-secondary)] 
+                  border-l-2 hover:bg-[var(--border)] transition-colors
                   ${EVENT_COLORS[event.event_type] || EVENT_COLORS.meeting}
                   ${event.status === 'tentative' ? 'opacity-70' : ''}
                 `}
                 data-testid={`right-panel-event-${event.id}`}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <p className="font-medium text-sm truncate">{event.title}</p>
+                  <p className="font-medium text-sm truncate text-[var(--primary-text)]">{event.title}</p>
                   {event.status === 'tentative' && (
                     <span className="badge badge-tentative text-xs">?</span>
                   )}
                 </div>
-                <div className="flex items-center gap-3 mt-1 text-xs text-secondary-text">
+                <div className="flex items-center gap-3 mt-1 text-xs text-[var(--secondary-text)]">
                   <span className="flex items-center gap-1 font-mono">
                     <Clock className="w-3 h-3" />
                     {event.start_time?.slice(11, 16)}
