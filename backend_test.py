@@ -205,18 +205,15 @@ class ExecutiveCalendarAPITester:
         self.log_test("Survey - Get questions", success,
                      "" if success else f"Failed to get questions: {data}")
         
-        # Test submit survey response
+        # Test submit survey response (date as query param, responses as body)
         today = datetime.now().strftime('%Y-%m-%d')
         response_data = {
-            "date": today,
-            "responses": {
-                "productivity": "4",
-                "completed_tasks": "Finished project review",
-                "improvements": "Better time management"
-            }
+            "productivity": "4",
+            "completed_tasks": "Finished project review",
+            "improvements": "Better time management"
         }
         
-        success, data = self.make_request('POST', '/survey/responses', response_data)
+        success, data = self.make_request('POST', f'/survey/responses?date={today}', response_data)
         self.log_test("Survey - Submit response", success,
                      "" if success else f"Failed to submit response: {data}")
         
