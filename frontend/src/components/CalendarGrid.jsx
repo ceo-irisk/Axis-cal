@@ -14,12 +14,12 @@ import {
 import { ru } from 'date-fns/locale';
 
 const EVENT_COLORS = {
-  meeting: 'bg-violet-500/15 border-l-violet-500 text-violet-700 dark:text-violet-300',
-  call: 'bg-cyan-500/15 border-l-cyan-500 text-cyan-700 dark:text-cyan-300',
-  personal: 'bg-amber-500/15 border-l-amber-500 text-amber-700 dark:text-amber-300',
-  urgent: 'bg-red-500/15 border-l-red-500 text-red-700 dark:text-red-300',
-  travel: 'bg-emerald-500/15 border-l-emerald-500 text-emerald-700 dark:text-emerald-300',
-  deep_work: 'bg-indigo-500/15 border-l-indigo-500 text-indigo-700 dark:text-indigo-300',
+  meeting: 'border-l-violet-500',
+  call: 'border-l-cyan-500',
+  personal: 'border-l-amber-500',
+  urgent: 'border-l-red-500',
+  travel: 'border-l-emerald-500',
+  deep_work: 'border-l-indigo-500',
 };
 
 export const CalendarGrid = ({ 
