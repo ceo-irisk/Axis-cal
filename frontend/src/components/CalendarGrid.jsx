@@ -9,21 +9,17 @@ import {
   isSameMonth, 
   isSameDay, 
   isToday,
-  parseISO,
-  startOfDay,
-  endOfDay,
-  eachHourOfInterval,
-  addHours
+  parseISO
 } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
 const EVENT_COLORS = {
-  meeting: 'bg-violet-500/20 border-l-violet-500 text-violet-300',
-  call: 'bg-cyan-500/20 border-l-cyan-500 text-cyan-300',
-  personal: 'bg-amber-500/20 border-l-amber-500 text-amber-300',
-  urgent: 'bg-red-500/20 border-l-red-500 text-red-300',
-  travel: 'bg-emerald-500/20 border-l-emerald-500 text-emerald-300',
-  deep_work: 'bg-indigo-500/20 border-l-indigo-500 text-indigo-300',
+  meeting: 'bg-violet-500/15 border-l-violet-500 text-violet-700 dark:text-violet-300',
+  call: 'bg-cyan-500/15 border-l-cyan-500 text-cyan-700 dark:text-cyan-300',
+  personal: 'bg-amber-500/15 border-l-amber-500 text-amber-700 dark:text-amber-300',
+  urgent: 'bg-red-500/15 border-l-red-500 text-red-700 dark:text-red-300',
+  travel: 'bg-emerald-500/15 border-l-emerald-500 text-emerald-700 dark:text-emerald-300',
+  deep_work: 'bg-indigo-500/15 border-l-indigo-500 text-indigo-700 dark:text-indigo-300',
 };
 
 export const CalendarGrid = ({ 
@@ -102,9 +98,9 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
   return (
     <div className="card-glass overflow-hidden" data-testid="month-view">
       {/* Week day headers */}
-      <div className="grid grid-cols-7 border-b border-white/5">
+      <div className="grid grid-cols-7 border-b border-[var(--border)]">
         {weekDays.map(day => (
-          <div key={day} className="px-4 py-3 text-center text-sm text-secondary-text font-medium">
+          <div key={day} className="px-4 py-3 text-center text-sm text-[var(--secondary-text)] font-medium">
             {day}
           </div>
         ))}
@@ -125,9 +121,9 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
               key={idx}
               onClick={() => onDateClick(day)}
               className={`
-                relative min-h-[120px] p-2 border-b border-r border-white/5 text-left transition-colors
+                relative min-h-[120px] p-2 border-b border-r border-[var(--border)] text-left transition-colors
                 ${isCurrentMonth ? '' : 'opacity-40'}
-                ${isSelected ? 'bg-white/10' : 'hover:bg-white/5'}
+                ${isSelected ? 'bg-[var(--accent-secondary)]' : 'hover:bg-[var(--accent-secondary)]/50'}
                 ${overloaded ? 'day-overloaded' : ''}
               `}
               data-testid={`day-cell-${format(day, 'yyyy-MM-dd')}`}
@@ -136,13 +132,13 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
               <div className="flex items-center justify-between mb-2">
                 <span className={`
                   inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-medium
-                  ${isTodayDate ? 'bg-white text-black' : ''}
-                  ${isSelected && !isTodayDate ? 'ring-1 ring-white/30' : ''}
+                  ${isTodayDate ? 'bg-[var(--accent-primary)] text-[var(--background)]' : 'text-[var(--primary-text)]'}
+                  ${isSelected && !isTodayDate ? 'ring-2 ring-[var(--accent-primary)]/30' : ''}
                 `}>
                   {format(day, 'd')}
                 </span>
                 {rating && (
-                  <span className="text-xs text-amber-400">★{rating}</span>
+                  <span className="text-xs text-amber-500">★{rating}</span>
                 )}
               </div>
 
@@ -167,7 +163,7 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
                   </div>
                 ))}
                 {events.filter(e => e.start_time?.startsWith(format(day, 'yyyy-MM-dd'))).length > 3 && (
-                  <p className="text-xs text-secondary-text px-2">
+                  <p className="text-xs text-[var(--secondary-text)] px-2">
                     +{events.filter(e => e.start_time?.startsWith(format(day, 'yyyy-MM-dd'))).length - 3} ещё
                   </p>
                 )}
@@ -211,18 +207,18 @@ const WeekView = ({ date, events, onDateClick, onEventClick }) => {
   return (
     <div className="card-glass overflow-hidden" data-testid="week-view">
       {/* Header */}
-      <div className="grid grid-cols-8 border-b border-white/5">
-        <div className="p-3 text-center text-sm text-secondary-text">
+      <div className="grid grid-cols-8 border-b border-[var(--border)]">
+        <div className="p-3 text-center text-sm text-[var(--secondary-text)]">
           <span className="font-mono">GMT+3</span>
         </div>
         {days.map(day => (
           <button
             key={day.toISOString()}
             onClick={() => onDateClick(day)}
-            className={`p-3 text-center hover:bg-white/5 transition-colors ${isToday(day) ? 'bg-white/5' : ''}`}
+            className={`p-3 text-center hover:bg-[var(--accent-secondary)] transition-colors ${isToday(day) ? 'bg-[var(--accent-secondary)]' : ''}`}
           >
-            <p className="text-xs text-secondary-text">{format(day, 'EEE', { locale: ru })}</p>
-            <p className={`text-lg font-medium ${isToday(day) ? 'text-white' : ''}`}>{format(day, 'd')}</p>
+            <p className="text-xs text-[var(--secondary-text)]">{format(day, 'EEE', { locale: ru })}</p>
+            <p className={`text-lg font-medium ${isToday(day) ? 'text-[var(--primary-text)]' : 'text-[var(--primary-text)]'}`}>{format(day, 'd')}</p>
           </button>
         ))}
       </div>
@@ -230,9 +226,9 @@ const WeekView = ({ date, events, onDateClick, onEventClick }) => {
       {/* Time grid */}
       <div className="grid grid-cols-8 max-h-[600px] overflow-y-auto">
         {/* Time column */}
-        <div className="border-r border-white/5">
+        <div className="border-r border-[var(--border)]">
           {hours.map(hour => (
-            <div key={hour} className="h-[60px] px-2 py-1 text-right text-xs text-secondary-text font-mono">
+            <div key={hour} className="h-[60px] px-2 py-1 text-right text-xs text-[var(--secondary-text)] font-mono">
               {String(hour).padStart(2, '0')}:00
             </div>
           ))}
@@ -242,9 +238,9 @@ const WeekView = ({ date, events, onDateClick, onEventClick }) => {
         {days.map(day => {
           const dayEvents = getDayEvents(day);
           return (
-            <div key={day.toISOString()} className="relative border-r border-white/5">
+            <div key={day.toISOString()} className="relative border-r border-[var(--border)]">
               {hours.map(hour => (
-                <div key={hour} className="h-[60px] border-b border-white/5" />
+                <div key={hour} className="h-[60px] border-b border-[var(--border)]" />
               ))}
               
               {/* Current time indicator */}
@@ -307,20 +303,20 @@ const DayView = ({ date, events, onEventClick }) => {
 
   return (
     <div className="card-glass overflow-hidden" data-testid="day-view">
-      <div className="p-4 border-b border-white/5">
-        <h2 className="text-lg font-semibold">
+      <div className="p-4 border-b border-[var(--border)]">
+        <h2 className="text-lg font-semibold text-[var(--primary-text)]">
           {format(date, 'EEEE, d MMMM yyyy', { locale: ru })}
         </h2>
-        <p className="text-sm text-secondary-text mt-1">
+        <p className="text-sm text-[var(--secondary-text)] mt-1">
           {dayEvents.length} событий
         </p>
       </div>
 
       <div className="grid grid-cols-[80px_1fr] max-h-[600px] overflow-y-auto">
         {/* Time column */}
-        <div className="border-r border-white/5">
+        <div className="border-r border-[var(--border)]">
           {hours.map(hour => (
-            <div key={hour} className="h-[80px] px-3 py-2 text-right text-sm text-secondary-text font-mono">
+            <div key={hour} className="h-[80px] px-3 py-2 text-right text-sm text-[var(--secondary-text)] font-mono">
               {String(hour).padStart(2, '0')}:00
             </div>
           ))}
@@ -329,7 +325,7 @@ const DayView = ({ date, events, onEventClick }) => {
         {/* Events area */}
         <div className="relative">
           {hours.map(hour => (
-            <div key={hour} className="h-[80px] border-b border-white/5" />
+            <div key={hour} className="h-[80px] border-b border-[var(--border)]" />
           ))}
 
           {/* Current time indicator */}
