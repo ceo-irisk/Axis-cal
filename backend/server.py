@@ -237,6 +237,13 @@ async def require_manager_or_admin(user: dict = Depends(get_current_user)) -> di
 
 @app.on_event("startup")
 async def startup_event():
+    # Create indexes for better query performance
+    await db.events.create_index("start_time")
+    await db.events.create_index("created_by")
+    await db.users.create_index("email", unique=True)
+    await db.day_ratings.create_index([("user_id", 1), ("date", 1)])
+    await db.survey_responses.create_index([("user_id", 1), ("date", 1)])
+    
     # Create default admin if not exists
     admin_email = os.environ.get('ADMIN_EMAIL', 'admin@company.com')
     admin_password = os.environ.get('ADMIN_PASSWORD', 'Admin123!')
