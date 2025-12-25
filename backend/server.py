@@ -1,15 +1,18 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from typing import List, Optional, Dict, Any
 import uuid
-from datetime import datetime, timezone
-
+from datetime import datetime, timezone, timedelta
+import jwt
+import bcrypt
+from enum import Enum
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -19,52 +22,864 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
-app = FastAPI()
+# JWT Configuration
+JWT_SECRET = os.environ.get('JWT_SECRET', 'executive_calendar_secret')
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRATION_HOURS = 24
+
+security = HTTPBearer()
+
+# Create the main app
+app = FastAPI(title="Executive Calendar API")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
+# ==================== ENUMS ====================
+
+class UserRole(str, Enum):
+    ADMIN = "admin"
+    MANAGER = "manager"
+    ASSISTANT = "assistant"
+
+class EventStatus(str, Enum):
+    CONFIRMED = "confirmed"
+    TENTATIVE = "tentative"
+    CANCELLED = "cancelled"
+
+class EventType(str, Enum):
+    MEETING = "meeting"
+    CALL = "call"
+    PERSONAL = "personal"
+    URGENT = "urgent"
+    TRAVEL = "travel"
+    DEEP_WORK = "deep_work"
+
+# ==================== MODELS ====================
+
+class UserBase(BaseModel):
+    email: EmailStr
+    name: str
+    role: UserRole
+    timezone: str = "Europe/Moscow"
+
+class UserCreate(UserBase):
+    password: str
+
+class User(UserBase):
+    model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    is_active: bool = True
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class UserResponse(BaseModel):
+    id: str
+    email: str
+    name: str
+    role: UserRole
+    timezone: str
+    is_active: bool
 
-# Add your routes to the router instead of directly to app
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserResponse
+
+class CustomField(BaseModel):
+    name: str
+    field_type: str = "text"  # text, number, select, checkbox
+    required: bool = False
+    options: Optional[List[str]] = None
+
+class EventBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+    start_time: datetime
+    end_time: datetime
+    event_type: EventType = EventType.MEETING
+    status: EventStatus = EventStatus.CONFIRMED
+    color: Optional[str] = None
+    pattern: Optional[str] = None  # for tentative events
+    location: Optional[str] = None
+    attendees: List[str] = []
+    custom_fields: Dict[str, Any] = {}
+    external_calendar_id: Optional[str] = None
+    external_event_id: Optional[str] = None
+
+class EventCreate(EventBase):
+    pass
+
+class Event(EventBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_by: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CalendarConfig(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    name: str
+    provider: str  # google, yandex, apple, bitrix24
+    color: str
+    pattern: Optional[str] = None
+    is_active: bool = True
+    sync_enabled: bool = True
+    credentials: Dict[str, Any] = {}
+    last_synced: Optional[datetime] = None
+
+class TemplateBase(BaseModel):
+    name: str
+    template_type: str  # day, week
+    events: List[Dict[str, Any]] = []  # relative times and event templates
+    is_active: bool = True
+
+class Template(TemplateBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_by: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class DayRating(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    date: str  # YYYY-MM-DD format
+    rating: int = Field(ge=1, le=5)
+    notes: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class SurveyQuestion(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    question: str
+    question_type: str = "text"  # text, scale, choice
+    options: Optional[List[str]] = None
+    order: int = 0
+    is_active: bool = True
+
+class SurveyResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    date: str
+    responses: Dict[str, Any] = {}
+    ai_summary: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class DayRule(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: str
+    rule_type: str  # max_meetings, min_break, max_hours
+    value: int
+    is_active: bool = True
+
+class EventFieldConfig(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    fields: List[CustomField] = []
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# ==================== HELPERS ====================
+
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+def verify_password(password: str, hashed: str) -> bool:
+    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+
+def create_token(user_id: str, role: str) -> str:
+    payload = {
+        "sub": user_id,
+        "role": role,
+        "exp": datetime.now(timezone.utc) + timedelta(hours=JWT_EXPIRATION_HOURS)
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    try:
+        payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        
+        user = await db.users.find_one({"id": user_id}, {"_id": 0, "password": 0})
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        return user
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+async def require_admin(user: dict = Depends(get_current_user)) -> dict:
+    if user.get("role") != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
+async def require_manager_or_admin(user: dict = Depends(get_current_user)) -> dict:
+    if user.get("role") not in [UserRole.ADMIN, UserRole.MANAGER]:
+        raise HTTPException(status_code=403, detail="Manager or Admin access required")
+    return user
+
+# ==================== STARTUP ====================
+
+@app.on_event("startup")
+async def startup_event():
+    # Create default admin if not exists
+    admin_email = os.environ.get('ADMIN_EMAIL', 'admin@company.com')
+    admin_password = os.environ.get('ADMIN_PASSWORD', 'Admin123!')
+    
+    existing_admin = await db.users.find_one({"email": admin_email})
+    if not existing_admin:
+        admin_user = {
+            "id": str(uuid.uuid4()),
+            "email": admin_email,
+            "name": "Администратор",
+            "role": UserRole.ADMIN,
+            "password": hash_password(admin_password),
+            "timezone": "Europe/Moscow",
+            "is_active": True,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.users.insert_one(admin_user)
+        logger.info(f"Created default admin: {admin_email}")
+    
+    # Create default survey questions if none exist
+    questions_count = await db.survey_questions.count_documents({})
+    if questions_count == 0:
+        default_questions = [
+            {"id": str(uuid.uuid4()), "question": "Как вы оцениваете продуктивность сегодняшнего дня?", "question_type": "scale", "options": ["1", "2", "3", "4", "5"], "order": 1, "is_active": True},
+            {"id": str(uuid.uuid4()), "question": "Какие задачи были выполнены?", "question_type": "text", "order": 2, "is_active": True},
+            {"id": str(uuid.uuid4()), "question": "Какие задачи остались невыполненными?", "question_type": "text", "order": 3, "is_active": True},
+            {"id": str(uuid.uuid4()), "question": "Что можно улучшить завтра?", "question_type": "text", "order": 4, "is_active": True}
+        ]
+        await db.survey_questions.insert_many(default_questions)
+        logger.info("Created default survey questions")
+    
+    # Create default day rules
+    rules_count = await db.day_rules.count_documents({})
+    if rules_count == 0:
+        default_rules = [
+            {"id": str(uuid.uuid4()), "name": "Максимум встреч", "description": "Максимальное количество встреч в день", "rule_type": "max_meetings", "value": 8, "is_active": True},
+            {"id": str(uuid.uuid4()), "name": "Минимальный перерыв", "description": "Минимальный перерыв между встречами (минуты)", "rule_type": "min_break", "value": 15, "is_active": True},
+            {"id": str(uuid.uuid4()), "name": "Максимум рабочих часов", "description": "Максимальное количество рабочих часов в день", "rule_type": "max_hours", "value": 10, "is_active": True}
+        ]
+        await db.day_rules.insert_many(default_rules)
+        logger.info("Created default day rules")
+
+# ==================== AUTH ROUTES ====================
+
+@api_router.post("/auth/login", response_model=TokenResponse)
+async def login(request: LoginRequest):
+    user = await db.users.find_one({"email": request.email})
+    if not user or not verify_password(request.password, user.get("password", "")):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    if not user.get("is_active", True):
+        raise HTTPException(status_code=401, detail="User is deactivated")
+    
+    token = create_token(user["id"], user["role"])
+    
+    return TokenResponse(
+        access_token=token,
+        user=UserResponse(
+            id=user["id"],
+            email=user["email"],
+            name=user["name"],
+            role=user["role"],
+            timezone=user.get("timezone", "Europe/Moscow"),
+            is_active=user.get("is_active", True)
+        )
+    )
+
+@api_router.get("/auth/me", response_model=UserResponse)
+async def get_me(user: dict = Depends(get_current_user)):
+    return UserResponse(**user)
+
+# ==================== USER ROUTES (Admin only) ====================
+
+@api_router.post("/users", response_model=UserResponse)
+async def create_user(user_data: UserCreate, admin: dict = Depends(require_admin)):
+    existing = await db.users.find_one({"email": user_data.email})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    user_dict = user_data.model_dump()
+    user_dict["id"] = str(uuid.uuid4())
+    user_dict["password"] = hash_password(user_dict["password"])
+    user_dict["created_at"] = datetime.now(timezone.utc).isoformat()
+    user_dict["is_active"] = True
+    
+    await db.users.insert_one(user_dict)
+    return UserResponse(**{k: v for k, v in user_dict.items() if k != "password"})
+
+@api_router.get("/users", response_model=List[UserResponse])
+async def get_users(admin: dict = Depends(require_admin)):
+    users = await db.users.find({}, {"_id": 0, "password": 0}).to_list(100)
+    return [UserResponse(**u) for u in users]
+
+@api_router.get("/users/{user_id}", response_model=UserResponse)
+async def get_user(user_id: str, admin: dict = Depends(require_admin)):
+    user = await db.users.find_one({"id": user_id}, {"_id": 0, "password": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return UserResponse(**user)
+
+@api_router.put("/users/{user_id}", response_model=UserResponse)
+async def update_user(user_id: str, user_data: UserBase, admin: dict = Depends(require_admin)):
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    update_data = user_data.model_dump()
+    await db.users.update_one({"id": user_id}, {"$set": update_data})
+    
+    updated = await db.users.find_one({"id": user_id}, {"_id": 0, "password": 0})
+    return UserResponse(**updated)
+
+@api_router.delete("/users/{user_id}")
+async def delete_user(user_id: str, admin: dict = Depends(require_admin)):
+    result = await db.users.delete_one({"id": user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "User deleted"}
+
+@api_router.patch("/users/{user_id}/toggle-active")
+async def toggle_user_active(user_id: str, admin: dict = Depends(require_admin)):
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    new_status = not user.get("is_active", True)
+    await db.users.update_one({"id": user_id}, {"$set": {"is_active": new_status}})
+    return {"is_active": new_status}
+
+# ==================== EVENT ROUTES ====================
+
+@api_router.post("/events", response_model=dict)
+async def create_event(event_data: EventCreate, user: dict = Depends(get_current_user)):
+    event_dict = event_data.model_dump()
+    event_dict["id"] = str(uuid.uuid4())
+    event_dict["created_by"] = user["id"]
+    event_dict["created_at"] = datetime.now(timezone.utc).isoformat()
+    event_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    event_dict["start_time"] = event_dict["start_time"].isoformat()
+    event_dict["end_time"] = event_dict["end_time"].isoformat()
+    
+    # Set pattern for tentative events
+    if event_dict["status"] == EventStatus.TENTATIVE:
+        event_dict["pattern"] = "tentative"
+    
+    await db.events.insert_one(event_dict)
+    return {k: v for k, v in event_dict.items() if k != "_id"}
+
+@api_router.get("/events")
+async def get_events(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    user: dict = Depends(get_current_user)
+):
+    query = {}
+    
+    if start_date:
+        query["start_time"] = {"$gte": start_date}
+    if end_date:
+        if "start_time" in query:
+            query["start_time"]["$lte"] = end_date
+        else:
+            query["start_time"] = {"$lte": end_date}
+    
+    events = await db.events.find(query, {"_id": 0}).to_list(1000)
+    return events
+
+@api_router.get("/events/{event_id}")
+async def get_event(event_id: str, user: dict = Depends(get_current_user)):
+    event = await db.events.find_one({"id": event_id}, {"_id": 0})
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return event
+
+@api_router.put("/events/{event_id}")
+async def update_event(event_id: str, event_data: EventCreate, user: dict = Depends(get_current_user)):
+    event = await db.events.find_one({"id": event_id})
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    update_data = event_data.model_dump()
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    update_data["start_time"] = update_data["start_time"].isoformat()
+    update_data["end_time"] = update_data["end_time"].isoformat()
+    
+    if update_data["status"] == EventStatus.TENTATIVE:
+        update_data["pattern"] = "tentative"
+    else:
+        update_data["pattern"] = None
+    
+    await db.events.update_one({"id": event_id}, {"$set": update_data})
+    updated = await db.events.find_one({"id": event_id}, {"_id": 0})
+    return updated
+
+@api_router.delete("/events/{event_id}")
+async def delete_event(event_id: str, user: dict = Depends(get_current_user)):
+    result = await db.events.delete_one({"id": event_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return {"message": "Event deleted"}
+
+# ==================== TEMPLATE ROUTES ====================
+
+@api_router.post("/templates")
+async def create_template(template_data: TemplateBase, user: dict = Depends(require_manager_or_admin)):
+    template_dict = template_data.model_dump()
+    template_dict["id"] = str(uuid.uuid4())
+    template_dict["created_by"] = user["id"]
+    template_dict["created_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.templates.insert_one(template_dict)
+    return {k: v for k, v in template_dict.items() if k != "_id"}
+
+@api_router.get("/templates")
+async def get_templates(user: dict = Depends(get_current_user)):
+    templates = await db.templates.find({}, {"_id": 0}).to_list(100)
+    return templates
+
+@api_router.put("/templates/{template_id}")
+async def update_template(template_id: str, template_data: TemplateBase, user: dict = Depends(require_manager_or_admin)):
+    result = await db.templates.update_one(
+        {"id": template_id},
+        {"$set": template_data.model_dump()}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Template not found")
+    
+    updated = await db.templates.find_one({"id": template_id}, {"_id": 0})
+    return updated
+
+@api_router.delete("/templates/{template_id}")
+async def delete_template(template_id: str, user: dict = Depends(require_manager_or_admin)):
+    result = await db.templates.delete_one({"id": template_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Template not found")
+    return {"message": "Template deleted"}
+
+@api_router.post("/templates/{template_id}/apply")
+async def apply_template(template_id: str, target_date: str, user: dict = Depends(get_current_user)):
+    template = await db.templates.find_one({"id": template_id}, {"_id": 0})
+    if not template:
+        raise HTTPException(status_code=404, detail="Template not found")
+    
+    created_events = []
+    base_date = datetime.fromisoformat(target_date)
+    
+    for event_template in template.get("events", []):
+        start_offset = timedelta(hours=event_template.get("start_hour", 9), minutes=event_template.get("start_minute", 0))
+        end_offset = timedelta(hours=event_template.get("end_hour", 10), minutes=event_template.get("end_minute", 0))
+        
+        if template["template_type"] == "week":
+            day_offset = event_template.get("day_of_week", 0)
+            event_date = base_date + timedelta(days=day_offset)
+        else:
+            event_date = base_date
+        
+        event_dict = {
+            "id": str(uuid.uuid4()),
+            "title": event_template.get("title", "Событие"),
+            "description": event_template.get("description"),
+            "start_time": (event_date.replace(hour=0, minute=0, second=0, microsecond=0) + start_offset).isoformat(),
+            "end_time": (event_date.replace(hour=0, minute=0, second=0, microsecond=0) + end_offset).isoformat(),
+            "event_type": event_template.get("event_type", "meeting"),
+            "status": event_template.get("status", "confirmed"),
+            "color": event_template.get("color"),
+            "created_by": user["id"],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.events.insert_one(event_dict)
+        created_events.append({k: v for k, v in event_dict.items() if k != "_id"})
+    
+    return {"created_events": created_events}
+
+# ==================== DAY RATING ROUTES ====================
+
+@api_router.post("/ratings")
+async def create_or_update_rating(rating: int, date: str, notes: Optional[str] = None, user: dict = Depends(get_current_user)):
+    if rating < 1 or rating > 5:
+        raise HTTPException(status_code=400, detail="Rating must be between 1 and 5")
+    
+    existing = await db.day_ratings.find_one({"user_id": user["id"], "date": date})
+    
+    if existing:
+        await db.day_ratings.update_one(
+            {"id": existing["id"]},
+            {"$set": {"rating": rating, "notes": notes}}
+        )
+        updated = await db.day_ratings.find_one({"id": existing["id"]}, {"_id": 0})
+        return updated
+    else:
+        rating_dict = {
+            "id": str(uuid.uuid4()),
+            "user_id": user["id"],
+            "date": date,
+            "rating": rating,
+            "notes": notes,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.day_ratings.insert_one(rating_dict)
+        return {k: v for k, v in rating_dict.items() if k != "_id"}
+
+@api_router.get("/ratings")
+async def get_ratings(start_date: Optional[str] = None, end_date: Optional[str] = None, user: dict = Depends(get_current_user)):
+    query = {"user_id": user["id"]}
+    if start_date:
+        query["date"] = {"$gte": start_date}
+    if end_date:
+        if "date" in query:
+            query["date"]["$lte"] = end_date
+        else:
+            query["date"] = {"$lte": end_date}
+    
+    ratings = await db.day_ratings.find(query, {"_id": 0}).to_list(366)
+    return ratings
+
+@api_router.get("/ratings/{date}")
+async def get_rating(date: str, user: dict = Depends(get_current_user)):
+    rating = await db.day_ratings.find_one({"user_id": user["id"], "date": date}, {"_id": 0})
+    return rating
+
+# ==================== SURVEY ROUTES ====================
+
+@api_router.get("/survey/questions")
+async def get_survey_questions(user: dict = Depends(get_current_user)):
+    questions = await db.survey_questions.find({"is_active": True}, {"_id": 0}).sort("order", 1).to_list(50)
+    return questions
+
+@api_router.post("/survey/questions")
+async def create_survey_question(question: str, question_type: str = "text", options: Optional[List[str]] = None, admin: dict = Depends(require_admin)):
+    max_order = await db.survey_questions.find_one(sort=[("order", -1)])
+    new_order = (max_order.get("order", 0) if max_order else 0) + 1
+    
+    question_dict = {
+        "id": str(uuid.uuid4()),
+        "question": question,
+        "question_type": question_type,
+        "options": options,
+        "order": new_order,
+        "is_active": True
+    }
+    await db.survey_questions.insert_one(question_dict)
+    return {k: v for k, v in question_dict.items() if k != "_id"}
+
+@api_router.put("/survey/questions/{question_id}")
+async def update_survey_question(question_id: str, question: str, question_type: str = "text", options: Optional[List[str]] = None, admin: dict = Depends(require_admin)):
+    result = await db.survey_questions.update_one(
+        {"id": question_id},
+        {"$set": {"question": question, "question_type": question_type, "options": options}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Question not found")
+    
+    updated = await db.survey_questions.find_one({"id": question_id}, {"_id": 0})
+    return updated
+
+@api_router.delete("/survey/questions/{question_id}")
+async def delete_survey_question(question_id: str, admin: dict = Depends(require_admin)):
+    result = await db.survey_questions.delete_one({"id": question_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Question not found")
+    return {"message": "Question deleted"}
+
+@api_router.post("/survey/responses")
+async def submit_survey_response(date: str, responses: Dict[str, Any], user: dict = Depends(get_current_user)):
+    # Get events for the day
+    events = await db.events.find({
+        "start_time": {"$gte": f"{date}T00:00:00", "$lt": f"{date}T23:59:59"}
+    }, {"_id": 0}).to_list(100)
+    
+    # Generate AI summary
+    ai_summary = await generate_day_summary(date, events, responses)
+    
+    response_dict = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "date": date,
+        "responses": responses,
+        "ai_summary": ai_summary,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Upsert - update if exists, insert if not
+    existing = await db.survey_responses.find_one({"user_id": user["id"], "date": date})
+    if existing:
+        await db.survey_responses.update_one(
+            {"id": existing["id"]},
+            {"$set": {"responses": responses, "ai_summary": ai_summary}}
+        )
+        response_dict["id"] = existing["id"]
+    else:
+        await db.survey_responses.insert_one(response_dict)
+    
+    return {k: v for k, v in response_dict.items() if k != "_id"}
+
+@api_router.get("/survey/responses")
+async def get_survey_responses(start_date: Optional[str] = None, end_date: Optional[str] = None, user: dict = Depends(get_current_user)):
+    query = {"user_id": user["id"]}
+    if start_date:
+        query["date"] = {"$gte": start_date}
+    if end_date:
+        if "date" in query:
+            query["date"]["$lte"] = end_date
+        else:
+            query["date"] = {"$lte": end_date}
+    
+    responses = await db.survey_responses.find(query, {"_id": 0}).to_list(100)
+    return responses
+
+@api_router.get("/survey/responses/{date}")
+async def get_survey_response(date: str, user: dict = Depends(get_current_user)):
+    response = await db.survey_responses.find_one({"user_id": user["id"], "date": date}, {"_id": 0})
+    return response
+
+# ==================== AI SUMMARY ====================
+
+async def generate_day_summary(date: str, events: list, survey_responses: dict) -> str:
+    try:
+        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        
+        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        if not api_key:
+            return "AI summary unavailable - no API key configured"
+        
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=f"day-summary-{date}",
+            system_message="Вы - ассистент руководителя. Ваша задача - создавать краткие, структурированные отчеты о прошедшем дне в формате Markdown. Будьте конкретны и профессиональны."
+        ).with_model("openai", "gpt-5.2")
+        
+        events_text = "\n".join([f"- {e.get('title', 'Без названия')} ({e.get('start_time', '')[:16]} - {e.get('end_time', '')[:16]}): {e.get('description', '')}" for e in events])
+        responses_text = "\n".join([f"- {k}: {v}" for k, v in survey_responses.items()])
+        
+        prompt = f"""Создайте краткий отчет о дне {date} для базы знаний руководителя.
+
+События дня:
+{events_text if events else "Нет событий"}
+
+Ответы на вопросы дня:
+{responses_text if survey_responses else "Нет ответов"}
+
+Создайте структурированный Markdown-отчет с разделами:
+1. Краткое резюме дня
+2. Ключевые события и встречи
+3. Выполненные задачи
+4. Зоны для улучшения
+5. Рекомендации на следующий день"""
+
+        user_message = UserMessage(text=prompt)
+        response = await chat.send_message(user_message)
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error generating AI summary: {e}")
+        return f"Ошибка генерации отчета: {str(e)}"
+
+# ==================== DAY RULES ROUTES ====================
+
+@api_router.get("/rules")
+async def get_rules(user: dict = Depends(get_current_user)):
+    rules = await db.day_rules.find({}, {"_id": 0}).to_list(50)
+    return rules
+
+@api_router.post("/rules")
+async def create_rule(name: str, description: str, rule_type: str, value: int, admin: dict = Depends(require_admin)):
+    rule_dict = {
+        "id": str(uuid.uuid4()),
+        "name": name,
+        "description": description,
+        "rule_type": rule_type,
+        "value": value,
+        "is_active": True
+    }
+    await db.day_rules.insert_one(rule_dict)
+    return {k: v for k, v in rule_dict.items() if k != "_id"}
+
+@api_router.put("/rules/{rule_id}")
+async def update_rule(rule_id: str, name: str, description: str, rule_type: str, value: int, admin: dict = Depends(require_admin)):
+    result = await db.day_rules.update_one(
+        {"id": rule_id},
+        {"$set": {"name": name, "description": description, "rule_type": rule_type, "value": value}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Rule not found")
+    
+    updated = await db.day_rules.find_one({"id": rule_id}, {"_id": 0})
+    return updated
+
+@api_router.delete("/rules/{rule_id}")
+async def delete_rule(rule_id: str, admin: dict = Depends(require_admin)):
+    result = await db.day_rules.delete_one({"id": rule_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Rule not found")
+    return {"message": "Rule deleted"}
+
+@api_router.get("/rules/check/{date}")
+async def check_day_rules(date: str, user: dict = Depends(get_current_user)):
+    rules = await db.day_rules.find({"is_active": True}, {"_id": 0}).to_list(50)
+    events = await db.events.find({
+        "start_time": {"$gte": f"{date}T00:00:00", "$lt": f"{date}T23:59:59"}
+    }, {"_id": 0}).to_list(100)
+    
+    violations = []
+    
+    for rule in rules:
+        if rule["rule_type"] == "max_meetings":
+            meeting_count = len([e for e in events if e.get("event_type") in ["meeting", "call"]])
+            if meeting_count > rule["value"]:
+                violations.append({
+                    "rule": rule["name"],
+                    "message": f"Превышен лимит встреч: {meeting_count} из {rule['value']} разрешённых",
+                    "severity": "high"
+                })
+        
+        elif rule["rule_type"] == "max_hours":
+            total_minutes = 0
+            for event in events:
+                try:
+                    start = datetime.fromisoformat(event["start_time"].replace("Z", "+00:00"))
+                    end = datetime.fromisoformat(event["end_time"].replace("Z", "+00:00"))
+                    total_minutes += (end - start).total_seconds() / 60
+                except:
+                    pass
+            
+            total_hours = total_minutes / 60
+            if total_hours > rule["value"]:
+                violations.append({
+                    "rule": rule["name"],
+                    "message": f"Превышен лимит рабочих часов: {total_hours:.1f} из {rule['value']} разрешённых",
+                    "severity": "high"
+                })
+        
+        elif rule["rule_type"] == "min_break":
+            sorted_events = sorted(events, key=lambda x: x.get("start_time", ""))
+            for i in range(len(sorted_events) - 1):
+                try:
+                    end_current = datetime.fromisoformat(sorted_events[i]["end_time"].replace("Z", "+00:00"))
+                    start_next = datetime.fromisoformat(sorted_events[i + 1]["start_time"].replace("Z", "+00:00"))
+                    gap_minutes = (start_next - end_current).total_seconds() / 60
+                    
+                    if 0 < gap_minutes < rule["value"]:
+                        violations.append({
+                            "rule": rule["name"],
+                            "message": f"Недостаточный перерыв между '{sorted_events[i].get('title', '')}' и '{sorted_events[i+1].get('title', '')}': {int(gap_minutes)} мин",
+                            "severity": "medium"
+                        })
+                except:
+                    pass
+    
+    return {
+        "date": date,
+        "is_valid": len(violations) == 0,
+        "violations": violations,
+        "events_count": len(events)
+    }
+
+# ==================== EVENT FIELD CONFIG ====================
+
+@api_router.get("/event-fields")
+async def get_event_fields(user: dict = Depends(get_current_user)):
+    config = await db.event_field_config.find_one({}, {"_id": 0})
+    if not config:
+        return {"fields": []}
+    return config
+
+@api_router.put("/event-fields")
+async def update_event_fields(fields: List[dict], admin: dict = Depends(require_admin)):
+    config = {
+        "id": "event-field-config",
+        "fields": fields,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.event_field_config.update_one(
+        {"id": "event-field-config"},
+        {"$set": config},
+        upsert=True
+    )
+    return config
+
+# ==================== CALENDAR INTEGRATION ROUTES ====================
+
+@api_router.get("/calendars")
+async def get_calendars(user: dict = Depends(get_current_user)):
+    calendars = await db.calendars.find({"user_id": user["id"]}, {"_id": 0, "credentials": 0}).to_list(20)
+    return calendars
+
+@api_router.post("/calendars")
+async def add_calendar(name: str, provider: str, color: str, pattern: Optional[str] = None, user: dict = Depends(get_current_user)):
+    calendar_dict = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "name": name,
+        "provider": provider,
+        "color": color,
+        "pattern": pattern,
+        "is_active": True,
+        "sync_enabled": False,
+        "credentials": {},
+        "last_synced": None
+    }
+    await db.calendars.insert_one(calendar_dict)
+    return {k: v for k, v in calendar_dict.items() if k not in ["_id", "credentials"]}
+
+@api_router.delete("/calendars/{calendar_id}")
+async def delete_calendar(calendar_id: str, user: dict = Depends(get_current_user)):
+    result = await db.calendars.delete_one({"id": calendar_id, "user_id": user["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Calendar not found")
+    return {"message": "Calendar deleted"}
+
+# ==================== OVERLOADED DAYS ====================
+
+@api_router.get("/analytics/overloaded-days")
+async def get_overloaded_days(start_date: str, end_date: str, user: dict = Depends(get_current_user)):
+    rules = await db.day_rules.find({"is_active": True, "rule_type": "max_meetings"}, {"_id": 0}).to_list(1)
+    max_meetings = rules[0]["value"] if rules else 8
+    
+    events = await db.events.find({
+        "start_time": {"$gte": f"{start_date}T00:00:00", "$lte": f"{end_date}T23:59:59"}
+    }, {"_id": 0}).to_list(1000)
+    
+    day_counts = {}
+    for event in events:
+        day = event["start_time"][:10]
+        if day not in day_counts:
+            day_counts[day] = 0
+        day_counts[day] += 1
+    
+    overloaded = [{"date": day, "count": count, "is_overloaded": count > max_meetings} for day, count in day_counts.items() if count > max_meetings * 0.8]
+    
+    return overloaded
+
+# ==================== HEALTH CHECK ====================
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Executive Calendar API", "version": "1.0.0"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
+@api_router.get("/health")
+async def health_check():
+    return {"status": "healthy"}
 
 # Include the router in the main app
 app.include_router(api_router)
@@ -76,13 +891,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
