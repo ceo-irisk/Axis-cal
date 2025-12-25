@@ -273,12 +273,8 @@ class ExecutiveCalendarAPITester:
         else:
             self.log_test("Admin - Create user", False, f"Failed to create user: {data}")
         
-        # Test create survey question (admin only)
-        success, data = self.make_request('POST', '/survey/questions', {
-            "question": "How was your focus today?",
-            "question_type": "scale",
-            "options": ["1", "2", "3", "4", "5"]
-        })
+        # Test create survey question (admin only) - uses query parameters
+        success, data = self.make_request('POST', '/survey/questions?question=How was your focus today?&question_type=scale&options=1&options=2&options=3&options=4&options=5')
         self.log_test("Admin - Create survey question", success,
                      "" if success else f"Failed to create question: {data}")
 
