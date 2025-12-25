@@ -92,7 +92,7 @@ class ExecutiveCalendarAPITester:
         # Test login with admin credentials
         login_data = {
             "email": "admin@company.com",
-            "password": "Admin123!"
+            "password": "admin123"
         }
         
         success, data = self.make_request('POST', '/auth/login', login_data, 
