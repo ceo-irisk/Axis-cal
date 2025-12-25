@@ -15,7 +15,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { loginUser } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+  
+  const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
