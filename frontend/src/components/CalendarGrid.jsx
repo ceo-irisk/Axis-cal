@@ -68,45 +68,25 @@ export const CalendarGrid = ({
   );
 };
 
-const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings, onDateClick, onEventClick, loading }) => {
+const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings, onDateClick, onEventClick }) => {
   const days = useMemo(() => {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
     const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
     const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
-    
     return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
   }, [currentDate]);
 
   const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-
-  const getDayEvents = (date) => {
-    const dateStr = format(date, 'yyyy-MM-dd');
-    return events.filter(e => e.start_time?.startsWith(dateStr)).slice(0, 3);
-  };
-
-  const isOverloaded = (date) => {
-    const dateStr = format(date, 'yyyy-MM-dd');
-    return overloadedDays.some(d => d.date === dateStr && d.is_overloaded);
-  };
-
-  const getDayRating = (date) => {
-    const dateStr = format(date, 'yyyy-MM-dd');
-    return ratings[dateStr]?.rating;
-  };
+  const getDayEvents = (date) => events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd'))).slice(0, 3);
+  const isOverloaded = (date) => overloadedDays.some(d => d.date === format(date, 'yyyy-MM-dd') && d.is_overloaded);
+  const getDayRating = (date) => ratings[format(date, 'yyyy-MM-dd')]?.rating;
 
   return (
     <div className="card-glass overflow-hidden" data-testid="month-view">
-      {/* Week day headers */}
-      <div className="grid grid-cols-7 border-b border-[var(--border)]">
-        {weekDays.map(day => (
-          <div key={day} className="px-4 py-3 text-center text-sm text-[var(--secondary-text)] font-medium">
-            {day}
-          </div>
-        ))}
+      <div className="grid grid-cols-7 border-b border-border">
+        {weekDays.map(day => <div key={day} className="px-4 py-3 text-center text-sm text-muted-foreground font-medium">{day}</div>)}
       </div>
-
-      {/* Calendar grid */}
       <div className="grid grid-cols-7">
         {days.map((day, idx) => {
           const dayEvents = getDayEvents(day);
@@ -117,56 +97,16 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
           const isTodayDate = isToday(day);
 
           return (
-            <button
-              key={idx}
-              onClick={() => onDateClick(day)}
-              className={`
-                relative min-h-[120px] p-2 border-b border-r border-[var(--border)] text-left transition-colors
-                ${isCurrentMonth ? '' : 'opacity-40'}
-                ${isSelected ? 'bg-[var(--accent-secondary)]' : 'hover:bg-[var(--accent-secondary)]/50'}
-                ${overloaded ? 'day-overloaded' : ''}
-              `}
-              data-testid={`day-cell-${format(day, 'yyyy-MM-dd')}`}
-            >
-              {/* Day number */}
+            <button key={idx} onClick={() => onDateClick(day)} className={`relative min-h-[120px] p-2 border-b border-r border-border text-left transition-colors ${!isCurrentMonth && 'opacity-40'} ${isSelected ? 'bg-accent' : 'hover:bg-accent/50'} ${overloaded && 'day-overloaded'}`} data-testid={`day-cell-${format(day, 'yyyy-MM-dd')}`}>
               <div className="flex items-center justify-between mb-2">
-                <span className={`
-                  inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-medium
-                  ${isTodayDate ? 'bg-[var(--accent-primary)] text-[var(--background)]' : 'text-[var(--primary-text)]'}
-                  ${isSelected && !isTodayDate ? 'ring-2 ring-[var(--accent-primary)]/30' : ''}
-                `}>
-                  {format(day, 'd')}
-                </span>
-                {rating && (
-                  <span className="text-xs text-amber-500">★{rating}</span>
-                )}
+                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-medium ${isTodayDate && 'bg-foreground text-background'} ${isSelected && !isTodayDate && 'ring-2 ring-ring/30'}`}>{format(day, 'd')}</span>
+                {rating && <span className="text-xs text-amber-500">★{rating}</span>}
               </div>
-
-              {/* Events */}
               <div className="space-y-1">
-                {dayEvents.map((event, eventIdx) => (
-                  <div
-                    key={event.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEventClick(event);
-                    }}
-                    className={`
-                      px-2 py-1 rounded text-xs truncate border-l-2 cursor-pointer
-                      transition-opacity hover:opacity-80
-                      ${EVENT_COLORS[event.event_type] || EVENT_COLORS.meeting}
-                      ${event.status === 'tentative' ? 'event-tentative' : ''}
-                    `}
-                    data-testid={`event-${event.id}`}
-                  >
-                    {event.title}
-                  </div>
+                {dayEvents.map((event) => (
+                  <div key={event.id} onClick={(e) => { e.stopPropagation(); onEventClick(event); }} className={`px-2 py-1 rounded text-xs truncate border-l-2 cursor-pointer hover:opacity-80 bg-accent ${EVENT_COLORS[event.event_type]} ${event.status === 'tentative' && 'event-tentative'}`} data-testid={`event-${event.id}`}>{event.title}</div>
                 ))}
-                {events.filter(e => e.start_time?.startsWith(format(day, 'yyyy-MM-dd'))).length > 3 && (
-                  <p className="text-xs text-[var(--secondary-text)] px-2">
-                    +{events.filter(e => e.start_time?.startsWith(format(day, 'yyyy-MM-dd'))).length - 3} ещё
-                  </p>
-                )}
+                {events.filter(e => e.start_time?.startsWith(format(day, 'yyyy-MM-dd'))).length > 3 && <p className="text-xs text-muted-foreground px-2">+{events.filter(e => e.start_time?.startsWith(format(day, 'yyyy-MM-dd'))).length - 3} ещё</p>}
               </div>
             </button>
           );
