@@ -179,14 +179,10 @@ class ExecutiveCalendarAPITester:
         """Test day rating functionality"""
         print("\n🔍 Testing Day Ratings...")
         
-        # Test create/update rating
+        # Test create/update rating (uses query parameters)
         today = datetime.now().strftime('%Y-%m-%d')
         
-        success, data = self.make_request('POST', '/ratings', {
-            "rating": 4,
-            "date": today,
-            "notes": "Good productive day"
-        })
+        success, data = self.make_request('POST', f'/ratings?rating=4&date={today}&notes=Good productive day')
         self.log_test("Ratings - Create day rating", success,
                      "" if success else f"Failed to create rating: {data}")
         
