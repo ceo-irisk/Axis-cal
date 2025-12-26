@@ -1,16 +1,5 @@
 import { useMemo } from 'react';
-import { 
-  format, 
-  startOfMonth, 
-  endOfMonth, 
-  startOfWeek, 
-  endOfWeek, 
-  eachDayOfInterval, 
-  isSameMonth, 
-  isSameDay, 
-  isToday,
-  parseISO
-} from 'date-fns';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, isToday, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
 const EVENT_COLORS = {
@@ -22,53 +11,13 @@ const EVENT_COLORS = {
   deep_work: 'event-deep-work',
 };
 
-export const CalendarGrid = ({ 
-  currentDate, 
-  selectedDate, 
-  events, 
-  overloadedDays,
-  ratings,
-  view,
-  onDateClick, 
-  onEventClick,
-  loading 
-}) => {
-  if (view === 'day') {
-    return (
-      <DayView 
-        date={selectedDate} 
-        events={events} 
-        onEventClick={onEventClick}
-      />
-    );
-  }
-
-  if (view === 'week') {
-    return (
-      <WeekView 
-        date={selectedDate} 
-        events={events} 
-        onDateClick={onDateClick}
-        onEventClick={onEventClick}
-      />
-    );
-  }
-
-  return (
-    <MonthView 
-      currentDate={currentDate}
-      selectedDate={selectedDate}
-      events={events}
-      overloadedDays={overloadedDays}
-      ratings={ratings}
-      onDateClick={onDateClick}
-      onEventClick={onEventClick}
-      loading={loading}
-    />
-  );
+export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, overloadedDays, ratings, view, onDateClick, onCellDoubleClick, onEventClick, loading }) => {
+  if (view === 'day') return <DayView date={selectedDate} events={events} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} />;
+  if (view === 'week') return <WeekView date={selectedDate} events={events} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} />;
+  return <MonthView currentDate={currentDate} selectedDate={selectedDate} events={events} overloadedDays={overloadedDays} ratings={ratings} onDateClick={onDateClick} onCellDoubleClick={onCellDoubleClick} onEventClick={onEventClick} />;
 };
 
-const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings, onDateClick, onEventClick }) => {
+const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings, onDateClick, onCellDoubleClick, onEventClick }) => {
   const days = useMemo(() => {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
@@ -83,9 +32,9 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
   const getDayRating = (date) => ratings[format(date, 'yyyy-MM-dd')]?.rating;
 
   return (
-    <div className="card-glass overflow-hidden" data-testid="month-view">
-      <div className="grid grid-cols-7 border-b border-border">
-        {weekDays.map(day => <div key={day} className="px-4 py-3 text-center text-sm text-muted-foreground font-medium">{day}</div>)}
+    <div className="card-glass" data-testid="month-view">
+      <div className="grid grid-cols-7 border-b border-border/50">
+        {weekDays.map(day => <div key={day} className="px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">{day}</div>)}
       </div>
       <div className="grid grid-cols-7">
         {days.map((day, idx) => {
@@ -97,16 +46,34 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
           const isTodayDate = isToday(day);
 
           return (
-            <button key={idx} onClick={() => onDateClick(day)} className={`relative min-h-[120px] p-2 border-b border-r border-border text-left transition-colors ${!isCurrentMonth && 'opacity-40'} ${isSelected ? 'bg-accent' : 'hover:bg-accent/50'} ${overloaded && 'day-overloaded'}`} data-testid={`day-cell-${format(day, 'yyyy-MM-dd')}`}>
-              <div className="flex items-center justify-between mb-2">
-                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-medium ${isTodayDate && 'bg-foreground text-background'} ${isSelected && !isTodayDate && 'ring-2 ring-ring/30'}`}>{format(day, 'd')}</span>
+            <button
+              key={idx}
+              onClick={() => onDateClick(day)}
+              onDoubleClick={() => onCellDoubleClick(day, 9)}
+              className={`relative min-h-[110px] p-2 border-b border-r border-border/30 text-left transition-colors
+                ${!isCurrentMonth && 'opacity-40'}
+                ${isSelected ? 'bg-accent' : 'hover:bg-accent/30'}
+                ${overloaded && 'day-overloaded'}`}
+              data-testid={`day-cell-${format(day, 'yyyy-MM-dd')}`}
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-sm
+                  ${isTodayDate && isSelected ? 'bg-foreground text-background font-semibold' : ''}
+                  ${isTodayDate && !isSelected ? 'bg-foreground/20 text-foreground font-medium' : ''}
+                  ${isSelected && !isTodayDate ? 'bg-foreground text-background font-semibold' : ''}`}>
+                  {format(day, 'd')}
+                </span>
                 {rating && <span className="text-xs text-amber-500">★{rating}</span>}
               </div>
               <div className="space-y-1">
                 {dayEvents.map((event) => (
-                  <div key={event.id} onClick={(e) => { e.stopPropagation(); onEventClick(event); }} className={`px-2 py-1 rounded text-xs truncate border-l-2 cursor-pointer hover:opacity-80 bg-accent ${EVENT_COLORS[event.event_type]} ${event.status === 'tentative' && 'event-tentative'}`} data-testid={`event-${event.id}`}>{event.title}</div>
+                  <div key={event.id} onClick={(e) => { e.stopPropagation(); onEventClick(event); }} className={`px-2 py-0.5 rounded text-xs truncate cursor-pointer hover:opacity-80 ${EVENT_COLORS[event.event_type]} ${event.status === 'tentative' && 'event-tentative'}`} data-testid={`event-${event.id}`}>
+                    {event.title}
+                  </div>
                 ))}
-                {events.filter(e => e.start_time?.startsWith(format(day, 'yyyy-MM-dd'))).length > 3 && <p className="text-xs text-muted-foreground px-2">+{events.filter(e => e.start_time?.startsWith(format(day, 'yyyy-MM-dd'))).length - 3} ещё</p>}
+                {events.filter(e => e.start_time?.startsWith(format(day, 'yyyy-MM-dd'))).length > 3 && (
+                  <p className="text-xs text-muted-foreground px-2">+{events.filter(e => e.start_time?.startsWith(format(day, 'yyyy-MM-dd'))).length - 3}</p>
+                )}
               </div>
             </button>
           );
@@ -116,7 +83,7 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
   );
 };
 
-const WeekView = ({ date, events, onDateClick, onEventClick }) => {
+const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }) => {
   const weekStart = startOfWeek(date, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
@@ -128,7 +95,7 @@ const WeekView = ({ date, events, onDateClick, onEventClick }) => {
       const end = parseISO(event.end_time);
       const startHour = start.getHours() + start.getMinutes() / 60;
       const duration = (end - start) / 3600000;
-      return { top: `${startHour * 60}px`, height: `${Math.max(duration * 60, 30)}px` };
+      return { top: `${startHour * 60}px`, height: `${Math.max(duration * 60, 24)}px` };
     } catch { return { top: '0px', height: '60px' }; }
   };
 
@@ -136,31 +103,28 @@ const WeekView = ({ date, events, onDateClick, onEventClick }) => {
 
   return (
     <div className="card-glass overflow-hidden" data-testid="week-view">
-      <div className="grid grid-cols-8 border-b border-border/50">
-        <div className="p-3 text-center text-xs text-muted-foreground font-mono">GMT+3</div>
+      <div className="grid grid-cols-8 border-b border-border/30">
+        <div className="p-3 text-center text-xs text-muted-foreground/70 font-mono"></div>
         {days.map(day => (
-          <button key={day.toISOString()} onClick={() => onDateClick(day)} className={`p-3 text-center hover:bg-accent/50 transition-colors ${isToday(day) ? 'bg-accent/50' : ''}`}>
+          <button key={day.toISOString()} onClick={() => onDateClick(day)} className={`p-3 text-center hover:bg-accent/30 transition-colors ${isSameDay(day, date) ? 'bg-accent' : ''}`}>
             <p className="text-xs text-muted-foreground">{format(day, 'EEE', { locale: ru })}</p>
-            <p className="text-lg font-medium">{format(day, 'd')}</p>
+            <p className={`text-lg font-medium ${isToday(day) && !isSameDay(day, date) ? 'text-violet-500' : ''} ${isToday(day) && isSameDay(day, date) ? 'text-foreground' : ''}`}>{format(day, 'd')}</p>
           </button>
         ))}
       </div>
-      <div className="grid grid-cols-8 max-h-[600px] overflow-y-auto">
-        <div className="border-r border-border/30">
-          {hours.map(hour => (
-            <div key={hour} className="h-[60px] px-2 py-1 text-right text-xs text-muted-foreground/70 font-mono">{String(hour).padStart(2, '0')}:00</div>
-          ))}
+      <div className="grid grid-cols-8 max-h-[calc(100vh-220px)] overflow-y-auto">
+        <div className="border-r border-border/20">
+          {hours.map(hour => <div key={hour} className="h-[60px] px-2 py-1 text-right text-xs text-muted-foreground/50 font-mono">{String(hour).padStart(2, '0')}:00</div>)}
         </div>
         {days.map(day => {
           const dayEvents = getDayEvents(day);
           return (
-            <div key={day.toISOString()} className="relative border-r border-border/30">
-              {hours.map(hour => <div key={hour} className="h-[60px] border-b border-border/30" />)}
+            <div key={day.toISOString()} className="relative border-r border-border/20">
+              {hours.map(hour => <div key={hour} className="h-[60px] border-b border-border/20 hover:bg-accent/20" onDoubleClick={() => onCellDoubleClick(day, hour)} />)}
               {isToday(day) && <div className="current-time-line" style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60) * 60}px` }} />}
               {dayEvents.map(event => (
-                <div key={event.id} onClick={() => onEventClick(event)} className={`absolute left-1 right-1 px-2 py-1 rounded cursor-pointer overflow-hidden hover:opacity-80 ${EVENT_COLORS[event.event_type]} ${event.status === 'tentative' && 'event-tentative'}`} style={getEventStyle(event)} data-testid={`event-${event.id}`}>
-                  <p className="text-xs font-medium truncate">{event.title}</p>
-                  <p className="text-xs opacity-70 font-mono">{event.start_time?.slice(11, 16)}</p>
+                <div key={event.id} onClick={() => onEventClick(event)} className={`absolute left-0.5 right-0.5 px-1.5 py-0.5 rounded text-xs cursor-pointer hover:opacity-90 ${EVENT_COLORS[event.event_type]} ${event.status === 'tentative' && 'event-tentative'}`} style={getEventStyle(event)} data-testid={`event-${event.id}`}>
+                  <p className="font-medium truncate text-[11px]">{event.title}</p>
                 </div>
               ))}
             </div>
@@ -171,10 +135,9 @@ const WeekView = ({ date, events, onDateClick, onEventClick }) => {
   );
 };
 
-const DayView = ({ date, events, onEventClick }) => {
+const DayView = ({ date, events, onEventClick, onCellDoubleClick }) => {
   const hours = Array.from({ length: 24 }, (_, i) => i);
-  const dateStr = format(date, 'yyyy-MM-dd');
-  const dayEvents = events.filter(e => e.start_time?.startsWith(dateStr));
+  const dayEvents = events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd')));
 
   const getEventStyle = (event) => {
     try {
@@ -182,36 +145,28 @@ const DayView = ({ date, events, onEventClick }) => {
       const end = parseISO(event.end_time);
       const startHour = start.getHours() + start.getMinutes() / 60;
       const duration = (end - start) / 3600000;
-      return { top: `${startHour * 80}px`, height: `${Math.max(duration * 80, 40)}px` };
-    } catch { return { top: '0px', height: '80px' }; }
+      return { top: `${startHour * 60}px`, height: `${Math.max(duration * 60, 30)}px` };
+    } catch { return { top: '0px', height: '60px' }; }
   };
 
   return (
     <div className="card-glass overflow-hidden" data-testid="day-view">
-      <div className="p-4 border-b border-border/50">
-        <h2 className="text-lg font-semibold">{format(date, 'EEEE, d MMMM yyyy', { locale: ru })}</h2>
-        <p className="text-sm text-muted-foreground mt-1">{dayEvents.length} событий</p>
+      <div className="p-4 border-b border-border/30">
+        <h2 className="text-lg font-semibold">{format(date, 'EEEE, d MMMM', { locale: ru })}</h2>
+        <p className="text-sm text-muted-foreground">{dayEvents.length} событий</p>
       </div>
-      <div className="grid grid-cols-[80px_1fr] max-h-[600px] overflow-y-auto">
-        <div className="border-r border-border/30">
-          {hours.map(hour => <div key={hour} className="h-[80px] px-3 py-2 text-right text-sm text-muted-foreground/70 font-mono">{String(hour).padStart(2, '0')}:00</div>)}
+      <div className="grid grid-cols-[60px_1fr] max-h-[calc(100vh-220px)] overflow-y-auto">
+        <div className="border-r border-border/20">
+          {hours.map(hour => <div key={hour} className="h-[60px] px-2 py-1 text-right text-xs text-muted-foreground/50 font-mono">{String(hour).padStart(2, '0')}:00</div>)}
         </div>
         <div className="relative">
-          {hours.map(hour => <div key={hour} className="h-[80px] border-b border-border/30" />)}
-          {isToday(date) && <div className="current-time-line" style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60) * 80}px` }} />}
+          {hours.map(hour => <div key={hour} className="h-[60px] border-b border-border/20 hover:bg-accent/20" onDoubleClick={() => onCellDoubleClick(date, hour)} />)}
+          {isToday(date) && <div className="current-time-line" style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60) * 60}px` }} />}
           {dayEvents.map(event => (
-            <div key={event.id} onClick={() => onEventClick(event)} className={`absolute left-2 right-2 px-4 py-2 rounded-xl cursor-pointer hover:opacity-80 ${EVENT_COLORS[event.event_type]} ${event.status === 'tentative' && 'event-tentative'}`} style={getEventStyle(event)} data-testid={`event-${event.id}`}>
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="font-medium truncate">{event.title}</p>
-                  {event.description && <p className="text-sm opacity-70 truncate">{event.description}</p>}
-                </div>
-                <p className="text-sm font-mono flex-shrink-0">{event.start_time?.slice(11, 16)} - {event.end_time?.slice(11, 16)}</p>
-              </div>
-              {event.location && <p className="text-xs opacity-60 mt-1">{event.location}</p>}
-              <div className="flex gap-2 mt-2">
-                <span className={`badge badge-${event.event_type}`}>{event.event_type === 'meeting' ? 'Встреча' : event.event_type === 'call' ? 'Звонок' : event.event_type === 'personal' ? 'Личное' : event.event_type === 'urgent' ? 'Срочно' : event.event_type === 'travel' ? 'Поездка' : 'Работа'}</span>
-                {event.status === 'tentative' && <span className="badge badge-tentative">Предварительно</span>}
+            <div key={event.id} onClick={() => onEventClick(event)} className={`absolute left-2 right-2 px-3 py-1.5 rounded-lg cursor-pointer hover:opacity-90 ${EVENT_COLORS[event.event_type]} ${event.status === 'tentative' && 'event-tentative'}`} style={getEventStyle(event)} data-testid={`event-${event.id}`}>
+              <div className="flex items-center justify-between">
+                <p className="font-medium text-sm truncate">{event.title}</p>
+                <p className="text-xs font-mono opacity-70">{event.start_time?.slice(11, 16)}</p>
               </div>
             </div>
           ))}
