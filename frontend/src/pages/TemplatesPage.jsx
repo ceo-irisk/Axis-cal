@@ -51,6 +51,7 @@ const DAYS_OF_WEEK = [
 
 export default function TemplatesPage() {
   const { canManage } = useAuth();
+  const navigate = useNavigate();
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
