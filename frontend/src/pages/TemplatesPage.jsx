@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { 
   getTemplates, 
@@ -24,7 +25,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '../components/ui/dialog';
-import { Plus, Trash2, Play, Calendar, Clock, FileText, Copy } from 'lucide-react';
+import { Plus, Trash2, Play, Calendar, Clock, FileText, Copy, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, addDays } from 'date-fns';
 import { ru } from 'date-fns/locale';
