@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { 
   getUsers, createUser, updateUser, deleteUser, toggleUserActive,
@@ -25,11 +26,12 @@ import {
   DialogFooter,
 } from '../components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Users, ClipboardList, Shield, Settings, Plus, Trash2, Edit, Power } from 'lucide-react';
+import { Users, ClipboardList, Shield, Settings, Plus, Trash2, Edit, Power, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AdminPage() {
   const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [questions, setQuestions] = useState([]);
