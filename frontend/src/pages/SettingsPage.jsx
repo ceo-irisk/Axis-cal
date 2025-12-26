@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { getCalendars, addCalendar, deleteCalendar } from '../lib/api';
 import Sidebar from '../components/Sidebar';
@@ -19,7 +20,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '../components/ui/dialog';
-import { Settings, Calendar, Plus, Trash2, Globe, Clock, RefreshCw, Link2 } from 'lucide-react';
+import { Settings, Calendar, Plus, Trash2, Globe, Clock, RefreshCw, Link2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 const CALENDAR_PROVIDERS = [
