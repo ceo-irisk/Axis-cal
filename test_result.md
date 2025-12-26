@@ -101,3 +101,139 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Создание календаря для руководителя и личного помощника с функциями:
+  - Темная и светлая темы
+  - Переключение видов календаря (День/Неделя/Месяц)
+  - Создание событий с выбором календаря
+  - Подсветка текущего дня и выбранной даты
+
+backend:
+  - task: "JWT Authentication"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Login with admin@example.com / admin123 works"
+
+  - task: "Events CRUD API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Events API returns events correctly"
+
+  - task: "Calendars API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Can create and list calendars"
+
+frontend:
+  - task: "View Switcher (Day/Week/Month)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/CalendarPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "All three views work correctly - Month, Week, Day"
+
+  - task: "Event Modal Calendar Select"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/EventModal.jsx"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "Had error with empty value in SelectItem"
+      - working: true
+        agent: "main"
+        comment: "Fixed by using 'default' value instead of empty string"
+
+  - task: "Double Click Event Creation"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/CalendarGrid.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Double click opens event modal with correct date"
+
+  - task: "Date Selection Highlighting"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/CalendarGrid.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Selected date highlighted, today shown with muted style when not selected"
+
+  - task: "Theme Toggle"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Sidebar.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Dark and light themes work correctly"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: true
+
+test_plan:
+  current_focus:
+    - "View Switcher (Day/Week/Month)"
+    - "Event Modal Calendar Select"
+    - "Double Click Event Creation"
+    - "Date Selection Highlighting"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: |
+      Fixed critical bugs from handoff:
+      1. Fixed SelectItem empty value error in EventModal - now uses 'default' value
+      2. Verified view switcher (Day/Week/Month) works correctly
+      3. Verified double-click event creation works
+      4. Verified date selection highlighting works correctly
+      5. Created admin user (admin@example.com / admin123)
+      6. Created test calendar "Work" to test calendar selection
+      Please test frontend functionality especially view switching and event creation
