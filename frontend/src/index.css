@@ -66,10 +66,15 @@
 /* ===== Layout ===== */
 .sidebar {
   @apply w-[260px] bg-card border-r border-border h-screen fixed left-0 top-0 z-50 flex flex-col;
+  transition: transform 0.3s ease;
 }
 
 .main-content {
-  @apply ml-[260px] min-h-screen p-6 mr-[300px] bg-background;
+  @apply ml-[260px] min-h-screen p-6 bg-background transition-all duration-300;
+}
+
+.has-right-panel .main-content {
+  @apply mr-[300px];
 }
 
 .right-panel {
