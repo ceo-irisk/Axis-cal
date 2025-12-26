@@ -3,14 +3,14 @@ import { useAuth } from '../lib/auth';
 import { useTheme } from '../lib/theme';
 import { useState, useEffect } from 'react';
 import { getCalendars, addCalendar, deleteCalendar } from '../lib/api';
-import { Sun, Moon, LogOut, Plus, Trash2, Eye, EyeOff, ChevronDown, ChevronRight } from 'lucide-react';
+import { Sun, Moon, LogOut, Plus, Trash2, Eye, EyeOff, ChevronDown, ChevronRight, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 const CALENDAR_COLORS = [
   '#8b5cf6', '#06b6d4', '#f59e0b', '#ef4444', '#10b981', '#6366f1', '#ec4899', '#14b8a6'
 ];
 
-export const Sidebar = ({ isOpen, onClose, onCalendarsChange }) => {
+export const Sidebar = ({ isOpen, onClose, onCalendarsChange, collapsed, onToggleCollapse }) => {
   const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
@@ -19,7 +19,8 @@ export const Sidebar = ({ isOpen, onClose, onCalendarsChange }) => {
   const [newCalName, setNewCalName] = useState('');
   const [newCalColor, setNewCalColor] = useState('#8b5cf6');
   const [hiddenCalendars, setHiddenCalendars] = useState(new Set());
-  const [expanded, setExpanded] = useState(true);
+  const [myCalendarsExpanded, setMyCalendarsExpanded] = useState(true);
+  const [externalCalendarsExpanded, setExternalCalendarsExpanded] = useState(true);
 
   useEffect(() => {
     fetchCalendars();
