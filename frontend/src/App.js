@@ -68,8 +68,9 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      {/* Settings routes */}
       <Route
-        path="/admin"
+        path="/settings/users"
         element={
           <ProtectedRoute>
             <AdminPage />
@@ -77,7 +78,7 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/templates"
+        path="/settings/templates"
         element={
           <ProtectedRoute>
             <TemplatesPage />
@@ -85,13 +86,25 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/settings"
+        path="/settings/calendars"
         element={
           <ProtectedRoute>
-            <SettingsPage />
+            <SettingsCalendarsPage />
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/settings/profile"
+        element={
+          <ProtectedRoute>
+            <SettingsProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      {/* Legacy routes - redirect to new paths */}
+      <Route path="/admin" element={<Navigate to="/settings/users" replace />} />
+      <Route path="/templates" element={<Navigate to="/settings/templates" replace />} />
+      <Route path="/settings" element={<Navigate to="/settings/calendars" replace />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
