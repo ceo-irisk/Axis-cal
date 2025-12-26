@@ -181,43 +181,45 @@ const DayView = ({ date, events, onEventClick }) => {
       const start = parseISO(event.start_time);
       const end = parseISO(event.end_time);
       const startHour = start.getHours() + start.getMinutes() / 60;
-      const endHour = end.getHours() + end.getMinutes() / 60;
-      const duration = endHour - startHour;
-      
-      return {
-        top: `${startHour * 80}px`,
-        height: `${Math.max(duration * 80, 40)}px`,
-      };
-    } catch {
-      return { top: '0px', height: '80px' };
-    }
+      const duration = (end - start) / 3600000;
+      return { top: `${startHour * 80}px`, height: `${Math.max(duration * 80, 40)}px` };
+    } catch { return { top: '0px', height: '80px' }; }
   };
 
   return (
     <div className="card-glass overflow-hidden" data-testid="day-view">
-      <div className="p-4 border-b border-[var(--border)]">
-        <h2 className="text-lg font-semibold text-[var(--primary-text)]">
-          {format(date, 'EEEE, d MMMM yyyy', { locale: ru })}
-        </h2>
-        <p className="text-sm text-[var(--secondary-text)] mt-1">
-          {dayEvents.length} событий
-        </p>
+      <div className="p-4 border-b border-border/50">
+        <h2 className="text-lg font-semibold">{format(date, 'EEEE, d MMMM yyyy', { locale: ru })}</h2>
+        <p className="text-sm text-muted-foreground mt-1">{dayEvents.length} событий</p>
       </div>
-
       <div className="grid grid-cols-[80px_1fr] max-h-[600px] overflow-y-auto">
-        {/* Time column */}
-        <div className="border-r border-[var(--border)]">
-          {hours.map(hour => (
-            <div key={hour} className="h-[80px] px-3 py-2 text-right text-sm text-[var(--secondary-text)] font-mono">
-              {String(hour).padStart(2, '0')}:00
+        <div className="border-r border-border/30">
+          {hours.map(hour => <div key={hour} className="h-[80px] px-3 py-2 text-right text-sm text-muted-foreground/70 font-mono">{String(hour).padStart(2, '0')}:00</div>)}
+        </div>
+        <div className="relative">
+          {hours.map(hour => <div key={hour} className="h-[80px] border-b border-border/30" />)}
+          {isToday(date) && <div className="current-time-line" style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60) * 80}px` }} />}
+          {dayEvents.map(event => (
+            <div key={event.id} onClick={() => onEventClick(event)} className={`absolute left-2 right-2 px-4 py-2 rounded-xl cursor-pointer hover:opacity-80 ${EVENT_COLORS[event.event_type]} ${event.status === 'tentative' && 'event-tentative'}`} style={getEventStyle(event)} data-testid={`event-${event.id}`}>
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="font-medium truncate">{event.title}</p>
+                  {event.description && <p className="text-sm opacity-70 truncate">{event.description}</p>}
+                </div>
+                <p className="text-sm font-mono flex-shrink-0">{event.start_time?.slice(11, 16)} - {event.end_time?.slice(11, 16)}</p>
+              </div>
+              {event.location && <p className="text-xs opacity-60 mt-1">{event.location}</p>}
+              <div className="flex gap-2 mt-2">
+                <span className={`badge badge-${event.event_type}`}>{event.event_type === 'meeting' ? 'Встреча' : event.event_type === 'call' ? 'Звонок' : event.event_type === 'personal' ? 'Личное' : event.event_type === 'urgent' ? 'Срочно' : event.event_type === 'travel' ? 'Поездка' : 'Работа'}</span>
+                {event.status === 'tentative' && <span className="badge badge-tentative">Предварительно</span>}
+              </div>
             </div>
           ))}
         </div>
-
-        {/* Events area */}
-        <div className="relative">
-          {hours.map(hour => (
-            <div key={hour} className="h-[80px] border-b border-[var(--border)]" />
+      </div>
+    </div>
+  );
+};
           ))}
 
           {/* Current time indicator */}
