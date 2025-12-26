@@ -97,11 +97,6 @@
 /* ===== Cards ===== */
 .card-glass {
   @apply bg-card border border-border rounded-2xl overflow-hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-}
-
-.dark .card-glass {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 /* ===== Badges ===== */
