@@ -170,13 +170,13 @@ export default function SettingsPage() {
             <section className="card-glass p-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-white/5">
+                  <div className="p-2 rounded-xl bg-accent">
                     <Calendar className="w-5 h-5" />
                   </div>
                   <div>
                     <h2 className="font-medium">Внешние календари</h2>
-                    <p className="text-sm text-secondary-text">
-                      Подключите внешние календари для синхронизации событий
+                    <p className="text-sm text-muted-foreground">
+                      Подключите календари из Google, Яндекс, Apple или Битрикс24
                     </p>
                   </div>
                 </div>
@@ -192,13 +192,13 @@ export default function SettingsPage() {
 
               {loading ? (
                 <div className="flex justify-center py-8">
-                  <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                  <div className="w-6 h-6 border-2 border-muted-foreground/20 border-t-foreground rounded-full animate-spin" />
                 </div>
               ) : calendars.length === 0 ? (
-                <div className="text-center py-8 text-secondary-text">
+                <div className="text-center py-8 text-muted-foreground">
                   <Link2 className="w-8 h-8 mx-auto mb-3 opacity-50" />
-                  <p>Нет подключённых календарей</p>
-                  <p className="text-sm mt-1">Добавьте внешний календарь для синхронизации</p>
+                  <p>Нет подключённых внешних календарей</p>
+                  <p className="text-sm mt-1">Добавьте календарь Google, Яндекс или Apple для синхронизации</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -207,7 +207,7 @@ export default function SettingsPage() {
                     return (
                       <div 
                         key={cal.id} 
-                        className="flex items-center justify-between p-4 rounded-xl bg-white/5"
+                        className="flex items-center justify-between p-4 rounded-xl bg-accent/50"
                         data-testid={`calendar-${cal.id}`}
                       >
                         <div className="flex items-center gap-4">
@@ -217,7 +217,7 @@ export default function SettingsPage() {
                           />
                           <div>
                             <p className="font-medium">{cal.name}</p>
-                            <p className="text-sm text-secondary-text flex items-center gap-1">
+                            <p className="text-sm text-muted-foreground flex items-center gap-1">
                               <span>{provider?.icon}</span>
                               {provider?.label || cal.provider}
                             </p>
@@ -242,7 +242,7 @@ export default function SettingsPage() {
               )}
 
               <div className="mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                <p className="text-sm text-amber-300">
+                <p className="text-sm text-amber-600 dark:text-amber-300">
                   <strong>Примечание:</strong> Полная синхронизация с внешними календарями будет доступна в следующей версии. 
                   Сейчас можно добавить календари для отображения.
                 </p>
