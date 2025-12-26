@@ -29,6 +29,7 @@ export default function CalendarPage() {
   const [showEventModal, setShowEventModal] = useState(false);
   const [showSurveyModal, setShowSurveyModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [defaultEventTime, setDefaultEventTime] = useState(null);
 
   const fetchData = useCallback(async () => {
