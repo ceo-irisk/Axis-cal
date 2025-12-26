@@ -165,9 +165,15 @@ export default function CalendarPage() {
 
   return (
     <div className="flex min-h-screen bg-background" data-testid="calendar-page">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onCalendarsChange={setCalendars} />
+      <Sidebar 
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)} 
+        onCalendarsChange={setCalendars}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+      />
       
-      <main className="main-content flex-1" data-testid="calendar-main">
+      <main className={`main-content flex-1 ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`} data-testid="calendar-main">
         <div className="max-w-full">
           <header className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
