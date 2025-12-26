@@ -291,15 +291,7 @@ async def startup_event():
 @api_router.post("/auth/login", response_model=TokenResponse)
 async def login(request: LoginRequest):
     user = await db.users.find_one({"email": request.email})
-    logger.info(f"Login attempt for: {request.email}, user found: {user is not None}")
-    if user:
-        pwd_field = user.get("password", "")
-        logger.info(f"Password field exists: {bool(pwd_field)}, length: {len(pwd_field) if pwd_field else 0}")
-        verify_result = verify_password(request.password, pwd_field)
-        logger.info(f"Password verify result: {verify_result}")
-        if not verify_result:
-            raise HTTPException(status_code=401, detail="Invalid credentials")
-    else:
+    if not user or not verify_password(request.password, user.get("password", "")):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     if not user.get("is_active", True):
