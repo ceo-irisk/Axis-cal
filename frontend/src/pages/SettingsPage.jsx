@@ -55,6 +55,7 @@ const TIMEZONES = [
 
 export default function SettingsPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [calendars, setCalendars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -67,7 +68,9 @@ export default function SettingsPage() {
   const fetchCalendars = async () => {
     try {
       const res = await getCalendars();
-      setCalendars(res.data || []);
+      // Фильтруем только внешние календари (не custom)
+      const externalCalendars = (res.data || []).filter(c => c.provider !== 'custom');
+      setCalendars(externalCalendars);
     } catch (error) {
       console.error('Error fetching calendars:', error);
     } finally {
