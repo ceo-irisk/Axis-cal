@@ -138,22 +138,22 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], on
             </div>
           </div>
 
-          {calendars.length > 0 && (
-            <div>
-              <Label className="text-xs text-muted-foreground">Календарь</Label>
-              <Select value={formData.calendar_id} onValueChange={(v) => setFormData({ ...formData, calendar_id: v })}>
-                <SelectTrigger className="mt-1" data-testid="event-calendar-select"><SelectValue placeholder="Выберите календарь" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Основной</SelectItem>
-                  {calendars.map(cal => (
-                    <SelectItem key={cal.id} value={cal.id}>
-                      <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cal.color }} />{cal.name}</div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+          <div>
+            <Label className="text-xs text-muted-foreground">Календарь</Label>
+            <Select value={formData.calendar_id || 'default'} onValueChange={(v) => setFormData({ ...formData, calendar_id: v === 'default' ? '' : v })}>
+              <SelectTrigger className="mt-1" data-testid="event-calendar-select"><SelectValue placeholder="Выберите календарь" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">
+                  <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-violet-500" />Основной</div>
+                </SelectItem>
+                {calendars.map(cal => (
+                  <SelectItem key={cal.id} value={cal.id}>
+                    <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cal.color }} />{cal.name}</div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
