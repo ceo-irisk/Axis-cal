@@ -3,7 +3,7 @@ import { useAuth } from '../lib/auth';
 import { useTheme } from '../lib/theme';
 import { useState, useEffect } from 'react';
 import { getCalendars, addCalendar, deleteCalendar } from '../lib/api';
-import { Sun, Moon, LogOut, Plus, Trash2, Eye, EyeOff, ChevronDown, ChevronRight, PanelLeftClose, PanelLeft, Users, Layout, Settings } from 'lucide-react';
+import { Sun, Moon, LogOut, Plus, Trash2, Eye, EyeOff, ChevronDown, ChevronRight, PanelLeftClose, PanelLeft, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 
 const CALENDAR_COLORS = [
