@@ -66,11 +66,6 @@
 /* ===== Layout ===== */
 .sidebar {
   @apply w-[260px] bg-card border-r border-border h-screen fixed left-0 top-0 z-50 flex flex-col;
-  box-shadow: 1px 0 3px rgba(0,0,0,0.03);
-}
-
-.dark .sidebar {
-  box-shadow: 1px 0 8px rgba(0,0,0,0.3);
 }
 
 .main-content {
@@ -79,11 +74,6 @@
 
 .right-panel {
   @apply w-[300px] bg-card border-l border-border h-screen fixed right-0 top-0 z-30 p-5 overflow-y-auto;
-  box-shadow: -1px 0 3px rgba(0,0,0,0.03);
-}
-
-.dark .right-panel {
-  box-shadow: -1px 0 8px rgba(0,0,0,0.3);
 }
 
 /* ===== Buttons ===== */
