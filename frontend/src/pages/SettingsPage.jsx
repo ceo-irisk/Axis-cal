@@ -252,35 +252,35 @@ export default function SettingsPage() {
             {/* Profile Section */}
             <section className="card-glass p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 rounded-xl bg-white/5">
+                <div className="p-2 rounded-xl bg-accent">
                   <Settings className="w-5 h-5" />
                 </div>
                 <div>
                   <h2 className="font-medium">Профиль</h2>
-                  <p className="text-sm text-secondary-text">
+                  <p className="text-sm text-muted-foreground">
                     Информация о вашем аккаунте
                   </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-white/5">
-                  <p className="text-sm text-secondary-text mb-1">Имя</p>
+                <div className="p-4 rounded-xl bg-accent/50">
+                  <p className="text-sm text-muted-foreground mb-1">Имя</p>
                   <p className="font-medium">{user?.name}</p>
                 </div>
-                <div className="p-4 rounded-xl bg-white/5">
-                  <p className="text-sm text-secondary-text mb-1">Email</p>
+                <div className="p-4 rounded-xl bg-accent/50">
+                  <p className="text-sm text-muted-foreground mb-1">Email</p>
                   <p className="font-medium">{user?.email}</p>
                 </div>
-                <div className="p-4 rounded-xl bg-white/5">
-                  <p className="text-sm text-secondary-text mb-1">Роль</p>
+                <div className="p-4 rounded-xl bg-accent/50">
+                  <p className="text-sm text-muted-foreground mb-1">Роль</p>
                   <p className="font-medium">
                     {user?.role === 'admin' ? 'Администратор' : 
                      user?.role === 'manager' ? 'Руководитель' : 'Помощник'}
                   </p>
                 </div>
-                <div className="p-4 rounded-xl bg-white/5">
-                  <p className="text-sm text-secondary-text mb-1">Часовой пояс</p>
+                <div className="p-4 rounded-xl bg-accent/50">
+                  <p className="text-sm text-muted-foreground mb-1">Часовой пояс</p>
                   <p className="font-medium">{selectedTimezone}</p>
                 </div>
               </div>
