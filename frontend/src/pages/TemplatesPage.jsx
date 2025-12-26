@@ -121,25 +121,35 @@ export default function TemplatesPage() {
     <div className="flex min-h-screen bg-background" data-testid="templates-page">
       <Sidebar />
       
-      <main className="main-content flex-1">
+      <main className="main-content flex-1" style={{ marginRight: 0 }}>
         <div className="max-w-5xl mx-auto">
-          <header className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-semibold tracking-tight">Шаблоны</h1>
-              <p className="text-secondary-text mt-1">
-                Создавайте шаблоны для типичных дней и недель
-              </p>
+          <header className="mb-8">
+            <button 
+              onClick={() => navigate('/')} 
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4 transition-colors"
+              data-testid="back-button"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-sm">Назад к календарю</span>
+            </button>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-semibold tracking-tight">Шаблоны</h1>
+                <p className="text-muted-foreground mt-1">
+                  Создавайте шаблоны для типичных дней и недель
+                </p>
+              </div>
+              {canManage() && (
+                <Button 
+                  onClick={() => setShowModal(true)} 
+                  className="btn-primary"
+                  data-testid="create-template-button"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Новый шаблон
+                </Button>
+              )}
             </div>
-            {canManage() && (
-              <Button 
-                onClick={() => setShowModal(true)} 
-                className="btn-primary"
-                data-testid="create-template-button"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Новый шаблон
-              </Button>
-            )}
           </header>
 
           {loading ? (
