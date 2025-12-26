@@ -199,20 +199,12 @@ export default function AdminPage() {
 
   return (
     <div className="flex min-h-screen bg-background" data-testid="admin-page">
-      <Sidebar />
+      <SettingsSidebar />
       
-      <main className="main-content flex-1" style={{ marginRight: 0 }}>
-        <div className="max-w-6xl mx-auto">
+      <main className="ml-[260px] flex-1 p-8">
+        <div className="max-w-5xl">
           <header className="mb-8">
-            <button 
-              onClick={() => navigate('/')} 
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4 transition-colors"
-              data-testid="back-button"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="text-sm">Назад к календарю</span>
-            </button>
-            <h1 className="text-3xl font-semibold tracking-tight">Панель администратора</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Пользователи</h1>
             <p className="text-muted-foreground mt-1">Управление пользователями и настройками системы</p>
           </header>
 
