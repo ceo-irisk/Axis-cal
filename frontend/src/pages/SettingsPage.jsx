@@ -116,12 +116,20 @@ export default function SettingsPage() {
     <div className="flex min-h-screen bg-background" data-testid="settings-page">
       <Sidebar />
       
-      <main className="main-content flex-1">
+      <main className="main-content flex-1" style={{ marginRight: 0 }}>
         <div className="max-w-4xl mx-auto">
           <header className="mb-8">
+            <button 
+              onClick={() => navigate('/')} 
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4 transition-colors"
+              data-testid="back-button"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-sm">Назад к календарю</span>
+            </button>
             <h1 className="text-3xl font-semibold tracking-tight">Настройки</h1>
-            <p className="text-secondary-text mt-1">
-              Управление календарями и персональными настройками
+            <p className="text-muted-foreground mt-1">
+              Управление внешними календарями и персональными настройками
             </p>
           </header>
 
