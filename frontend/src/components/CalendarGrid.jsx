@@ -122,93 +122,45 @@ const WeekView = ({ date, events, onDateClick, onEventClick }) => {
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
-  const getEventStyle = (event, dayDate) => {
+  const getEventStyle = (event) => {
     try {
       const start = parseISO(event.start_time);
       const end = parseISO(event.end_time);
       const startHour = start.getHours() + start.getMinutes() / 60;
-      const endHour = end.getHours() + end.getMinutes() / 60;
-      const duration = endHour - startHour;
-      
-      return {
-        top: `${startHour * 60}px`,
-        height: `${Math.max(duration * 60, 30)}px`,
-      };
-    } catch {
-      return { top: '0px', height: '60px' };
-    }
+      const duration = (end - start) / 3600000;
+      return { top: `${startHour * 60}px`, height: `${Math.max(duration * 60, 30)}px` };
+    } catch { return { top: '0px', height: '60px' }; }
   };
 
-  const getDayEvents = (day) => {
-    const dateStr = format(day, 'yyyy-MM-dd');
-    return events.filter(e => e.start_time?.startsWith(dateStr));
-  };
+  const getDayEvents = (day) => events.filter(e => e.start_time?.startsWith(format(day, 'yyyy-MM-dd')));
 
   return (
     <div className="card-glass overflow-hidden" data-testid="week-view">
-      {/* Header */}
-      <div className="grid grid-cols-8 border-b border-[var(--border)]">
-        <div className="p-3 text-center text-sm text-[var(--secondary-text)]">
-          <span className="font-mono">GMT+3</span>
-        </div>
+      <div className="grid grid-cols-8 border-b border-border/50">
+        <div className="p-3 text-center text-xs text-muted-foreground font-mono">GMT+3</div>
         {days.map(day => (
-          <button
-            key={day.toISOString()}
-            onClick={() => onDateClick(day)}
-            className={`p-3 text-center hover:bg-[var(--accent-secondary)] transition-colors ${isToday(day) ? 'bg-[var(--accent-secondary)]' : ''}`}
-          >
-            <p className="text-xs text-[var(--secondary-text)]">{format(day, 'EEE', { locale: ru })}</p>
-            <p className={`text-lg font-medium ${isToday(day) ? 'text-[var(--primary-text)]' : 'text-[var(--primary-text)]'}`}>{format(day, 'd')}</p>
+          <button key={day.toISOString()} onClick={() => onDateClick(day)} className={`p-3 text-center hover:bg-accent/50 transition-colors ${isToday(day) ? 'bg-accent/50' : ''}`}>
+            <p className="text-xs text-muted-foreground">{format(day, 'EEE', { locale: ru })}</p>
+            <p className="text-lg font-medium">{format(day, 'd')}</p>
           </button>
         ))}
       </div>
-
-      {/* Time grid */}
       <div className="grid grid-cols-8 max-h-[600px] overflow-y-auto">
-        {/* Time column */}
-        <div className="border-r border-[var(--border)]">
+        <div className="border-r border-border/30">
           {hours.map(hour => (
-            <div key={hour} className="h-[60px] px-2 py-1 text-right text-xs text-[var(--secondary-text)] font-mono">
-              {String(hour).padStart(2, '0')}:00
-            </div>
+            <div key={hour} className="h-[60px] px-2 py-1 text-right text-xs text-muted-foreground/70 font-mono">{String(hour).padStart(2, '0')}:00</div>
           ))}
         </div>
-
-        {/* Day columns */}
         {days.map(day => {
           const dayEvents = getDayEvents(day);
           return (
-            <div key={day.toISOString()} className="relative border-r border-[var(--border)]">
-              {hours.map(hour => (
-                <div key={hour} className="h-[60px] border-b border-[var(--border)]" />
-              ))}
-              
-              {/* Current time indicator */}
-              {isToday(day) && (
-                <div 
-                  className="current-time-line"
-                  style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60) * 60}px` }}
-                />
-              )}
-
-              {/* Events */}
+            <div key={day.toISOString()} className="relative border-r border-border/30">
+              {hours.map(hour => <div key={hour} className="h-[60px] border-b border-border/30" />)}
+              {isToday(day) && <div className="current-time-line" style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60) * 60}px` }} />}
               {dayEvents.map(event => (
-                <div
-                  key={event.id}
-                  onClick={() => onEventClick(event)}
-                  className={`
-                    absolute left-1 right-1 px-2 py-1 rounded cursor-pointer
-                    border-l-2 overflow-hidden transition-opacity hover:opacity-80
-                    ${EVENT_COLORS[event.event_type] || EVENT_COLORS.meeting}
-                    ${event.status === 'tentative' ? 'event-tentative' : ''}
-                  `}
-                  style={getEventStyle(event, day)}
-                  data-testid={`event-${event.id}`}
-                >
+                <div key={event.id} onClick={() => onEventClick(event)} className={`absolute left-1 right-1 px-2 py-1 rounded cursor-pointer overflow-hidden hover:opacity-80 ${EVENT_COLORS[event.event_type]} ${event.status === 'tentative' && 'event-tentative'}`} style={getEventStyle(event)} data-testid={`event-${event.id}`}>
                   <p className="text-xs font-medium truncate">{event.title}</p>
-                  <p className="text-xs opacity-70 font-mono">
-                    {event.start_time?.slice(11, 16)}
-                  </p>
+                  <p className="text-xs opacity-70 font-mono">{event.start_time?.slice(11, 16)}</p>
                 </div>
               ))}
             </div>
