@@ -137,28 +137,28 @@ export default function SettingsPage() {
             {/* Timezone Section */}
             <section className="card-glass p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 rounded-xl bg-white/5">
+                <div className="p-2 rounded-xl bg-accent">
                   <Globe className="w-5 h-5" />
                 </div>
                 <div>
                   <h2 className="font-medium">Часовой пояс</h2>
-                  <p className="text-sm text-secondary-text">
+                  <p className="text-sm text-muted-foreground">
                     Все события будут отображаться в выбранном часовом поясе
                   </p>
                 </div>
               </div>
 
               <Select value={selectedTimezone} onValueChange={handleTimezoneChange}>
-                <SelectTrigger className="w-full md:w-80 bg-white/5 border-white/10" data-testid="timezone-select">
+                <SelectTrigger className="w-full md:w-80" data-testid="timezone-select">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {TIMEZONES.map(tz => (
                     <SelectItem key={tz.value} value={tz.value}>
                       <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-secondary-text" />
+                        <Clock className="w-4 h-4 text-muted-foreground" />
                         <span>{tz.label}</span>
-                        <span className="text-secondary-text font-mono text-xs">{tz.offset}</span>
+                        <span className="text-muted-foreground font-mono text-xs">{tz.offset}</span>
                       </div>
                     </SelectItem>
                   ))}
