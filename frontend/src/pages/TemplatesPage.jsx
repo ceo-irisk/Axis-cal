@@ -7,7 +7,7 @@ import {
   deleteTemplate, 
   applyTemplate 
 } from '../lib/api';
-import Sidebar from '../components/Sidebar';
+import SettingsSidebar from '../components/SettingsSidebar';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
