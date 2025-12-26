@@ -7,6 +7,8 @@ import CalendarPage from './pages/CalendarPage';
 import AdminPage from './pages/AdminPage';
 import TemplatesPage from './pages/TemplatesPage';
 import SettingsPage from './pages/SettingsPage';
+import SettingsCalendarsPage from './pages/SettingsCalendarsPage';
+import SettingsProfilePage from './pages/SettingsProfilePage';
 import './App.css';
 
 // Protected Route component
