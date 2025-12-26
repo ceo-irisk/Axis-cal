@@ -71,14 +71,11 @@
 
 .main-content {
   @apply ml-[260px] min-h-screen p-6 bg-background transition-all duration-300;
-}
-
-.has-right-panel .main-content {
-  @apply mr-[300px];
+  margin-right: 320px;
 }
 
 .right-panel {
-  @apply w-[300px] bg-card border-l border-border h-screen fixed right-0 top-0 z-30 p-5 overflow-y-auto;
+  @apply w-[320px] bg-card border-l border-border h-screen fixed right-0 top-0 z-20 p-5 overflow-y-auto;
 }
 
 /* ===== Buttons ===== */
