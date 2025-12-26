@@ -183,12 +183,11 @@
 }
 
 @media (max-width: 1024px) {
-  .sidebar { @apply w-[70px]; }
-  .main-content { @apply ml-[70px]; }
+  .sidebar { @apply -translate-x-full; }
+  .sidebar.open { @apply translate-x-0; }
+  .main-content { @apply ml-0; }
 }
 
 @media (max-width: 768px) {
-  .sidebar { @apply -translate-x-full transition-transform duration-300; }
-  .sidebar.open { @apply translate-x-0; }
-  .main-content { @apply ml-0 p-4; }
+  .main-content { @apply p-4; }
 }
