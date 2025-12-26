@@ -204,32 +204,10 @@ export const Sidebar = ({ isOpen, onClose, onCalendarsChange, collapsed, onToggl
           <div className="p-4 border-t border-border space-y-2">
             {!collapsed && (
               <>
-                {/* Admin panel link - only for admins */}
-                {user?.role === 'admin' && (
-                  <NavLink 
-                    to="/admin" 
-                    className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${isActive ? 'bg-accent text-foreground font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'}`}
-                    data-testid="nav-admin"
-                  >
-                    <Users className="w-5 h-5" />
-                    Пользователи
-                  </NavLink>
-                )}
-
-                {/* Templates link */}
-                <NavLink 
-                  to="/templates" 
-                  className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${isActive ? 'bg-accent text-foreground font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'}`}
-                  data-testid="nav-templates"
-                >
-                  <Layout className="w-5 h-5" />
-                  Шаблоны
-                </NavLink>
-
                 {/* Settings link */}
                 <NavLink 
-                  to="/settings" 
-                  className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${isActive ? 'bg-accent text-foreground font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'}`}
+                  to="/settings/calendars" 
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50"
                   data-testid="nav-settings"
                 >
                   <Settings className="w-5 h-5" />
