@@ -57,10 +57,10 @@ export default function LoginPage() {
               <Calendar className="w-8 h-8 text-[var(--primary-text)]" strokeWidth={1.5} />
             </div>
             <h1 className="text-2xl font-semibold tracking-tight mb-2 text-[var(--primary-text)]">
-              Executive Calendar
+              Axis
             </h1>
             <p className="text-[var(--secondary-text)] text-sm">
-              Вход в систему управления календарём
+              Вход в систему
             </p>
           </div>
 
