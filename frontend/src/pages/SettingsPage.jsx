@@ -314,9 +314,9 @@ function AddCalendarModal({ open, onClose, onSave }) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="glass-heavy border-white/10 max-w-md" data-testid="add-calendar-modal">
+      <DialogContent className="max-w-md" data-testid="add-calendar-modal">
         <DialogHeader>
-          <DialogTitle>Добавить календарь</DialogTitle>
+          <DialogTitle>Подключить внешний календарь</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -326,7 +326,7 @@ function AddCalendarModal({ open, onClose, onSave }) {
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="Рабочий календарь"
               required
-              className="mt-1.5 bg-white/5 border-white/10"
+              className="mt-1.5"
               data-testid="calendar-name-input"
             />
           </div>
@@ -337,7 +337,7 @@ function AddCalendarModal({ open, onClose, onSave }) {
               value={formData.provider} 
               onValueChange={(v) => setFormData({ ...formData, provider: v })}
             >
-              <SelectTrigger className="mt-1.5 bg-white/5 border-white/10" data-testid="calendar-provider-select">
+              <SelectTrigger className="mt-1.5" data-testid="calendar-provider-select">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -362,7 +362,7 @@ function AddCalendarModal({ open, onClose, onSave }) {
                   type="button"
                   onClick={() => setFormData({ ...formData, color: color.value })}
                   className={`w-8 h-8 rounded-full transition-transform ${
-                    formData.color === color.value ? 'ring-2 ring-white ring-offset-2 ring-offset-black scale-110' : ''
+                    formData.color === color.value ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-110' : ''
                   }`}
                   style={{ backgroundColor: color.value }}
                   title={color.label}
@@ -376,7 +376,7 @@ function AddCalendarModal({ open, onClose, onSave }) {
               Отмена
             </Button>
             <Button type="submit" className="btn-primary" data-testid="save-calendar-button">
-              Добавить
+              Подключить
             </Button>
           </DialogFooter>
         </form>
