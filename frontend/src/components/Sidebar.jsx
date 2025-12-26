@@ -63,6 +63,10 @@ export const Sidebar = ({ isOpen, onClose, onCalendarsChange, collapsed, onToggl
     });
   };
 
+  // Разделяем календари на "мои" (custom) и "внешние" (google, yandex и т.д.)
+  const myCalendars = calendars.filter(c => c.provider === 'custom');
+  const externalCalendars = calendars.filter(c => c.provider !== 'custom');
+
   const handleLogout = () => { logout(); navigate('/login'); };
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
@@ -70,30 +74,45 @@ export const Sidebar = ({ isOpen, onClose, onCalendarsChange, collapsed, onToggl
     <>
       {isOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={onClose} />}
       
-      <aside className={`sidebar ${isOpen ? 'open' : ''}`} data-testid="sidebar">
+      <aside className={`sidebar ${isOpen ? 'open' : ''} ${collapsed ? 'collapsed' : ''}`} data-testid="sidebar">
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="p-5 border-b border-border">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-                <span className="text-white font-bold text-sm">A</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">A</span>
+                </div>
+                {!collapsed && (
+                  <div>
+                    <h2 className="font-semibold text-sm">Axis</h2>
+                    <p className="text-xs text-muted-foreground">Calendar</p>
+                  </div>
+                )}
               </div>
-              <div>
-                <h2 className="font-semibold text-sm">Axis</h2>
-                <p className="text-xs text-muted-foreground">Calendar</p>
-              </div>
+              {onToggleCollapse && (
+                <button 
+                  onClick={onToggleCollapse} 
+                  className="p-1.5 rounded-lg hover:bg-accent hidden lg:flex"
+                  title={collapsed ? 'Развернуть' : 'Свернуть'}
+                  data-testid="toggle-sidebar"
+                >
+                  {collapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+                </button>
+              )}
             </div>
           </div>
 
           {/* Calendars section */}
           <div className="flex-1 overflow-y-auto p-4">
-            <button onClick={() => setExpanded(!expanded)} className="flex items-center justify-between w-full text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3 hover:text-foreground">
-              <span>Мои календари</span>
-              {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            {/* Мои календари */}
+            <button onClick={() => setMyCalendarsExpanded(!myCalendarsExpanded)} className="flex items-center justify-between w-full text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3 hover:text-foreground">
+              {!collapsed && <span>Мои календари</span>}
+              {!collapsed && (myCalendarsExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />)}
             </button>
 
-            {expanded && (
-              <div className="space-y-1">
+            {myCalendarsExpanded && !collapsed && (
+              <div className="space-y-1 mb-6">
                 {/* Default calendar */}
                 <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-accent/50 group">
                   <div className="w-3 h-3 rounded-full bg-violet-500" />
@@ -101,7 +120,7 @@ export const Sidebar = ({ isOpen, onClose, onCalendarsChange, collapsed, onToggl
                   <Eye className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100" />
                 </div>
 
-                {calendars.map(cal => (
+                {myCalendars.map(cal => (
                   <div key={cal.id} className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-accent/50 group" data-testid={`sidebar-cal-${cal.id}`}>
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cal.color }} />
                     <span className={`text-sm flex-1 ${hiddenCalendars.has(cal.id) ? 'line-through text-muted-foreground' : ''}`}>{cal.name}</span>
@@ -143,6 +162,41 @@ export const Sidebar = ({ isOpen, onClose, onCalendarsChange, collapsed, onToggl
                   </button>
                 )}
               </div>
+            )}
+
+            {/* Внешние календари */}
+            {!collapsed && (
+              <>
+                <button onClick={() => setExternalCalendarsExpanded(!externalCalendarsExpanded)} className="flex items-center justify-between w-full text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3 hover:text-foreground">
+                  <span>Внешние календари</span>
+                  {externalCalendarsExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                </button>
+
+                {externalCalendarsExpanded && (
+                  <div className="space-y-1">
+                    {externalCalendars.length === 0 ? (
+                      <p className="text-xs text-muted-foreground px-2 py-2">Нет подключённых календарей</p>
+                    ) : (
+                      externalCalendars.map(cal => (
+                        <div key={cal.id} className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-accent/50 group">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cal.color }} />
+                          <span className={`text-sm flex-1 ${hiddenCalendars.has(cal.id) ? 'line-through text-muted-foreground' : ''}`}>{cal.name}</span>
+                          <button onClick={() => toggleCalendarVisibility(cal.id)} className="opacity-0 group-hover:opacity-100">
+                            {hiddenCalendars.has(cal.id) ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4 text-muted-foreground" />}
+                          </button>
+                        </div>
+                      ))
+                    )}
+                    <NavLink 
+                      to="/settings" 
+                      className="flex items-center gap-2 w-full px-2 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Подключить
+                    </NavLink>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
