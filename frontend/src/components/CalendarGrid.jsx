@@ -526,7 +526,6 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                         absolute px-1 py-1 rounded-md text-xs cursor-pointer 
                         hover:opacity-90 transition-opacity overflow-hidden group
                         ${eventColorClass}
-                        ${isTemplate ? 'ring-2 ring-[#085C53] ring-inset' : ''}
                         ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
                       `} 
                       style={{...getEventStyle(event), ...overlapStyle}} 
