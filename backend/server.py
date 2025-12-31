@@ -944,6 +944,12 @@ async def create_event_type(name: str, label: str, color: str, admin: dict = Dep
     await db.event_types.insert_one(type_dict)
     return {k: v for k, v in type_dict.items() if k != "_id"}
 
+@api_router.put("/dictionaries/event-types/reorder")
+async def reorder_event_types(request: EventTypeReorderRequest, admin: dict = Depends(require_admin)):
+    for idx, type_id in enumerate(request.type_ids):
+        await db.event_types.update_one({"id": type_id}, {"$set": {"order": idx}})
+    return {"message": "Event types reordered"}
+
 @api_router.put("/dictionaries/event-types/{type_id}")
 async def update_event_type(type_id: str, name: str, label: str, color: str, order: int = 0, is_active: bool = True, admin: dict = Depends(require_admin)):
     result = await db.event_types.update_one(
@@ -962,12 +968,6 @@ async def delete_event_type(type_id: str, admin: dict = Depends(require_admin)):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Event type not found")
     return {"message": "Event type deleted"}
-
-@api_router.put("/dictionaries/event-types/reorder")
-async def reorder_event_types(request: EventTypeReorderRequest, admin: dict = Depends(require_admin)):
-    for idx, type_id in enumerate(request.type_ids):
-        await db.event_types.update_one({"id": type_id}, {"$set": {"order": idx}})
-    return {"message": "Event types reordered"}
 
 # ==================== EVENT STATUSES DICTIONARY ====================
 
