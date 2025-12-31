@@ -6,7 +6,7 @@ import { login } from '../lib/api';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Calendar, Lock, Mail, AlertCircle, Sun, Moon } from 'lucide-react';
+import { Lock, Mail, AlertCircle, Sun, Moon } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -53,8 +53,8 @@ export default function LoginPage() {
       <div className="relative w-full max-w-md animate-fade-in">
         <div className="card-glass rounded-3xl p-8">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[var(--accent-secondary)] mb-4">
-              <Calendar className="w-8 h-8 text-[var(--primary-text)]" strokeWidth={1.5} />
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl mb-4 overflow-hidden">
+              <img src="/logo.png" alt="Axis" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-2xl font-semibold tracking-tight mb-2 text-[var(--primary-text)]">
               Axis
@@ -85,7 +85,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@company.com"
                   required
-                  className="pl-10 h-12 bg-[var(--surface)] border-[var(--border-strong)] rounded-xl focus:border-[var(--accent-primary)] focus:ring-0"
+                  className="pl-10 h-12 bg-[var(--surface)] border-[var(--border-strong)] rounded-xl focus:border-[#085C53] focus:ring-0"
                   data-testid="login-email-input"
                 />
               </div>
@@ -104,7 +104,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="pl-10 h-12 bg-[var(--surface)] border-[var(--border-strong)] rounded-xl focus:border-[var(--accent-primary)] focus:ring-0"
+                  className="pl-10 h-12 bg-[var(--surface)] border-[var(--border-strong)] rounded-xl focus:border-[#085C53] focus:ring-0"
                   data-testid="login-password-input"
                 />
               </div>
@@ -113,7 +113,7 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-12 rounded-full bg-[var(--accent-primary)] text-[var(--background)] hover:opacity-90 font-medium transition-opacity"
+              className="w-full h-12 rounded-full bg-[#085C53] text-white hover:bg-[#074a44] font-medium transition-opacity"
               data-testid="login-submit-button"
             >
               {loading ? (
