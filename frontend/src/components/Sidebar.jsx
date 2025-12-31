@@ -129,9 +129,116 @@ export const Sidebar = ({
     } catch (e) { console.error(e); }
   };
 
+  const fetchDictionaries = async () => {
+    try {
+      const [typesRes, statusesRes, templatesRes] = await Promise.all([
+        getEventTypes(),
+        getEventStatuses(),
+        getTemplates()
+      ]);
+      setEventTypes(typesRes.data || []);
+      setEventStatuses(statusesRes.data || []);
+      setTemplates(templatesRes.data || []);
+    } catch (e) { console.error(e); }
+  };
+
   useEffect(() => {
     fetchCalendars();
+    fetchDictionaries();
   }, []);
+
+  // Event Types handlers
+  const handleSaveEventType = async (data) => {
+    try {
+      if (editingType?.id && !editingType.id.startsWith('default-')) {
+        await updateEventType(editingType.id, data.name, data.label, data.color, data.order || 0);
+        toast.success('Тип события обновлён');
+      } else {
+        await createEventType(data.name, data.label, data.color);
+        toast.success('Тип события создан');
+      }
+      setShowTypeModal(false);
+      setEditingType(null);
+      fetchDictionaries();
+    } catch (e) { toast.error('Ошибка сохранения'); }
+  };
+
+  const handleDeleteEventType = async (id) => {
+    if (id.startsWith('default-')) {
+      toast.error('Нельзя удалить стандартный тип');
+      return;
+    }
+    if (!confirm('Удалить тип события?')) return;
+    try {
+      await deleteEventType(id);
+      toast.success('Тип события удалён');
+      fetchDictionaries();
+    } catch (e) { toast.error('Ошибка удаления'); }
+  };
+
+  // Event Statuses handlers
+  const handleSaveEventStatus = async (data) => {
+    try {
+      if (editingStatus?.id && !editingStatus.id.startsWith('default-')) {
+        await updateEventStatus(editingStatus.id, data.name, data.label, data.color, data.order || 0);
+        toast.success('Статус события обновлён');
+      } else {
+        await createEventStatus(data.name, data.label, data.color);
+        toast.success('Статус события создан');
+      }
+      setShowStatusModal(false);
+      setEditingStatus(null);
+      fetchDictionaries();
+    } catch (e) { toast.error('Ошибка сохранения'); }
+  };
+
+  const handleDeleteEventStatus = async (id) => {
+    if (id.startsWith('default-')) {
+      toast.error('Нельзя удалить стандартный статус');
+      return;
+    }
+    if (!confirm('Удалить статус события?')) return;
+    try {
+      await deleteEventStatus(id);
+      toast.success('Статус события удалён');
+      fetchDictionaries();
+    } catch (e) { toast.error('Ошибка удаления'); }
+  };
+
+  // Templates handlers
+  const handleSaveTemplate = async (data) => {
+    try {
+      if (editingTemplate?.id) {
+        await updateTemplate(editingTemplate.id, data);
+        toast.success('Шаблон обновлён');
+      } else {
+        await createTemplate(data);
+        toast.success('Шаблон создан');
+      }
+      setShowTemplateModal(false);
+      setEditingTemplate(null);
+      fetchDictionaries();
+    } catch (e) { toast.error('Ошибка сохранения'); }
+  };
+
+  const handleDeleteTemplate = async (id) => {
+    if (!confirm('Удалить шаблон?')) return;
+    try {
+      await deleteTemplate(id);
+      toast.success('Шаблон удалён');
+      fetchDictionaries();
+    } catch (e) { toast.error('Ошибка удаления'); }
+  };
+
+  const handleApplyTemplate = async () => {
+    if (!selectedTemplateForApply || !applyDate) return;
+    try {
+      const result = await applyTemplate(selectedTemplateForApply.id, applyDate);
+      toast.success(`Создано ${result.data.created_events?.length || 0} событий`);
+      setShowApplyModal(false);
+      setSelectedTemplateForApply(null);
+    } catch (e) { toast.error('Ошибка применения шаблона'); }
+  };
 
   const handleAddCalendar = async () => {
     if (!newCalName.trim()) return;
