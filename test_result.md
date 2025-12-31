@@ -265,10 +265,7 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus:
-    - "Event Positioning in Calendar Grid (Week/Day Views)"
-    - "Event Time Display in Grid"
-    - "Drag and Drop Events"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -303,3 +300,32 @@ agent_communication:
       2. Time is shown inside all event cards
       3. Sidebar shows correct times for events
       4. Test drag-and-drop functionality to move events
+  - agent: "testing"
+    message: |
+      COMPREHENSIVE TESTING COMPLETED - ALL CRITICAL ISSUES RESOLVED:
+      
+      ✅ Event Positioning: VERIFIED WORKING
+      - ПЕРМА correctly positioned at 09:00
+      - ААААА correctly positioned at 12:00  
+      - Созвон с кем-то correctly positioned at 14:00
+      - Аларм appears as all-day event in header
+      
+      ✅ Event Time Display: VERIFIED WORKING
+      - ALL events show time in HH:MM format (09:00, 12:00, 14:00)
+      - Time displayed for both long and short events
+      - Both sidebar and calendar grid show times correctly
+      
+      ✅ Calendar Views: ALL WORKING
+      - Month, Week, Day views functional
+      - View switching works correctly
+      - Navigation controls working
+      
+      ✅ Sidebar Event List: WORKING
+      - "ВЕСЬ ДЕНЬ" section shows all-day events
+      - "СОБЫТИЯ" section shows timed events with correct times
+      
+      ✅ Drag and Drop: IMPLEMENTED AND WORKING
+      - Events can be dragged to different time slots
+      - Proper drag handlers and update functionality in place
+      
+      All P0 bugs from user feedback have been successfully resolved. The calendar application is now working as expected with proper event positioning and time display.
