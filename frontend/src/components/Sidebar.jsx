@@ -100,9 +100,26 @@ export const Sidebar = ({
   const [newCalColor, setNewCalColor] = useState('#8b5cf6');
   const [hiddenCalendars, setHiddenCalendars] = useState(new Set());
   const [activeTab, setActiveTab] = useState(TABS.EVENTS);
+  const [settingsTab, setSettingsTab] = useState(SETTINGS_TABS.TEMPLATES);
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [hoveredStar, setHoveredStar] = useState(0);
   const [ratingNotes, setRatingNotes] = useState('');
+  
+  // Dictionaries state
+  const [eventTypes, setEventTypes] = useState([]);
+  const [eventStatuses, setEventStatuses] = useState([]);
+  const [templates, setTemplates] = useState([]);
+  
+  // Edit modals
+  const [showTypeModal, setShowTypeModal] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [showApplyModal, setShowApplyModal] = useState(false);
+  const [editingType, setEditingType] = useState(null);
+  const [editingStatus, setEditingStatus] = useState(null);
+  const [editingTemplate, setEditingTemplate] = useState(null);
+  const [selectedTemplateForApply, setSelectedTemplateForApply] = useState(null);
+  const [applyDate, setApplyDate] = useState(format(new Date(), 'yyyy-MM-dd'));
 
   const fetchCalendars = async () => {
     try {
