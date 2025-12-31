@@ -105,14 +105,15 @@ const TemplateSelector = ({ day, templates, onApplyTemplate }) => {
   );
 };
 
-export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, templates, overloadedDays, ratings, view, onDateClick, onCellDoubleClick, onEventClick, onEventUpdate, onApplyTemplate, onEventDelete, selectedEventId, onEventSelect, loading, selectedTimezone, onTimezoneChange }) => {
+export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, templates, overloadedDays, ratings, view, onDateClick, onCellDoubleClick, onEventClick, onEventUpdate, onApplyTemplate, onEventDelete, selectedEventId, onEventSelect, loading, selectedTimezone, onTimezoneChange, customTimezones = [] }) => {
   // Calculate timezone shift
   const localOffset = getLocalTimezoneOffset();
-  const selectedTz = TIMEZONES.find(tz => tz.value === selectedTimezone);
+  const allTimezones = [...TIMEZONES, ...customTimezones];
+  const selectedTz = allTimezones.find(tz => tz.value === selectedTimezone);
   const timezoneShift = selectedTz ? selectedTz.offset - localOffset : 0;
 
-  if (view === 'day') return <DayView date={selectedDate} events={events} templates={templates} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} timezoneShift={timezoneShift} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} />;
-  if (view === 'week') return <WeekView date={selectedDate} events={events} templates={templates} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} timezoneShift={timezoneShift} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} />;
+  if (view === 'day') return <DayView date={selectedDate} events={events} templates={templates} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} timezoneShift={timezoneShift} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} />;
+  if (view === 'week') return <WeekView date={selectedDate} events={events} templates={templates} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} timezoneShift={timezoneShift} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} />;
   return <MonthView currentDate={currentDate} selectedDate={selectedDate} events={events} overloadedDays={overloadedDays} ratings={ratings} onDateClick={onDateClick} onCellDoubleClick={onCellDoubleClick} onEventClick={onEventClick} selectedEventId={selectedEventId} onEventSelect={onEventSelect} />;
 };
 
