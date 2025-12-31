@@ -1,0 +1,69 @@
+{
+  "timestamp": "2025-12-31T02:25:04.912284",
+  "total_tests": 10,
+  "passed_tests": 10,
+  "failed_tests": 0,
+  "success_rate": 100.0,
+  "test_results": [
+    {
+      "test": "Auth - Login with admin@example.com",
+      "success": true,
+      "details": "User: \u0410\u0434\u043c\u0438\u043d\u0438\u0441\u0442\u0440\u0430\u0442\u043e\u0440, Role: admin",
+      "response_data": null
+    },
+    {
+      "test": "Events - GET /api/events",
+      "success": true,
+      "details": "Retrieved 17 events",
+      "response_data": null
+    },
+    {
+      "test": "Events - Found unconfirmed events",
+      "success": true,
+      "details": "Found 2 unconfirmed events including '\u0421\u043e\u0437\u0432\u043e\u043d \u0441 \u043a\u0435\u043c-\u0442\u043e'",
+      "response_data": null
+    },
+    {
+      "test": "Events - Time fields present",
+      "success": true,
+      "details": "17/17 events have time fields",
+      "response_data": null
+    },
+    {
+      "test": "Events - PUT /api/events/{id} (resize simulation)",
+      "success": true,
+      "details": "Successfully updated event 1f56e842-309b-4375-9b27-14ae853d0d6f",
+      "response_data": null
+    },
+    {
+      "test": "Templates - GET /api/templates",
+      "success": true,
+      "details": "Retrieved 1 templates",
+      "response_data": null
+    },
+    {
+      "test": "Templates - Template structure for selector",
+      "success": true,
+      "details": "Template has required fields: ['id', 'name', 'template_type']",
+      "response_data": null
+    },
+    {
+      "test": "Templates - POST /api/templates/{id}/apply",
+      "success": true,
+      "details": "Applied template, created 2 events",
+      "response_data": null
+    },
+    {
+      "test": "Events - '\u0421\u043e\u0437\u0432\u043e\u043d \u0441 \u043a\u0435\u043c-\u0442\u043e' unconfirmed status",
+      "success": true,
+      "details": "is_unconfirmed: True, status: confirmed",
+      "response_data": null
+    },
+    {
+      "test": "Events - Proper time format for display",
+      "success": true,
+      "details": "17/17 events have proper time format",
+      "response_data": null
+    }
+  ]
+}
