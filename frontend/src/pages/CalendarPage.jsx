@@ -35,10 +35,37 @@ export default function CalendarPage() {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedEventId, setSelectedEventId] = useState(null);
   const [showEventModal, setShowEventModal] = useState(false);
   const [showSurveyModal, setShowSurveyModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [defaultEventTime, setDefaultEventTime] = useState(null);
+
+  // Handle keyboard events for deleting selected event
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Backspace' && selectedEventId && !showEventModal) {
+        e.preventDefault();
+        const eventToDelete = events.find(ev => ev.id === selectedEventId);
+        if (eventToDelete) {
+          if (confirm(`Удалить событие "${eventToDelete.title}"?`)) {
+            handleDeleteEvent(selectedEventId);
+          }
+        }
+      }
+      // Escape to deselect
+      if (e.key === 'Escape') {
+        setSelectedEventId(null);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedEventId, events, showEventModal]);
+
+  const handleEventSelect = (eventId) => {
+    setSelectedEventId(eventId === selectedEventId ? null : eventId);
+  };
 
   const fetchData = useCallback(async () => {
     setLoading(true);
