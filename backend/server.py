@@ -908,6 +908,134 @@ async def get_overloaded_days(start_date: str, end_date: str, user: dict = Depen
     
     return overloaded
 
+# ==================== TEMPLATE UPDATE ROUTE ====================
+
+@api_router.put("/templates/{template_id}")
+async def update_template(template_id: str, name: str, template_type: str, events: List[Dict[str, Any]], user: dict = Depends(get_current_user)):
+    existing = await db.templates.find_one({"id": template_id}, {"_id": 0})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Template not found")
+    
+    result = await db.templates.update_one(
+        {"id": template_id},
+        {"$set": {
+            "name": name,
+            "template_type": template_type,
+            "events": events,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    updated = await db.templates.find_one({"id": template_id}, {"_id": 0})
+    return updated
+
+# ==================== EVENT TYPES DICTIONARY ====================
+
+@api_router.get("/dictionaries/event-types")
+async def get_event_types(user: dict = Depends(get_current_user)):
+    types = await db.event_types.find({}, {"_id": 0}).sort("order", 1).to_list(50)
+    if not types:
+        # Return default types if none exist
+        return [
+            {"id": "default-meeting", "name": "meeting", "label": "Встреча", "color": "#8b5cf6", "order": 0, "is_active": True},
+            {"id": "default-call", "name": "call", "label": "Звонок", "color": "#06b6d4", "order": 1, "is_active": True},
+            {"id": "default-personal", "name": "personal", "label": "Личное", "color": "#f59e0b", "order": 2, "is_active": True},
+            {"id": "default-urgent", "name": "urgent", "label": "Срочно", "color": "#ef4444", "order": 3, "is_active": True},
+            {"id": "default-travel", "name": "travel", "label": "Поездка", "color": "#10b981", "order": 4, "is_active": True},
+            {"id": "default-deep_work", "name": "deep_work", "label": "Глубокая работа", "color": "#6366f1", "order": 5, "is_active": True},
+        ]
+    return types
+
+@api_router.post("/dictionaries/event-types")
+async def create_event_type(name: str, label: str, color: str, admin: dict = Depends(require_admin)):
+    max_order = await db.event_types.find_one(sort=[("order", -1)])
+    new_order = (max_order.get("order", 0) if max_order else 0) + 1
+    
+    type_dict = {
+        "id": str(uuid.uuid4()),
+        "name": name,
+        "label": label,
+        "color": color,
+        "order": new_order,
+        "is_active": True
+    }
+    await db.event_types.insert_one(type_dict)
+    return {k: v for k, v in type_dict.items() if k != "_id"}
+
+@api_router.put("/dictionaries/event-types/{type_id}")
+async def update_event_type(type_id: str, name: str, label: str, color: str, order: int = 0, is_active: bool = True, admin: dict = Depends(require_admin)):
+    result = await db.event_types.update_one(
+        {"id": type_id},
+        {"$set": {"name": name, "label": label, "color": color, "order": order, "is_active": is_active}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Event type not found")
+    
+    updated = await db.event_types.find_one({"id": type_id}, {"_id": 0})
+    return updated
+
+@api_router.delete("/dictionaries/event-types/{type_id}")
+async def delete_event_type(type_id: str, admin: dict = Depends(require_admin)):
+    result = await db.event_types.delete_one({"id": type_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Event type not found")
+    return {"message": "Event type deleted"}
+
+@api_router.put("/dictionaries/event-types/reorder")
+async def reorder_event_types(type_ids: List[str], admin: dict = Depends(require_admin)):
+    for idx, type_id in enumerate(type_ids):
+        await db.event_types.update_one({"id": type_id}, {"$set": {"order": idx}})
+    return {"message": "Event types reordered"}
+
+# ==================== EVENT STATUSES DICTIONARY ====================
+
+@api_router.get("/dictionaries/event-statuses")
+async def get_event_statuses(user: dict = Depends(get_current_user)):
+    statuses = await db.event_statuses.find({}, {"_id": 0}).sort("order", 1).to_list(50)
+    if not statuses:
+        # Return default statuses if none exist
+        return [
+            {"id": "default-confirmed", "name": "confirmed", "label": "Подтверждено", "color": "#10b981", "order": 0, "is_active": True},
+            {"id": "default-tentative", "name": "tentative", "label": "Не подтверждено", "color": "#f59e0b", "order": 1, "is_active": True},
+            {"id": "default-cancelled", "name": "cancelled", "label": "Отменено", "color": "#ef4444", "order": 2, "is_active": True},
+        ]
+    return statuses
+
+@api_router.post("/dictionaries/event-statuses")
+async def create_event_status(name: str, label: str, color: str, admin: dict = Depends(require_admin)):
+    max_order = await db.event_statuses.find_one(sort=[("order", -1)])
+    new_order = (max_order.get("order", 0) if max_order else 0) + 1
+    
+    status_dict = {
+        "id": str(uuid.uuid4()),
+        "name": name,
+        "label": label,
+        "color": color,
+        "order": new_order,
+        "is_active": True
+    }
+    await db.event_statuses.insert_one(status_dict)
+    return {k: v for k, v in status_dict.items() if k != "_id"}
+
+@api_router.put("/dictionaries/event-statuses/{status_id}")
+async def update_event_status(status_id: str, name: str, label: str, color: str, order: int = 0, is_active: bool = True, admin: dict = Depends(require_admin)):
+    result = await db.event_statuses.update_one(
+        {"id": status_id},
+        {"$set": {"name": name, "label": label, "color": color, "order": order, "is_active": is_active}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Event status not found")
+    
+    updated = await db.event_statuses.find_one({"id": status_id}, {"_id": 0})
+    return updated
+
+@api_router.delete("/dictionaries/event-statuses/{status_id}")
+async def delete_event_status(status_id: str, admin: dict = Depends(require_admin)):
+    result = await db.event_statuses.delete_one({"id": status_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Event status not found")
+    return {"message": "Event status deleted"}
+
 # ==================== HEALTH CHECK ====================
 
 @api_router.get("/")
