@@ -414,6 +414,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
               <div className="min-h-[24px] px-1 pb-1 space-y-0.5 overflow-hidden">
                 {getAllDayEvents(day).map(event => {
                   const isUnconfirmed = event.status === 'tentative';
+                  const isTemplate = event.is_template_event;
                   const eventColorClass = isUnconfirmed 
                     ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
                     : (EVENT_COLORS[event.event_type] || 'event-meeting');
