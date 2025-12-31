@@ -233,23 +233,44 @@ const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick, 
   };
 
   // Resize handlers
-  const handleResizeStart = (e, event) => {
+  const handleResizeStart = (e, event, day) => {
     e.stopPropagation();
     e.preventDefault();
-    setResizingEvent(event);
+    
+    const startY = e.clientY;
+    const eventStart = new Date(event.start_time);
+    const eventEnd = new Date(event.end_time);
+    const originalDuration = (eventEnd - eventStart) / 60000; // minutes
     
     const handleMouseMove = (moveEvent) => {
-      if (!gridRef.current || !resizingEvent) return;
-      const rect = gridRef.current.getBoundingClientRect();
-      const y = moveEvent.clientY - rect.top;
-      const newEndHour = Math.max(1, Math.round(y / 60));
-      // Update would happen here
+      const deltaY = moveEvent.clientY - startY;
+      const deltaMinutes = Math.round(deltaY / 60 * 60); // 60px = 1 hour = 60 minutes
+      const newDuration = Math.max(15, originalDuration + deltaMinutes); // minimum 15 minutes
+      
+      // Visual feedback - update the event element height
+      const eventEl = document.querySelector(`[data-testid="event-${event.id}"]`);
+      if (eventEl) {
+        eventEl.style.height = `${Math.max(newDuration, 15)}px`;
+      }
     };
     
-    const handleMouseUp = () => {
-      setResizingEvent(null);
+    const handleMouseUp = (upEvent) => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      
+      if (!onEventUpdate) return;
+      
+      const deltaY = upEvent.clientY - startY;
+      const deltaMinutes = Math.round(deltaY / 60 * 60);
+      const newDuration = Math.max(15, originalDuration + deltaMinutes);
+      
+      const newEnd = new Date(eventStart.getTime() + newDuration * 60000);
+      
+      onEventUpdate({
+        ...event,
+        start_time: event.start_time,
+        end_time: newEnd.toISOString()
+      });
     };
     
     document.addEventListener('mousemove', handleMouseMove);
