@@ -91,57 +91,6 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], on
     getEventFields().then(res => setCustomFields(res.data?.fields || [])).catch(console.error);
   }, []);
 
-  useEffect(() => {
-    getEventFields().then(res => setCustomFields(res.data?.fields || [])).catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    if (event) {
-      setFormData({
-        title: event.title || '',
-        description: event.description || '',
-        start_time: event.start_time?.slice(0, 16) || '',
-        end_time: event.end_time?.slice(0, 16) || '',
-        event_type: event.event_type || 'meeting',
-        status: event.status || 'confirmed',
-        location: event.location || '',
-        attendees: event.attendees || [],
-        custom_fields: event.custom_fields || {},
-        calendar_id: event.calendar_id || '',
-        is_all_day: event.is_all_day || false,
-        is_unconfirmed: event.is_unconfirmed || false,
-        is_blocked: event.is_blocked || false,
-        is_completed: event.is_completed || false,
-        is_urgent: event.is_urgent || false,
-        is_video_call: event.is_video_call || false,
-      });
-    } else {
-      const startDate = defaultDate || new Date();
-      const startTime = new Date(startDate);
-      startTime.setHours(defaultHour ?? 9, 0, 0, 0);
-      const endTime = addHours(startTime, 1);
-      
-      setFormData({
-        title: '',
-        description: '',
-        start_time: format(startTime, "yyyy-MM-dd'T'HH:mm"),
-        end_time: format(endTime, "yyyy-MM-dd'T'HH:mm"),
-        event_type: 'meeting',
-        status: 'confirmed',
-        location: '',
-        attendees: [],
-        custom_fields: {},
-        calendar_id: calendars[0]?.id || '',
-        is_all_day: false,
-        is_unconfirmed: false,
-        is_blocked: false,
-        is_completed: false,
-        is_urgent: false,
-        is_video_call: false,
-      });
-    }
-  }, [event, defaultDate, defaultHour, calendars]);
-
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave({
