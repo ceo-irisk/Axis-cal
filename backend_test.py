@@ -426,14 +426,8 @@ class ExecutiveCalendarAPITester:
         if success:
             original_types = data
             
-            # Test create new event type
-            new_type_data = {
-                "name": "test_type",
-                "label": "Тестовый тип",
-                "color": "#ff5722"
-            }
-            
-            success, create_data = self.make_request('POST', '/dictionaries/event-types', new_type_data)
+            # Test create new event type (uses query parameters)
+            success, create_data = self.make_request('POST', '/dictionaries/event-types?name=test_type&label=Тестовый тип&color=%23ff5722')
             if success and 'id' in create_data:
                 new_type_id = create_data['id']
                 self.log_test("Dictionaries - Create event type", True)
