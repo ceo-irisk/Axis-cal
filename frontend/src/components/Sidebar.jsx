@@ -850,8 +850,25 @@ export const Sidebar = ({
                         </button>
                       </div>
                       <div className="space-y-1">
-                        {eventTypes.map(type => (
+                        {eventTypes.map((type, index) => (
                           <div key={type.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/50 group">
+                            {/* Reorder buttons */}
+                            <div className="flex flex-col gap-0.5 opacity-0 group-hover:opacity-100">
+                              <button 
+                                onClick={() => handleMoveType(index, 'up')}
+                                disabled={index === 0}
+                                className={`p-0.5 rounded hover:bg-background ${index === 0 ? 'opacity-30 cursor-not-allowed' : ''}`}
+                              >
+                                <ChevronUp className="w-3 h-3" />
+                              </button>
+                              <button 
+                                onClick={() => handleMoveType(index, 'down')}
+                                disabled={index === eventTypes.length - 1}
+                                className={`p-0.5 rounded hover:bg-background ${index === eventTypes.length - 1 ? 'opacity-30 cursor-not-allowed' : ''}`}
+                              >
+                                <ChevronDown className="w-3 h-3" />
+                              </button>
+                            </div>
                             <div className="w-4 h-4 rounded" style={{ backgroundColor: type.color }} />
                             <span className="flex-1 text-sm">{type.label}</span>
                             <code className="text-xs text-muted-foreground">{type.name}</code>
@@ -880,8 +897,25 @@ export const Sidebar = ({
                         </button>
                       </div>
                       <div className="space-y-1">
-                        {eventStatuses.map(status => (
+                        {eventStatuses.map((status, index) => (
                           <div key={status.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/50 group">
+                            {/* Reorder buttons */}
+                            <div className="flex flex-col gap-0.5 opacity-0 group-hover:opacity-100">
+                              <button 
+                                onClick={() => handleMoveStatus(index, 'up')}
+                                disabled={index === 0}
+                                className={`p-0.5 rounded hover:bg-background ${index === 0 ? 'opacity-30 cursor-not-allowed' : ''}`}
+                              >
+                                <ChevronUp className="w-3 h-3" />
+                              </button>
+                              <button 
+                                onClick={() => handleMoveStatus(index, 'down')}
+                                disabled={index === eventStatuses.length - 1}
+                                className={`p-0.5 rounded hover:bg-background ${index === eventStatuses.length - 1 ? 'opacity-30 cursor-not-allowed' : ''}`}
+                              >
+                                <ChevronDown className="w-3 h-3" />
+                              </button>
+                            </div>
                             <div className="w-4 h-4 rounded" style={{ backgroundColor: status.color }} />
                             <span className="flex-1 text-sm">{status.label}</span>
                             <code className="text-xs text-muted-foreground">{status.name}</code>
