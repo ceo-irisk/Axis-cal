@@ -111,8 +111,12 @@ export const Sidebar = ({
 
   const handleRate = (stars) => onRateDay?.(stars, ratingNotes);
 
-  // Calculate total event hours for dashboard
-  const totalMinutes = events.reduce((acc, event) => {
+  // Разделяем события на all-day и обычные
+  const allDayEvents = events.filter(e => e.is_all_day);
+  const timedEvents = events.filter(e => !e.is_all_day);
+
+  // Calculate total event hours for dashboard (исключаем all-day события)
+  const totalMinutes = timedEvents.reduce((acc, event) => {
     try {
       return acc + (new Date(event.end_time) - new Date(event.start_time)) / 60000;
     } catch { return acc; }
@@ -121,7 +125,7 @@ export const Sidebar = ({
   const remainingMinutes = Math.round(totalMinutes % 60);
 
   const dateStr = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '';
-  const isToday = dateStr === format(new Date(), 'yyyy-MM-dd');
+  const isTodayDate = dateStr === format(new Date(), 'yyyy-MM-dd');
 
   // Check which days have events for mini calendar dots
   const getEventsForDay = (day) => {
