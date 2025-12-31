@@ -153,7 +153,7 @@ frontend:
     file: "/app/frontend/src/pages/CalendarPage.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
@@ -165,7 +165,7 @@ frontend:
     file: "/app/frontend/src/components/EventModal.jsx"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "main"
@@ -180,7 +180,7 @@ frontend:
     file: "/app/frontend/src/components/CalendarGrid.jsx"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
@@ -192,7 +192,7 @@ frontend:
     file: "/app/frontend/src/components/CalendarGrid.jsx"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
@@ -209,6 +209,45 @@ frontend:
       - working: true
         agent: "main"
         comment: "Dark and light themes work correctly"
+
+  - task: "Event Positioning in Calendar Grid (Week/Day Views)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/CalendarGrid.jsx"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "Events not aligned with time slots, event ААААА missing, no time displayed on events"
+      - working: true
+        agent: "main"
+        comment: "Fixed getEventStyle to use local time via new Date() instead of parseISO, time now always shows on events"
+
+  - task: "Event Time Display in Grid"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/CalendarGrid.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Added getLocalTime helper, time now shown for all events not just long ones"
+
+  - task: "Drag and Drop Events"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/CalendarGrid.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Code implemented but not tested yet"
 
 metadata:
   created_by: "main_agent"
