@@ -1,9 +1,9 @@
 {
-  "timestamp": "2025-12-31T04:44:55.634835",
+  "timestamp": "2025-12-31T04:45:35.394351",
   "total_tests": 38,
-  "passed_tests": 37,
-  "failed_tests": 1,
-  "success_rate": 97.36842105263158,
+  "passed_tests": 38,
+  "failed_tests": 0,
+  "success_rate": 100.0,
   "test_results": [
     {
       "test": "Health - Root endpoint",
@@ -181,8 +181,8 @@
     },
     {
       "test": "Dictionaries - Create event type",
-      "success": false,
-      "details": "Failed to create event type: {'detail': [{'type': 'missing', 'loc': ['query', 'name'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}, {'type': 'missing', 'loc': ['query', 'label'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}, {'type': 'missing', 'loc': ['query', 'color'], 'msg': 'Field required', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}]}",
+      "success": true,
+      "details": "",
       "response_data": null
     },
     {
