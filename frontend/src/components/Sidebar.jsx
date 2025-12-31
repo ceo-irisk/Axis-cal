@@ -945,6 +945,45 @@ export const Sidebar = ({
                       </div>
                       <p className="text-xs text-amber-500 mt-3 text-center">Редактирование флагов — скоро</p>
                     </div>
+
+                    {/* Custom Timezones */}
+                    <div className="border-t border-border pt-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-sm font-medium flex items-center gap-2">
+                          <Globe className="w-4 h-4" />
+                          Часовые пояса
+                        </h3>
+                        <button 
+                          onClick={() => setShowTimezoneModal(true)}
+                          className="p-1.5 rounded-lg hover:bg-accent"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        Добавьте свои часовые пояса для удобства
+                      </p>
+                      <div className="space-y-1">
+                        {customTimezones.map(tz => (
+                          <div key={tz.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/50 group">
+                            <Globe className="w-4 h-4 text-muted-foreground" />
+                            <span className="flex-1 text-sm">{tz.label}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {tz.offset >= 0 ? '+' : ''}{tz.offset}
+                            </span>
+                            <button 
+                              onClick={() => handleDeleteTimezone(tz.id)} 
+                              className="p-1 rounded hover:bg-red-500/20 opacity-0 group-hover:opacity-100"
+                            >
+                              <Trash2 className="w-3 h-3 text-red-500" />
+                            </button>
+                          </div>
+                        ))}
+                        {customTimezones.length === 0 && (
+                          <p className="text-xs text-muted-foreground text-center py-2">Нет кастомных часовых поясов</p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
 
