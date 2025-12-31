@@ -16,7 +16,7 @@ import { Menu } from 'lucide-react';
 export default function CalendarPage() {
   const { user } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [view, setView] = useState('month');
+  const [view, setView] = useState('week'); // По умолчанию неделя
   const [events, setEvents] = useState([]);
   const [calendars, setCalendars] = useState([]);
   const [ratings, setRatings] = useState({});
