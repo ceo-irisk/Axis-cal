@@ -4,10 +4,6 @@ import { ThemeProvider } from './lib/theme';
 import { Toaster } from './components/ui/sonner';
 import LoginPage from './pages/LoginPage';
 import CalendarPage from './pages/CalendarPage';
-import AdminPage from './pages/AdminPage';
-import TemplatesPage from './pages/TemplatesPage';
-import SettingsCalendarsPage from './pages/SettingsCalendarsPage';
-import SettingsProfilePage from './pages/SettingsProfilePage';
 import './App.css';
 
 // Protected Route component
@@ -67,43 +63,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      {/* Settings routes */}
-      <Route
-        path="/settings/users"
-        element={
-          <ProtectedRoute>
-            <AdminPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/settings/templates"
-        element={
-          <ProtectedRoute>
-            <TemplatesPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/settings/calendars"
-        element={
-          <ProtectedRoute>
-            <SettingsCalendarsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/settings/profile"
-        element={
-          <ProtectedRoute>
-            <SettingsProfilePage />
-          </ProtectedRoute>
-        }
-      />
-      {/* Legacy routes - redirect to new paths */}
-      <Route path="/admin" element={<Navigate to="/settings/users" replace />} />
-      <Route path="/templates" element={<Navigate to="/settings/templates" replace />} />
-      <Route path="/settings" element={<Navigate to="/settings/calendars" replace />} />
+      {/* All other routes redirect to main page */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
