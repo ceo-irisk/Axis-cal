@@ -524,7 +524,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
   );
 };
 
-const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate }) => {
+const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, selectedEventId, onEventSelect }) => {
   const hours = Array.from({ length: 24 }, (_, i) => i); // Все 24 часа
   const dayEvents = events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd')) && !e.is_all_day);
   const allDayEvents = events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd')) && e.is_all_day);
