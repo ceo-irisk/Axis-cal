@@ -413,7 +413,7 @@ const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick, 
                     {/* Resize handle */}
                     <div 
                       className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize opacity-0 group-hover:opacity-100 bg-black/20 rounded-b"
-                      onMouseDown={(e) => handleResizeStart(e, event)}
+                      onMouseDown={(e) => handleResizeStart(e, event, day)}
                     />
                   </div>
                 );
