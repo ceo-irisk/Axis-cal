@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../lib/auth';
 import { 
   getEvents, createEvent, updateEvent, deleteEvent, 
-  getRatings, createRating, checkDayRules, getOverloadedDays, getCalendars
+  getRatings, createRating, checkDayRules, getOverloadedDays, getCalendars,
+  getTemplates, applyTemplate
 } from '../lib/api';
 import Sidebar from '../components/Sidebar';
 import CalendarGrid from '../components/CalendarGrid';
