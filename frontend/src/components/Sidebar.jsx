@@ -682,56 +682,566 @@ export const Sidebar = ({
 
             {/* Settings Tab */}
             {activeTab === TABS.SETTINGS && (
-              <div className="space-y-2">
-                {isAdmin?.() && (
-                  <NavLink 
-                    to="/settings/users" 
-                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                  >
-                    <Users className="w-5 h-5" />
-                    Пользователи
-                  </NavLink>
-                )}
-                
-                <NavLink 
-                  to="/settings/templates" 
-                  className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                >
-                  <LayoutIcon className="w-5 h-5" />
-                  Шаблоны
-                </NavLink>
-                
-                <NavLink 
-                  to="/settings/calendars" 
-                  className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                >
-                  <Calendar className="w-5 h-5" />
-                  Внешние календари
-                </NavLink>
-                
-                <NavLink 
-                  to="/settings/profile" 
-                  className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                >
-                  <Users className="w-5 h-5" />
-                  Профиль
-                </NavLink>
-
-                <div className="pt-4 border-t border-border mt-4">
+              <div className="space-y-4">
+                {/* Settings Sub-tabs */}
+                <div className="flex flex-wrap gap-1 border-b border-border pb-2">
+                  {isAdmin?.() && (
+                    <button 
+                      onClick={() => setSettingsTab(SETTINGS_TABS.USERS)} 
+                      className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.USERS ? 'bg-violet-500 text-white' : 'text-muted-foreground hover:bg-accent'}`}
+                    >
+                      Пользователи
+                    </button>
+                  )}
                   <button 
-                    onClick={toggleTheme} 
-                    className="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    onClick={() => setSettingsTab(SETTINGS_TABS.TEMPLATES)} 
+                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.TEMPLATES ? 'bg-violet-500 text-white' : 'text-muted-foreground hover:bg-accent'}`}
                   >
-                    {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                    {theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+                    Шаблоны
+                  </button>
+                  <button 
+                    onClick={() => setSettingsTab(SETTINGS_TABS.DICTIONARIES)} 
+                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.DICTIONARIES ? 'bg-violet-500 text-white' : 'text-muted-foreground hover:bg-accent'}`}
+                  >
+                    Справочники
+                  </button>
+                  <button 
+                    onClick={() => setSettingsTab(SETTINGS_TABS.EXTERNAL_CALENDARS)} 
+                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.EXTERNAL_CALENDARS ? 'bg-violet-500 text-white' : 'text-muted-foreground hover:bg-accent'}`}
+                  >
+                    Календари
+                  </button>
+                  <button 
+                    onClick={() => setSettingsTab(SETTINGS_TABS.PROFILE)} 
+                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.PROFILE ? 'bg-violet-500 text-white' : 'text-muted-foreground hover:bg-accent'}`}
+                  >
+                    Профиль
                   </button>
                 </div>
+
+                {/* Users Sub-tab */}
+                {settingsTab === SETTINGS_TABS.USERS && isAdmin?.() && (
+                  <div className="text-center py-8">
+                    <Users className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+                    <p className="text-sm text-muted-foreground mb-4">Управление пользователями</p>
+                    <button onClick={() => navigate('/settings/users')} className="btn-primary text-sm">
+                      Открыть
+                    </button>
+                  </div>
+                )}
+
+                {/* Templates Sub-tab */}
+                {settingsTab === SETTINGS_TABS.TEMPLATES && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-medium">Шаблоны дней</h3>
+                      <button 
+                        onClick={() => { setEditingTemplate(null); setShowTemplateModal(true); }}
+                        className="p-1.5 rounded-lg hover:bg-accent"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                    
+                    {templates.length === 0 ? (
+                      <p className="text-xs text-muted-foreground py-4 text-center">Нет шаблонов</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {templates.map(template => (
+                          <div key={template.id} className="p-3 rounded-lg bg-accent/50 hover:bg-accent group">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-medium text-sm">{template.name}</span>
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button 
+                                  onClick={() => { setSelectedTemplateForApply(template); setShowApplyModal(true); }}
+                                  className="p-1 rounded hover:bg-violet-500/20" title="Применить"
+                                >
+                                  <Play className="w-3.5 h-3.5 text-violet-500" />
+                                </button>
+                                <button 
+                                  onClick={() => { setEditingTemplate(template); setShowTemplateModal(true); }}
+                                  className="p-1 rounded hover:bg-background" title="Редактировать"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                </button>
+                                <button 
+                                  onClick={() => handleDeleteTemplate(template.id)}
+                                  className="p-1 rounded hover:bg-red-500/20" title="Удалить"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                                </button>
+                              </div>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {template.events?.length || 0} событий • {template.template_type === 'week' ? 'Неделя' : 'День'}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Dictionaries Sub-tab */}
+                {settingsTab === SETTINGS_TABS.DICTIONARIES && (
+                  <div className="space-y-4">
+                    {/* Event Types */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-sm font-medium">Типы событий</h3>
+                        <button 
+                          onClick={() => { setEditingType(null); setShowTypeModal(true); }}
+                          className="p-1.5 rounded-lg hover:bg-accent"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="space-y-1">
+                        {eventTypes.map(type => (
+                          <div key={type.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/50 group">
+                            <div className="w-4 h-4 rounded" style={{ backgroundColor: type.color }} />
+                            <span className="flex-1 text-sm">{type.label}</span>
+                            <code className="text-xs text-muted-foreground">{type.name}</code>
+                            <div className="flex gap-1 opacity-0 group-hover:opacity-100">
+                              <button onClick={() => { setEditingType(type); setShowTypeModal(true); }} className="p-1 rounded hover:bg-background">
+                                <Edit2 className="w-3 h-3" />
+                              </button>
+                              <button onClick={() => handleDeleteEventType(type.id)} className="p-1 rounded hover:bg-red-500/20">
+                                <Trash2 className="w-3 h-3 text-red-500" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="border-t border-border pt-4">
+                      {/* Event Statuses */}
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-sm font-medium">Статусы событий</h3>
+                        <button 
+                          onClick={() => { setEditingStatus(null); setShowStatusModal(true); }}
+                          className="p-1.5 rounded-lg hover:bg-accent"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="space-y-1">
+                        {eventStatuses.map(status => (
+                          <div key={status.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/50 group">
+                            <div className="w-4 h-4 rounded" style={{ backgroundColor: status.color }} />
+                            <span className="flex-1 text-sm">{status.label}</span>
+                            <code className="text-xs text-muted-foreground">{status.name}</code>
+                            <div className="flex gap-1 opacity-0 group-hover:opacity-100">
+                              <button onClick={() => { setEditingStatus(status); setShowStatusModal(true); }} className="p-1 rounded hover:bg-background">
+                                <Edit2 className="w-3 h-3" />
+                              </button>
+                              <button onClick={() => handleDeleteEventStatus(status.id)} className="p-1 rounded hover:bg-red-500/20">
+                                <Trash2 className="w-3 h-3 text-red-500" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* External Calendars Sub-tab */}
+                {settingsTab === SETTINGS_TABS.EXTERNAL_CALENDARS && (
+                  <div className="text-center py-8">
+                    <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+                    <p className="text-sm text-muted-foreground mb-4">Подключение внешних календарей</p>
+                    <p className="text-xs text-muted-foreground">Google, Yandex, Apple Calendar</p>
+                    <p className="text-xs text-amber-500 mt-2">Скоро</p>
+                  </div>
+                )}
+
+                {/* Profile Sub-tab */}
+                {settingsTab === SETTINGS_TABS.PROFILE && (
+                  <div className="space-y-4">
+                    <div className="p-4 rounded-xl bg-accent/50">
+                      <p className="text-sm font-medium">{user?.name || 'Пользователь'}</p>
+                      <p className="text-xs text-muted-foreground">{user?.email}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Роль: {user?.role === 'admin' ? 'Администратор' : 'Пользователь'}</p>
+                    </div>
+                    
+                    <button 
+                      onClick={toggleTheme} 
+                      className="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    >
+                      {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                      {theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+                    </button>
+                    
+                    <button 
+                      onClick={logout}
+                      className="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-sm text-red-500 hover:bg-red-500/10"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      Выйти
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
       </aside>
+
+      {/* Event Type Modal */}
+      <Dialog open={showTypeModal} onOpenChange={setShowTypeModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingType ? 'Редактировать тип' : 'Новый тип события'}</DialogTitle>
+          </DialogHeader>
+          <EventTypeForm 
+            initialData={editingType} 
+            onSave={handleSaveEventType}
+            onCancel={() => { setShowTypeModal(false); setEditingType(null); }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Event Status Modal */}
+      <Dialog open={showStatusModal} onOpenChange={setShowStatusModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingStatus ? 'Редактировать статус' : 'Новый статус события'}</DialogTitle>
+          </DialogHeader>
+          <EventStatusForm 
+            initialData={editingStatus} 
+            onSave={handleSaveEventStatus}
+            onCancel={() => { setShowStatusModal(false); setEditingStatus(null); }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Template Modal */}
+      <Dialog open={showTemplateModal} onOpenChange={setShowTemplateModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{editingTemplate ? 'Редактировать шаблон' : 'Новый шаблон'}</DialogTitle>
+          </DialogHeader>
+          <TemplateForm 
+            initialData={editingTemplate}
+            eventTypes={eventTypes}
+            onSave={handleSaveTemplate}
+            onCancel={() => { setShowTemplateModal(false); setEditingTemplate(null); }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Apply Template Modal */}
+      <Dialog open={showApplyModal} onOpenChange={setShowApplyModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Применить шаблон</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm">Шаблон: <strong>{selectedTemplateForApply?.name}</strong></p>
+            <div>
+              <Label>Дата применения</Label>
+              <Input 
+                type="date" 
+                value={applyDate} 
+                onChange={(e) => setApplyDate(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowApplyModal(false)}>Отмена</Button>
+            <Button onClick={handleApplyTemplate}>Применить</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
+  );
+};
+
+// ==================== FORM COMPONENTS ====================
+
+const EventTypeForm = ({ initialData, onSave, onCancel }) => {
+  const [name, setName] = useState(initialData?.name || '');
+  const [label, setLabel] = useState(initialData?.label || '');
+  const [color, setColor] = useState(initialData?.color || '#8b5cf6');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!name.trim() || !label.trim()) return;
+    onSave({ name: name.trim(), label: label.trim(), color, order: initialData?.order || 0 });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label>Код (латиницей)</Label>
+        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="meeting" className="mt-1" />
+      </div>
+      <div>
+        <Label>Название</Label>
+        <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Встреча" className="mt-1" />
+      </div>
+      <div>
+        <Label>Цвет</Label>
+        <div className="flex gap-2 mt-1">
+          <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="w-10 h-10 rounded cursor-pointer" />
+          <Input value={color} onChange={(e) => setColor(e.target.value)} className="flex-1" />
+        </div>
+      </div>
+      <DialogFooter>
+        <Button type="button" variant="outline" onClick={onCancel}>Отмена</Button>
+        <Button type="submit">Сохранить</Button>
+      </DialogFooter>
+    </form>
+  );
+};
+
+const EventStatusForm = ({ initialData, onSave, onCancel }) => {
+  const [name, setName] = useState(initialData?.name || '');
+  const [label, setLabel] = useState(initialData?.label || '');
+  const [color, setColor] = useState(initialData?.color || '#10b981');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!name.trim() || !label.trim()) return;
+    onSave({ name: name.trim(), label: label.trim(), color, order: initialData?.order || 0 });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label>Код (латиницей)</Label>
+        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="confirmed" className="mt-1" />
+      </div>
+      <div>
+        <Label>Название</Label>
+        <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Подтверждено" className="mt-1" />
+      </div>
+      <div>
+        <Label>Цвет</Label>
+        <div className="flex gap-2 mt-1">
+          <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="w-10 h-10 rounded cursor-pointer" />
+          <Input value={color} onChange={(e) => setColor(e.target.value)} className="flex-1" />
+        </div>
+      </div>
+      <DialogFooter>
+        <Button type="button" variant="outline" onClick={onCancel}>Отмена</Button>
+        <Button type="submit">Сохранить</Button>
+      </DialogFooter>
+    </form>
+  );
+};
+
+const TemplateForm = ({ initialData, eventTypes, onSave, onCancel }) => {
+  const [name, setName] = useState(initialData?.name || '');
+  const [templateType, setTemplateType] = useState(initialData?.template_type || 'day');
+  const [events, setEvents] = useState(initialData?.events || []);
+  const [showEventForm, setShowEventForm] = useState(false);
+  const [editingEventIdx, setEditingEventIdx] = useState(null);
+
+  const handleAddEvent = (eventData) => {
+    if (editingEventIdx !== null) {
+      const updated = [...events];
+      updated[editingEventIdx] = eventData;
+      setEvents(updated);
+      setEditingEventIdx(null);
+    } else {
+      setEvents([...events, eventData]);
+    }
+    setShowEventForm(false);
+  };
+
+  const handleEditEvent = (idx) => {
+    setEditingEventIdx(idx);
+    setShowEventForm(true);
+  };
+
+  const handleDeleteEvent = (idx) => {
+    setEvents(events.filter((_, i) => i !== idx));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    onSave({ name: name.trim(), template_type: templateType, events });
+  };
+
+  if (showEventForm) {
+    return (
+      <TemplateEventForm 
+        initialData={editingEventIdx !== null ? events[editingEventIdx] : null}
+        eventTypes={eventTypes}
+        templateType={templateType}
+        onSave={handleAddEvent}
+        onCancel={() => { setShowEventForm(false); setEditingEventIdx(null); }}
+      />
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label>Название шаблона</Label>
+        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Рабочий день" className="mt-1" />
+      </div>
+      <div>
+        <Label>Тип шаблона</Label>
+        <Select value={templateType} onValueChange={setTemplateType}>
+          <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="day">День</SelectItem>
+            <SelectItem value="week">Неделя</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <Label>События ({events.length})</Label>
+          <Button type="button" size="sm" variant="outline" onClick={() => setShowEventForm(true)}>
+            <Plus className="w-4 h-4 mr-1" /> Добавить
+          </Button>
+        </div>
+        
+        {events.length === 0 ? (
+          <p className="text-xs text-muted-foreground py-4 text-center border rounded-lg">Нет событий</p>
+        ) : (
+          <div className="space-y-2 max-h-[200px] overflow-y-auto">
+            {events.map((event, idx) => (
+              <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-accent/50 group">
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{event.title}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {String(event.start_hour).padStart(2, '0')}:{String(event.start_minute || 0).padStart(2, '0')} - 
+                    {String(event.end_hour).padStart(2, '0')}:{String(event.end_minute || 0).padStart(2, '0')}
+                    {templateType === 'week' && ` • День ${event.day_of_week + 1}`}
+                  </p>
+                </div>
+                <button type="button" onClick={() => handleEditEvent(idx)} className="p-1 rounded hover:bg-background opacity-0 group-hover:opacity-100">
+                  <Edit2 className="w-3.5 h-3.5" />
+                </button>
+                <button type="button" onClick={() => handleDeleteEvent(idx)} className="p-1 rounded hover:bg-red-500/20 opacity-0 group-hover:opacity-100">
+                  <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <DialogFooter>
+        <Button type="button" variant="outline" onClick={onCancel}>Отмена</Button>
+        <Button type="submit">Сохранить</Button>
+      </DialogFooter>
+    </form>
+  );
+};
+
+const TemplateEventForm = ({ initialData, eventTypes, templateType, onSave, onCancel }) => {
+  const [title, setTitle] = useState(initialData?.title || '');
+  const [description, setDescription] = useState(initialData?.description || '');
+  const [eventType, setEventType] = useState(initialData?.event_type || 'meeting');
+  const [startHour, setStartHour] = useState(initialData?.start_hour ?? 9);
+  const [startMinute, setStartMinute] = useState(initialData?.start_minute ?? 0);
+  const [endHour, setEndHour] = useState(initialData?.end_hour ?? 10);
+  const [endMinute, setEndMinute] = useState(initialData?.end_minute ?? 0);
+  const [dayOfWeek, setDayOfWeek] = useState(initialData?.day_of_week ?? 0);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!title.trim()) return;
+    onSave({
+      title: title.trim(),
+      description,
+      event_type: eventType,
+      start_hour: parseInt(startHour),
+      start_minute: parseInt(startMinute),
+      end_hour: parseInt(endHour),
+      end_minute: parseInt(endMinute),
+      day_of_week: parseInt(dayOfWeek)
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="flex items-center gap-2 mb-4">
+        <button type="button" onClick={onCancel} className="p-1 rounded hover:bg-accent">
+          <ArrowLeft className="w-4 h-4" />
+        </button>
+        <h3 className="font-medium">{initialData ? 'Редактировать событие' : 'Новое событие'}</h3>
+      </div>
+
+      <div>
+        <Label>Название</Label>
+        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Утренняя встреча" className="mt-1" />
+      </div>
+      
+      <div>
+        <Label>Описание</Label>
+        <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Описание события" className="mt-1" />
+      </div>
+
+      <div>
+        <Label>Тип события</Label>
+        <Select value={eventType} onValueChange={setEventType}>
+          <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {eventTypes.map(type => (
+              <SelectItem key={type.name} value={type.name}>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded" style={{ backgroundColor: type.color }} />
+                  {type.label}
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {templateType === 'week' && (
+        <div>
+          <Label>День недели</Label>
+          <Select value={String(dayOfWeek)} onValueChange={(v) => setDayOfWeek(parseInt(v))}>
+            <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="0">Понедельник</SelectItem>
+              <SelectItem value="1">Вторник</SelectItem>
+              <SelectItem value="2">Среда</SelectItem>
+              <SelectItem value="3">Четверг</SelectItem>
+              <SelectItem value="4">Пятница</SelectItem>
+              <SelectItem value="5">Суббота</SelectItem>
+              <SelectItem value="6">Воскресенье</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Начало</Label>
+          <div className="flex gap-1 mt-1">
+            <Input type="number" min="0" max="23" value={startHour} onChange={(e) => setStartHour(e.target.value)} className="w-16" />
+            <span className="flex items-center">:</span>
+            <Input type="number" min="0" max="59" step="5" value={startMinute} onChange={(e) => setStartMinute(e.target.value)} className="w-16" />
+          </div>
+        </div>
+        <div>
+          <Label>Конец</Label>
+          <div className="flex gap-1 mt-1">
+            <Input type="number" min="0" max="23" value={endHour} onChange={(e) => setEndHour(e.target.value)} className="w-16" />
+            <span className="flex items-center">:</span>
+            <Input type="number" min="0" max="59" step="5" value={endMinute} onChange={(e) => setEndMinute(e.target.value)} className="w-16" />
+          </div>
+        </div>
+      </div>
+
+      <DialogFooter>
+        <Button type="button" variant="outline" onClick={onCancel}>Назад</Button>
+        <Button type="submit">Сохранить событие</Button>
+      </DialogFooter>
+    </form>
   );
 };
 
