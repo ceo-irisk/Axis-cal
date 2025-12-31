@@ -376,7 +376,7 @@ export const Sidebar = ({
                 <button onClick={handleLogout} className="p-1 rounded-lg hover:bg-accent" title="Выйти" data-testid="logout-button">
                   <LogOut className="w-4 h-4 text-muted-foreground" />
                 </button>
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#085C53] to-indigo-600 flex items-center justify-center text-xs font-medium text-white">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#085C53] to-[#074a44] flex items-center justify-center text-xs font-medium text-white">
                   {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
                 <div className="flex-1 min-w-0">
