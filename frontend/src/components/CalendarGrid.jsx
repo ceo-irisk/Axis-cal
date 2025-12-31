@@ -383,15 +383,17 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
               {/* All-day events row */}
               <div className="min-h-[24px] px-1 pb-1 space-y-0.5 overflow-hidden">
                 {getAllDayEvents(day).map(event => {
-                  const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
+                  const isUnconfirmed = event.status === 'tentative';
                   const eventColorClass = isUnconfirmed 
                     ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
                     : (EVENT_COLORS[event.event_type] || 'event-meeting');
+                  const isSelected = selectedEventId === event.id;
                   return (
                     <div 
                       key={event.id}
-                      onClick={() => onEventClick(event)}
-                      className={`px-2 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 ${eventColorClass}`}
+                      onClick={() => onEventSelect?.(event.id)}
+                      onDoubleClick={() => onEventClick(event)}
+                      className={`px-2 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 ${eventColorClass} ${isSelected ? 'ring-2 ring-violet-500 ring-offset-1' : ''}`}
                     >
                       {event.title}
                     </div>
