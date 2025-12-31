@@ -1,9 +1,9 @@
 {
-  "timestamp": "2025-12-25T18:56:22.304718",
-  "total_tests": 3,
-  "passed_tests": 2,
+  "timestamp": "2025-12-31T02:24:09.487404",
+  "total_tests": 28,
+  "passed_tests": 27,
   "failed_tests": 1,
-  "success_rate": 66.66666666666666,
+  "success_rate": 96.42857142857143,
   "test_results": [
     {
       "test": "Health - Root endpoint",
@@ -19,8 +19,158 @@
     },
     {
       "test": "Auth - Admin login",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Auth - Get current user",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Auth - Invalid login rejection",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Events - Get events list",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Events - Create event",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Events - Get specific event",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Events - Update event",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Ratings - Create day rating",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Ratings - Get ratings list",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Ratings - Get specific date rating",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Survey - Get questions",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Survey - Submit response",
       "success": false,
-      "details": "Login failed: {'detail': 'Invalid credentials'}",
+      "details": "Failed to submit response: {'error': \"HTTPSConnectionPool(host='axiscalendar.preview.emergentagent.com', port=443): Read timed out. (read timeout=10)\"}",
+      "response_data": null
+    },
+    {
+      "test": "Survey - Get responses",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Rules - Get rules list",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Rules - Check day rules",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Admin - Get users list",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Admin - Create user",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Admin - Get specific user",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Admin - Toggle user active",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Admin - Create survey question",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Templates - Get templates list",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Templates - Create template",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Analytics - Get overloaded days",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Cleanup - Delete test event",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Cleanup - Delete test user",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Cleanup - Delete test template",
+      "success": true,
+      "details": "",
       "response_data": null
     }
   ]
