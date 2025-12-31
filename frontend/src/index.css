@@ -152,6 +152,26 @@
   @apply border-2 border-dashed border-indigo-500 bg-transparent dark:bg-indigo-500/5; 
 }
 
+/* Template events - solid border, no fill */
+.event-template-meeting { 
+  @apply border-2 border-solid border-[#085C53] bg-transparent; 
+}
+.event-template-call { 
+  @apply border-2 border-solid border-cyan-500 bg-transparent; 
+}
+.event-template-personal { 
+  @apply border-2 border-solid border-amber-500 bg-transparent; 
+}
+.event-template-urgent { 
+  @apply border-2 border-solid border-red-500 bg-transparent; 
+}
+.event-template-travel { 
+  @apply border-2 border-solid border-emerald-500 bg-transparent; 
+}
+.event-template-deep-work { 
+  @apply border-2 border-solid border-indigo-500 bg-transparent; 
+}
+
 .event-tentative {
   background: repeating-linear-gradient(45deg, transparent, transparent 4px, hsl(var(--muted)) 4px, hsl(var(--muted)) 8px);
 }
