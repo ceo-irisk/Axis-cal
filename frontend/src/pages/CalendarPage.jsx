@@ -258,6 +258,7 @@ export default function CalendarPage() {
         onShowUsers={() => setMainView(MAIN_VIEW.USERS)}
         onShowCalendar={() => setMainView(MAIN_VIEW.CALENDAR)}
         mainView={mainView}
+        onCustomTimezonesChange={setCustomTimezones}
       />
       
       <main className="main-content-full flex-1" data-testid="calendar-main">
