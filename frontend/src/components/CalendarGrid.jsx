@@ -473,12 +473,15 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
         <div className={`flex-shrink-0 ${COL_RIGHT} p-1 border-b border-l border-border/30 flex items-center justify-center`}>
           <TimezoneSelector selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} />
         </div>
+        
+        {/* Scrollbar placeholder to match grid scrollbar */}
+        <div className={`flex-shrink-0 ${SCROLLBAR_WIDTH} border-b border-border/30`}></div>
       </div>
 
       {/* Time grid */}
       <div 
         ref={gridRef}
-        className="flex h-[calc(100vh-220px)] overflow-y-auto" 
+        className="flex h-[calc(100vh-220px)] overflow-y-scroll" 
       >
         {/* Left time column */}
         <div className={`flex-shrink-0 ${COL_LEFT} border-r border-border/20`}>
