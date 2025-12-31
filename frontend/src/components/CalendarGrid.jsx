@@ -699,10 +699,7 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
           <p className="text-xs text-muted-foreground mb-2">События дня</p>
           <div className="space-y-1">
             {allDayEvents.map(event => {
-              const isUnconfirmed = event.status === 'tentative';
-              const eventColorClass = isUnconfirmed 
-                ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
-                : (EVENT_COLORS[event.event_type] || 'event-meeting');
+              const eventColorClass = getEventColorClass(event);
               const isSelected = selectedEventId === event.id;
               return (
                 <div 
