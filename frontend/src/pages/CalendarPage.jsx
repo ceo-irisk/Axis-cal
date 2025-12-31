@@ -180,16 +180,8 @@ export default function CalendarPage() {
   };
 
   const handleDeleteEvent = async (eventId) => {
-    try {
-      await deleteEvent(eventId);
-      toast.success('Событие удалено');
-      setShowEventModal(false);
-      setSelectedEventId(null);
-      fetchData();
-    } catch (error) {
-      console.error('Error deleting event:', error);
-      toast.error('Ошибка удаления события');
-    }
+    await handleDeleteEventById(eventId);
+    fetchData();
   };
 
   const handleEventUpdate = async (eventData) => {
