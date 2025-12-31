@@ -240,6 +240,7 @@ export default function CalendarPage() {
             onDateClick={handleDateClick}
             onCellDoubleClick={handleCellDoubleClick}
             onEventClick={handleEventClick}
+            onEventUpdate={handleEventUpdate}
             loading={loading}
           />
         </div>
