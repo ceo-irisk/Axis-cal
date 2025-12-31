@@ -2,15 +2,37 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { useTheme } from '../lib/theme';
 import { useState, useEffect } from 'react';
-import { getCalendars, addCalendar, deleteCalendar } from '../lib/api';
+import { 
+  getCalendars, addCalendar, deleteCalendar,
+  getEventTypes, createEventType, updateEventType, deleteEventType,
+  getEventStatuses, createEventStatus, updateEventStatus, deleteEventStatus,
+  getTemplates, createTemplate, updateTemplate, deleteTemplate, applyTemplate
+} from '../lib/api';
 import { 
   Sun, Moon, LogOut, Plus, Trash2, Eye, EyeOff, ChevronLeft, ChevronRight,
   Calendar, LayoutGrid, Settings, Star, AlertTriangle, Clock, MapPin, FileText,
-  Users, Layout as LayoutIcon, Square, CheckCircle2, Zap, Video
+  Users, Layout as LayoutIcon, Square, CheckCircle2, Zap, Video, Book, Edit2, Play, ArrowLeft, Palette
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Button } from './ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from './ui/dialog';
 
 // Helper to format event time in local timezone
 const formatEventTime = (isoString) => {
