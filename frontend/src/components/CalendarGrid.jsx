@@ -433,7 +433,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                       key={event.id}
                       onClick={() => onEventSelect?.(event.id)}
                       onDoubleClick={() => onEventClick(event)}
-                      className={`px-2 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 ${eventColorClass} ${isTemplate ? 'ring-1 ring-[#085C53]' : ''} ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
+                      className={`px-2 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 ${eventColorClass} ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
                     >
                       {event.title}
                     </div>
