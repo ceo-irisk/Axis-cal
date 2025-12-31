@@ -12,6 +12,16 @@ import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
+// Helper to format event time in local timezone
+const formatEventTime = (isoString) => {
+  try {
+    const date = new Date(isoString);
+    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  } catch {
+    return isoString?.slice(11, 16) || '00:00';
+  }
+};
+
 // Event icons component
 const EventIcons = ({ event }) => {
   const icons = [];
