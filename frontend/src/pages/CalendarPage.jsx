@@ -42,6 +42,7 @@ export default function CalendarPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [defaultEventTime, setDefaultEventTime] = useState(null);
   const [selectedTimezone, setSelectedTimezone] = useState(() => getLocalTimezoneName());
+  const [customTimezones, setCustomTimezones] = useState([]);
 
   const handleDeleteEventById = useCallback(async (eventId) => {
     try {
