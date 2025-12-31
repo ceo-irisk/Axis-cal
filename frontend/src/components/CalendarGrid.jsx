@@ -424,7 +424,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                       key={event.id}
                       onClick={() => onEventSelect?.(event.id)}
                       onDoubleClick={() => onEventClick(event)}
-                      className={`px-2 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 ${eventColorClass} ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
+                      className={`px-2 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 ${eventColorClass} ${isTemplate ? 'ring-1 ring-[#085C53]' : ''} ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
                     >
                       {event.title}
                     </div>
@@ -435,8 +435,10 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
           ))}
         </div>
         
-        {/* Right spacer for time column */}
-        <div className="flex-shrink-0 w-[50px] p-2 text-center text-[10px] text-muted-foreground border-b border-border/30"></div>
+        {/* Timezone selector - right side */}
+        <div className="flex-shrink-0 w-[200px] p-2 border-b border-border/30 flex items-center justify-center">
+          <TimezoneSelector selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} />
+        </div>
       </div>
 
       {/* Time grid */}
