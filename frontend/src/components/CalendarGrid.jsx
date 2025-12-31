@@ -346,53 +346,58 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
   return (
     <div className="card-glass overflow-hidden" data-testid="week-view">
       {/* Header with day names and dates */}
-      <div className="grid" style={{ gridTemplateColumns: '50px repeat(7, 1fr) 50px' }}>
-        <div className="p-2 text-center text-[10px] text-muted-foreground border-b border-r border-border/30"></div>
+      <div className="flex">
+        {/* Left spacer for time column */}
+        <div className="flex-shrink-0 w-[50px] p-2 text-center text-[10px] text-muted-foreground border-b border-r border-border/30"></div>
         
-        {days.map((day, idx) => (
-          <div 
-            key={day.toISOString()} 
-            className={`group border-b border-r border-border/30 ${isSameDay(day, date) ? 'bg-violet-500/10' : ''}`}
-          >
-            {/* Day header - centered, fixed layout */}
-            <div className="p-2 text-center relative">
-              <button 
-                onClick={() => onDateClick(day)} 
-                className="hover:bg-accent/30 rounded px-2 py-0.5 transition-colors inline-block"
-              >
-                <p className="text-xs text-muted-foreground uppercase">{dayNames[idx]}</p>
-                <p className={`text-lg font-semibold ${isToday(day) ? 'text-violet-500' : ''}`}>
-                  {format(day, 'd')}
-                </p>
-              </button>
-              {/* Template selector - absolute positioned in corner */}
-              <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <TemplateSelector day={day} templates={templates} onApplyTemplate={onApplyTemplate} />
+        {/* Day headers */}
+        <div className="flex-1 grid border-b border-border/30" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
+          {days.map((day, idx) => (
+            <div 
+              key={day.toISOString()} 
+              className={`group border-r border-border/30 ${isSameDay(day, date) ? 'bg-violet-500/10' : ''}`}
+            >
+              {/* Day header - centered, fixed layout */}
+              <div className="p-2 text-center relative">
+                <button 
+                  onClick={() => onDateClick(day)} 
+                  className="hover:bg-accent/30 rounded px-2 py-0.5 transition-colors inline-block"
+                >
+                  <p className="text-xs text-muted-foreground uppercase">{dayNames[idx]}</p>
+                  <p className={`text-lg font-semibold ${isToday(day) ? 'text-violet-500' : ''}`}>
+                    {format(day, 'd')}
+                  </p>
+                </button>
+                {/* Template selector - absolute positioned in corner */}
+                <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <TemplateSelector day={day} templates={templates} onApplyTemplate={onApplyTemplate} />
+                </div>
+              </div>
+              
+              {/* All-day events row */}
+              <div className="min-h-[24px] px-1 pb-1 space-y-0.5 overflow-hidden">
+                {getAllDayEvents(day).map(event => {
+                  const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
+                  const eventColorClass = isUnconfirmed 
+                    ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
+                    : (EVENT_COLORS[event.event_type] || 'event-meeting');
+                  return (
+                    <div 
+                      key={event.id}
+                      onClick={() => onEventClick(event)}
+                      className={`px-2 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 ${eventColorClass}`}
+                    >
+                      {event.title}
+                    </div>
+                  );
+                })}
               </div>
             </div>
-            
-            {/* All-day events row */}
-            <div className="min-h-[24px] px-1 pb-1 space-y-0.5 overflow-hidden">
-              {getAllDayEvents(day).map(event => {
-                const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
-                const eventColorClass = isUnconfirmed 
-                  ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
-                  : (EVENT_COLORS[event.event_type] || 'event-meeting');
-                return (
-                  <div 
-                    key={event.id}
-                    onClick={() => onEventClick(event)}
-                    className={`px-2 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 ${eventColorClass}`}
-                  >
-                    {event.title}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
         
-        <div className="p-2 text-center text-[10px] text-muted-foreground border-b border-border/30"></div>
+        {/* Right spacer for time column */}
+        <div className="flex-shrink-0 w-[50px] p-2 text-center text-[10px] text-muted-foreground border-b border-border/30"></div>
       </div>
 
       {/* Time grid */}
