@@ -576,8 +576,8 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
         </div>
 
         {/* Right time column - fixed width */}
-        {/* Right column - same width as timezone selector */}
-        <div className="flex-shrink-0 w-[140px] border-l border-border/20">
+        {/* Right time column */}
+        <div className={`flex-shrink-0 ${COL_RIGHT} border-l border-border/20`}>
           {hours.map(hour => (
             <div key={hour} className="h-[60px] px-1 flex items-start pt-1 justify-start text-[10px] text-muted-foreground/60 font-mono">
               {String(hour).padStart(2, '0')}:00
