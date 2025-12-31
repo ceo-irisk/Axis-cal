@@ -562,7 +562,6 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
       return { left: '8px', right: '8px', width: 'auto' };
     }
   };
-  };
 
   const getEventDuration = (event) => {
     try {
