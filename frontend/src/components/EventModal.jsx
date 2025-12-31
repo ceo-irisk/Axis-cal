@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { format, addHours } from 'date-fns';
-import { X, Trash2, Clock, MapPin, Users, FileText } from 'lucide-react';
+import { X, Trash2, Clock, MapPin, Users, FileText, Square, CheckCircle2, Zap, Video, CalendarDays } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Switch } from '../components/ui/switch';
 import { getEventFields } from '../lib/api';
 
 const EVENT_TYPES = [
@@ -36,6 +37,13 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], on
     attendees: [],
     custom_fields: {},
     calendar_id: '',
+    // New fields
+    is_all_day: false,
+    is_unconfirmed: false,
+    is_blocked: false,
+    is_completed: false,
+    is_urgent: false,
+    is_video_call: false,
   });
   const [attendeeInput, setAttendeeInput] = useState('');
 
@@ -56,6 +64,12 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], on
         attendees: event.attendees || [],
         custom_fields: event.custom_fields || {},
         calendar_id: event.calendar_id || '',
+        is_all_day: event.is_all_day || false,
+        is_unconfirmed: event.is_unconfirmed || false,
+        is_blocked: event.is_blocked || false,
+        is_completed: event.is_completed || false,
+        is_urgent: event.is_urgent || false,
+        is_video_call: event.is_video_call || false,
       });
     } else {
       const startDate = defaultDate || new Date();
@@ -74,6 +88,12 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], on
         attendees: [],
         custom_fields: {},
         calendar_id: calendars[0]?.id || '',
+        is_all_day: false,
+        is_unconfirmed: false,
+        is_blocked: false,
+        is_completed: false,
+        is_urgent: false,
+        is_video_call: false,
       });
     }
   }, [event, defaultDate, defaultHour, calendars]);
@@ -98,110 +118,279 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], on
     setFormData({ ...formData, attendees: formData.attendees.filter(a => a !== email) });
   };
 
+  const toggleFlag = (flag) => {
+    setFormData({ ...formData, [flag]: !formData[flag] });
+  };
+
   return (
-    <div className="modal-overlay" onClick={onClose} data-testid="event-modal-overlay">
-      <div className="modal-content" onClick={(e) => e.stopPropagation()} data-testid="event-modal">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-semibold">{event ? 'Редактировать' : 'Новое событие'}</h2>
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose} data-testid="event-modal-overlay">
+      <div 
+        className="bg-card rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto" 
+        onClick={(e) => e.stopPropagation()} 
+        data-testid="event-modal"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-5 border-b border-border sticky top-0 bg-card z-10">
+          <h2 className="text-lg font-semibold">{event ? 'Редактировать событие' : 'Новое событие'}</h2>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-accent" data-testid="close-event-modal">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="p-5 space-y-5">
+          {/* Title */}
           <div>
-            <Input value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="Название события" required className="text-lg font-medium border-0 border-b border-border rounded-none px-0 focus-visible:ring-0" data-testid="event-title-input" />
+            <Input 
+              value={formData.title} 
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })} 
+              placeholder="Название события" 
+              required 
+              className="text-lg font-medium border-0 border-b border-border rounded-none px-0 focus-visible:ring-0" 
+              data-testid="event-title-input" 
+            />
           </div>
 
+          {/* Type and Status row */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs text-muted-foreground">Тип</Label>
+              <Label className="text-xs text-muted-foreground mb-1.5 block">Тип</Label>
               <Select value={formData.event_type} onValueChange={(v) => setFormData({ ...formData, event_type: v })}>
-                <SelectTrigger className="mt-1" data-testid="event-type-select"><SelectValue /></SelectTrigger>
-                <SelectContent>
+                <SelectTrigger data-testid="event-type-select">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper" sideOffset={4}>
                   {EVENT_TYPES.map(type => (
                     <SelectItem key={type.value} value={type.value}>
-                      <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: type.color }} />{type.label}</div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: type.color }} />
+                        {type.label}
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Статус</Label>
+              <Label className="text-xs text-muted-foreground mb-1.5 block">Статус</Label>
               <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })}>
-                <SelectTrigger className="mt-1" data-testid="event-status-select"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {STATUS_OPTIONS.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
+                <SelectTrigger data-testid="event-status-select">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper" sideOffset={4}>
+                  {STATUS_OPTIONS.map(s => (
+                    <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
 
+          {/* Calendar */}
           <div>
-            <Label className="text-xs text-muted-foreground">Календарь</Label>
+            <Label className="text-xs text-muted-foreground mb-1.5 block">Календарь</Label>
             <Select value={formData.calendar_id || 'default'} onValueChange={(v) => setFormData({ ...formData, calendar_id: v === 'default' ? '' : v })}>
-              <SelectTrigger className="mt-1" data-testid="event-calendar-select"><SelectValue placeholder="Выберите календарь" /></SelectTrigger>
-              <SelectContent>
+              <SelectTrigger data-testid="event-calendar-select">
+                <SelectValue placeholder="Выберите календарь" />
+              </SelectTrigger>
+              <SelectContent position="popper" sideOffset={4}>
                 <SelectItem value="default">
-                  <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-violet-500" />Основной</div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-violet-500" />
+                    Основной
+                  </div>
                 </SelectItem>
                 {calendars.map(cal => (
                   <SelectItem key={cal.id} value={cal.id}>
-                    <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cal.color }} />{cal.name}</div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cal.color }} />
+                      {cal.name}
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />Начало</Label>
-              <Input type="datetime-local" value={formData.start_time} onChange={(e) => setFormData({ ...formData, start_time: e.target.value })} required className="mt-1" data-testid="event-start-input" />
+          {/* All day toggle */}
+          <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-accent/50">
+            <div className="flex items-center gap-2">
+              <CalendarDays className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm">Весь день</span>
             </div>
-            <div>
-              <Label className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />Конец</Label>
-              <Input type="datetime-local" value={formData.end_time} onChange={(e) => setFormData({ ...formData, end_time: e.target.value })} required className="mt-1" data-testid="event-end-input" />
+            <Switch 
+              checked={formData.is_all_day} 
+              onCheckedChange={(checked) => setFormData({ ...formData, is_all_day: checked })}
+              data-testid="event-all-day-switch"
+            />
+          </div>
+
+          {/* Time row - hidden if all day */}
+          {!formData.is_all_day && (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs text-muted-foreground flex items-center gap-1 mb-1.5">
+                  <Clock className="w-3 h-3" />Начало
+                </Label>
+                <Input 
+                  type="datetime-local" 
+                  value={formData.start_time} 
+                  onChange={(e) => setFormData({ ...formData, start_time: e.target.value })} 
+                  required 
+                  data-testid="event-start-input" 
+                />
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground flex items-center gap-1 mb-1.5">
+                  <Clock className="w-3 h-3" />Конец
+                </Label>
+                <Input 
+                  type="datetime-local" 
+                  value={formData.end_time} 
+                  onChange={(e) => setFormData({ ...formData, end_time: e.target.value })} 
+                  required 
+                  data-testid="event-end-input" 
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Event flags/icons */}
+          <div>
+            <Label className="text-xs text-muted-foreground mb-2 block">Статус события</Label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => toggleFlag('is_blocked')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                  formData.is_blocked ? 'bg-red-500/20 text-red-500 border border-red-500/50' : 'bg-accent hover:bg-accent/80'
+                }`}
+              >
+                <Square className="w-3.5 h-3.5" />
+                Заблокировано
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleFlag('is_completed')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                  formData.is_completed ? 'bg-green-500/20 text-green-500 border border-green-500/50' : 'bg-accent hover:bg-accent/80'
+                }`}
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                Выполнено
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleFlag('is_urgent')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                  formData.is_urgent ? 'bg-amber-500/20 text-amber-500 border border-amber-500/50' : 'bg-accent hover:bg-accent/80'
+                }`}
+              >
+                <Zap className="w-3.5 h-3.5" />
+                Срочно
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleFlag('is_video_call')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                  formData.is_video_call ? 'bg-blue-500/20 text-blue-500 border border-blue-500/50' : 'bg-accent hover:bg-accent/80'
+                }`}
+              >
+                <Video className="w-3.5 h-3.5" />
+                Видеозвонок
+              </button>
             </div>
           </div>
 
-          <div>
-            <Label className="text-xs text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />Место</Label>
-            <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} placeholder="Офис / Zoom / etc" className="mt-1" data-testid="event-location-input" />
+          {/* Unconfirmed toggle */}
+          <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-accent/50">
+            <div className="flex items-center gap-2">
+              <span className="text-sm">Не согласовано</span>
+              <span className="text-xs text-muted-foreground">(пунктирная рамка)</span>
+            </div>
+            <Switch 
+              checked={formData.is_unconfirmed} 
+              onCheckedChange={(checked) => setFormData({ ...formData, is_unconfirmed: checked })}
+              data-testid="event-unconfirmed-switch"
+            />
           </div>
 
+          {/* Location */}
           <div>
-            <Label className="text-xs text-muted-foreground flex items-center gap-1"><FileText className="w-3 h-3" />Описание</Label>
-            <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Дополнительная информация..." rows={2} className="mt-1 resize-none" data-testid="event-description-input" />
+            <Label className="text-xs text-muted-foreground flex items-center gap-1 mb-1.5">
+              <MapPin className="w-3 h-3" />Место
+            </Label>
+            <Input 
+              value={formData.location} 
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })} 
+              placeholder="Офис / Zoom / etc" 
+              data-testid="event-location-input" 
+            />
           </div>
 
+          {/* Description */}
           <div>
-            <Label className="text-xs text-muted-foreground flex items-center gap-1"><Users className="w-3 h-3" />Участники</Label>
-            <div className="flex gap-2 mt-1">
-              <Input value={attendeeInput} onChange={(e) => setAttendeeInput(e.target.value)} placeholder="Email" className="flex-1" onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAttendee())} data-testid="event-attendee-input" />
+            <Label className="text-xs text-muted-foreground flex items-center gap-1 mb-1.5">
+              <FileText className="w-3 h-3" />Описание
+            </Label>
+            <Textarea 
+              value={formData.description} 
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
+              placeholder="Дополнительная информация..." 
+              rows={2} 
+              className="resize-none" 
+              data-testid="event-description-input" 
+            />
+          </div>
+
+          {/* Attendees */}
+          <div>
+            <Label className="text-xs text-muted-foreground flex items-center gap-1 mb-1.5">
+              <Users className="w-3 h-3" />Участники
+            </Label>
+            <div className="flex gap-2">
+              <Input 
+                value={attendeeInput} 
+                onChange={(e) => setAttendeeInput(e.target.value)} 
+                placeholder="Email участника" 
+                className="flex-1" 
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAttendee())} 
+                data-testid="event-attendee-input" 
+              />
               <Button type="button" onClick={handleAddAttendee} variant="secondary" size="sm">+</Button>
             </div>
             {formData.attendees.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {formData.attendees.map(email => (
                   <span key={email} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent text-xs">
-                    {email}<button type="button" onClick={() => handleRemoveAttendee(email)} className="hover:text-red-400"><X className="w-3 h-3" /></button>
+                    {email}
+                    <button type="button" onClick={() => handleRemoveAttendee(email)} className="hover:text-red-400">
+                      <X className="w-3 h-3" />
+                    </button>
                   </span>
                 ))}
               </div>
             )}
           </div>
 
+          {/* Footer */}
           <div className="flex items-center justify-between pt-4 border-t border-border">
             {event && (
-              <Button type="button" variant="ghost" onClick={() => onDelete(event.id)} className="text-red-500 hover:text-red-400 hover:bg-red-500/10" data-testid="delete-event-button">
-                <Trash2 className="w-4 h-4 mr-2" />Удалить
+              <Button 
+                type="button" 
+                variant="ghost" 
+                onClick={() => onDelete(event.id)} 
+                className="text-red-500 hover:text-red-400 hover:bg-red-500/10" 
+                data-testid="delete-event-button"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Удалить
               </Button>
             )}
             <div className="flex gap-2 ml-auto">
               <Button type="button" variant="ghost" onClick={onClose}>Отмена</Button>
-              <Button type="submit" className="btn-primary" data-testid="save-event-button">{event ? 'Сохранить' : 'Создать'}</Button>
+              <Button type="submit" className="btn-primary" data-testid="save-event-button">
+                {event ? 'Сохранить' : 'Создать'}
+              </Button>
             </div>
           </div>
         </form>
