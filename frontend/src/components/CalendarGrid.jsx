@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, isToday, parseISO } from 'date-fns';
+import { useMemo, useState, useRef } from 'react';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, isToday, parseISO, addMinutes, setHours, setMinutes } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { ChevronDown, Square, CheckCircle2, Zap, Video } from 'lucide-react';
 
@@ -40,20 +40,23 @@ const TemplateSelector = ({ day, onSelect }) => {
         <ChevronDown className="w-3 h-3" />
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-lg shadow-lg z-10 py-1 min-w-[120px]">
-          <button className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent">Рабочий день</button>
-          <button className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent">Выходной</button>
-          <button className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent">Отпуск</button>
-          <button className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent text-muted-foreground">Нет шаблона</button>
-        </div>
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-lg shadow-lg z-20 py-1 min-w-[120px]">
+            <button className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent" onClick={() => setOpen(false)}>Рабочий день</button>
+            <button className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent" onClick={() => setOpen(false)}>Выходной</button>
+            <button className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent" onClick={() => setOpen(false)}>Отпуск</button>
+            <button className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent text-muted-foreground" onClick={() => setOpen(false)}>Нет шаблона</button>
+          </div>
+        </>
       )}
     </div>
   );
 };
 
-export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, overloadedDays, ratings, view, onDateClick, onCellDoubleClick, onEventClick, loading }) => {
-  if (view === 'day') return <DayView date={selectedDate} events={events} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} />;
-  if (view === 'week') return <WeekView date={selectedDate} events={events} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} />;
+export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, overloadedDays, ratings, view, onDateClick, onCellDoubleClick, onEventClick, onEventUpdate, loading }) => {
+  if (view === 'day') return <DayView date={selectedDate} events={events} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} />;
+  if (view === 'week') return <WeekView date={selectedDate} events={events} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} />;
   return <MonthView currentDate={currentDate} selectedDate={selectedDate} events={events} overloadedDays={overloadedDays} ratings={ratings} onDateClick={onDateClick} onCellDoubleClick={onCellDoubleClick} onEventClick={onEventClick} />;
 };
 
@@ -123,14 +126,17 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
   );
 };
 
-const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }) => {
-  const weekStart = startOfWeek(date, { weekStartsOn: 1 }); // Понедельник первый
+const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate }) => {
+  const weekStart = startOfWeek(date, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
-  const hours = Array.from({ length: 13 }, (_, i) => i + 7); // 7:00 - 19:00
-
-  // Day name abbreviations
+  const hours = Array.from({ length: 24 }, (_, i) => i); // 0:00 - 23:00 (все 24 часа)
   const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  
+  // Drag state
+  const [draggedEvent, setDraggedEvent] = useState(null);
+  const [resizingEvent, setResizingEvent] = useState(null);
+  const gridRef = useRef(null);
 
   const getEventStyle = (event) => {
     try {
@@ -138,10 +144,9 @@ const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }
       const end = parseISO(event.end_time);
       const startHour = start.getHours() + start.getMinutes() / 60;
       const duration = (end - start) / 3600000;
-      // Offset from 7:00 (start of visible hours)
-      const topOffset = (startHour - 7) * 60;
+      const topOffset = startHour * 60; // Начинаем с 0:00
       return { 
-        top: `${Math.max(topOffset, 0)}px`, 
+        top: `${topOffset}px`, 
         height: `${Math.max(duration * 60, 24)}px` 
       };
     } catch { return { top: '0px', height: '60px' }; }
@@ -165,27 +170,79 @@ const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }
     try {
       const start = parseISO(event.start_time);
       const end = parseISO(event.end_time);
-      return (end - start) / 3600000; // в часах
+      return (end - start) / 3600000;
     } catch { return 1; }
   };
 
   const isLongEvent = (event) => getEventDuration(event) >= 1;
 
+  // Drag handlers
+  const handleDragStart = (e, event) => {
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggedEvent(event);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e, day, hour) => {
+    e.preventDefault();
+    if (!draggedEvent || !onEventUpdate) return;
+    
+    const start = parseISO(draggedEvent.start_time);
+    const end = parseISO(draggedEvent.end_time);
+    const duration = end - start;
+    
+    const newStart = setMinutes(setHours(day, hour), 0);
+    const newEnd = new Date(newStart.getTime() + duration);
+    
+    onEventUpdate({
+      ...draggedEvent,
+      start_time: newStart.toISOString(),
+      end_time: newEnd.toISOString()
+    });
+    
+    setDraggedEvent(null);
+  };
+
+  // Resize handlers
+  const handleResizeStart = (e, event) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setResizingEvent(event);
+    
+    const handleMouseMove = (moveEvent) => {
+      if (!gridRef.current || !resizingEvent) return;
+      const rect = gridRef.current.getBoundingClientRect();
+      const y = moveEvent.clientY - rect.top;
+      const newEndHour = Math.max(1, Math.round(y / 60));
+      // Update would happen here
+    };
+    
+    const handleMouseUp = () => {
+      setResizingEvent(null);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
   return (
     <div className="card-glass overflow-hidden" data-testid="week-view">
       {/* Header with day names and dates */}
-      <div className="grid" style={{ gridTemplateColumns: '60px repeat(7, 1fr) 60px' }}>
-        {/* Left time column header */}
+      <div className="grid" style={{ gridTemplateColumns: '50px repeat(7, 1fr) 50px' }}>
         <div className="p-2 text-center text-[10px] text-muted-foreground border-b border-r border-border/30"></div>
         
-        {/* Day headers */}
         {days.map((day, idx) => (
           <div 
             key={day.toISOString()} 
-            className={`group border-b border-r border-border/30 ${isSameDay(day, date) ? 'bg-accent/30' : ''}`}
+            className={`group border-b border-r border-border/30 ${isSameDay(day, date) ? 'bg-violet-500/10' : ''}`}
           >
             <div className="flex items-start justify-between p-2">
-              {/* Left: Day name and date */}
               <button 
                 onClick={() => onDateClick(day)} 
                 className="text-left hover:bg-accent/30 rounded px-1 -ml-1 transition-colors"
@@ -195,46 +252,49 @@ const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }
                   {format(day, 'd')}
                 </p>
               </button>
-              
-              {/* Right: Template selector */}
               <TemplateSelector day={day} />
             </div>
             
             {/* All-day events row */}
-            <div className="min-h-[28px] px-1 pb-1 space-y-0.5">
-              {getAllDayEvents(day).map(event => (
-                <div 
-                  key={event.id}
-                  onClick={() => onEventClick(event)}
-                  className={`px-2 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 ${EVENT_COLORS[event.event_type] || 'event-meeting'} ${event.status === 'tentative' && 'event-tentative'}`}
-                >
-                  {event.title}
-                </div>
-              ))}
+            <div className="min-h-[24px] px-1 pb-1 space-y-0.5">
+              {getAllDayEvents(day).map(event => {
+                const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
+                return (
+                  <div 
+                    key={event.id}
+                    onClick={() => onEventClick(event)}
+                    className={`px-2 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 
+                      ${isUnconfirmed ? 'border border-dashed border-current bg-transparent' : ''} 
+                      ${EVENT_COLORS[event.event_type] || 'event-meeting'}`}
+                  >
+                    {event.title}
+                  </div>
+                );
+              })}
             </div>
           </div>
         ))}
         
-        {/* Right time column header */}
         <div className="p-2 text-center text-[10px] text-muted-foreground border-b border-border/30"></div>
       </div>
 
       {/* Time grid */}
       <div 
-        className="grid max-h-[calc(100vh-280px)] overflow-y-auto" 
-        style={{ gridTemplateColumns: '60px repeat(7, 1fr) 60px' }}
+        ref={gridRef}
+        className="grid max-h-[calc(100vh-260px)] overflow-y-auto" 
+        style={{ gridTemplateColumns: '50px repeat(7, 1fr) 50px' }}
       >
         {/* Left time column */}
         <div className="border-r border-border/20">
           {hours.map(hour => (
-            <div key={hour} className="h-[60px] px-2 flex items-start pt-1 justify-end text-[10px] text-muted-foreground/50 font-mono">
+            <div key={hour} className="h-[60px] px-1 flex items-start pt-1 justify-end text-[10px] text-muted-foreground/60 font-mono">
               {String(hour).padStart(2, '0')}:00
             </div>
           ))}
         </div>
 
         {/* Day columns */}
-        {days.map(day => {
+        {days.map((day, dayIdx) => {
           const dayEvents = getDayEvents(day);
           const isTodayCol = isToday(day);
           const isSelectedCol = isSameDay(day, date);
@@ -249,15 +309,17 @@ const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }
                 <div 
                   key={hour} 
                   className="h-[60px] border-b border-dashed border-border/20 hover:bg-accent/10" 
-                  onDoubleClick={() => onCellDoubleClick(day, hour)} 
+                  onDoubleClick={() => onCellDoubleClick(day, hour)}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, day, hour)}
                 />
               ))}
               
               {/* Current time line */}
               {isTodayCol && (
                 <div 
-                  className="absolute left-0 right-0 border-t-2 border-violet-500 z-10" 
-                  style={{ top: `${(new Date().getHours() - 7 + new Date().getMinutes() / 60) * 60}px` }}
+                  className="absolute left-0 right-0 border-t-2 border-violet-500 z-10 pointer-events-none" 
+                  style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60) * 60}px` }}
                 >
                   <div className="absolute -left-1 -top-1.5 w-3 h-3 rounded-full bg-violet-500" />
                 </div>
@@ -273,10 +335,12 @@ const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }
                 return (
                   <div 
                     key={event.id} 
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, event)}
                     onClick={() => onEventClick(event)} 
                     className={`
-                      absolute left-0.5 right-0.5 px-2 py-1 rounded-md text-xs cursor-pointer 
-                      hover:opacity-90 transition-opacity overflow-hidden
+                      absolute left-0.5 right-0.5 px-1.5 py-1 rounded-md text-xs cursor-pointer 
+                      hover:opacity-90 transition-opacity overflow-hidden group
                       ${isTemplate 
                         ? 'bg-transparent border-2 border-violet-400 text-violet-600 dark:text-violet-300' 
                         : isUnconfirmed 
@@ -287,19 +351,24 @@ const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }
                     style={getEventStyle(event)} 
                     data-testid={`event-${event.id}`}
                   >
-                    <div className="flex items-start justify-between gap-1">
-                      <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-1 h-full">
+                      <div className="flex-1 min-w-0 flex flex-col">
                         {isLong && (
-                          <span className="text-[10px] font-mono opacity-70 mr-1">
+                          <span className="text-[10px] font-mono opacity-70">
                             {event.start_time?.slice(11, 16)}
                           </span>
                         )}
-                        <span className={`font-medium ${isLong ? 'text-[11px]' : 'text-[10px]'} truncate`}>
+                        <span className={`font-medium leading-tight ${isLong ? 'text-[11px]' : 'text-[10px]'}`}>
                           {event.title}
                         </span>
                       </div>
                       <EventIcons event={event} />
                     </div>
+                    {/* Resize handle */}
+                    <div 
+                      className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize opacity-0 group-hover:opacity-100 bg-black/20 rounded-b"
+                      onMouseDown={(e) => handleResizeStart(e, event)}
+                    />
                   </div>
                 );
               })}
@@ -310,7 +379,7 @@ const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }
         {/* Right time column */}
         <div className="border-l border-border/20">
           {hours.map(hour => (
-            <div key={hour} className="h-[60px] px-2 flex items-start pt-1 justify-start text-[10px] text-muted-foreground/50 font-mono">
+            <div key={hour} className="h-[60px] px-1 flex items-start pt-1 justify-start text-[10px] text-muted-foreground/60 font-mono">
               {String(hour).padStart(2, '0')}:00
             </div>
           ))}
@@ -320,10 +389,12 @@ const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }
   );
 };
 
-const DayView = ({ date, events, onEventClick, onCellDoubleClick }) => {
-  const hours = Array.from({ length: 13 }, (_, i) => i + 7); // 7:00 - 19:00
+const DayView = ({ date, events, onEventClick, onCellDoubleClick, onEventUpdate }) => {
+  const hours = Array.from({ length: 24 }, (_, i) => i); // Все 24 часа
   const dayEvents = events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd')) && !e.is_all_day);
   const allDayEvents = events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd')) && e.is_all_day);
+  
+  const [draggedEvent, setDraggedEvent] = useState(null);
 
   const getEventStyle = (event) => {
     try {
@@ -331,8 +402,8 @@ const DayView = ({ date, events, onEventClick, onCellDoubleClick }) => {
       const end = parseISO(event.end_time);
       const startHour = start.getHours() + start.getMinutes() / 60;
       const duration = (end - start) / 3600000;
-      const topOffset = (startHour - 7) * 60;
-      return { top: `${Math.max(topOffset, 0)}px`, height: `${Math.max(duration * 60, 30)}px` };
+      const topOffset = startHour * 60;
+      return { top: `${topOffset}px`, height: `${Math.max(duration * 60, 30)}px` };
     } catch { return { top: '0px', height: '60px' }; }
   };
 
@@ -342,6 +413,35 @@ const DayView = ({ date, events, onEventClick, onCellDoubleClick }) => {
       const end = parseISO(event.end_time);
       return (end - start) / 3600000;
     } catch { return 1; }
+  };
+
+  const handleDragStart = (e, event) => {
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggedEvent(event);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e, hour) => {
+    e.preventDefault();
+    if (!draggedEvent || !onEventUpdate) return;
+    
+    const start = parseISO(draggedEvent.start_time);
+    const end = parseISO(draggedEvent.end_time);
+    const duration = end - start;
+    
+    const newStart = setMinutes(setHours(date, hour), 0);
+    const newEnd = new Date(newStart.getTime() + duration);
+    
+    onEventUpdate({
+      ...draggedEvent,
+      start_time: newStart.toISOString(),
+      end_time: newEnd.toISOString()
+    });
+    
+    setDraggedEvent(null);
   };
 
   return (
@@ -362,25 +462,33 @@ const DayView = ({ date, events, onEventClick, onCellDoubleClick }) => {
         <div className="px-4 py-2 border-b border-border/30 bg-accent/20">
           <p className="text-xs text-muted-foreground mb-2">События дня</p>
           <div className="space-y-1">
-            {allDayEvents.map(event => (
-              <div 
-                key={event.id}
-                onClick={() => onEventClick(event)}
-                className={`px-3 py-1.5 rounded text-sm cursor-pointer hover:opacity-80 ${EVENT_COLORS[event.event_type]}`}
-              >
-                {event.title}
-              </div>
-            ))}
+            {allDayEvents.map(event => {
+              const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
+              return (
+                <div 
+                  key={event.id}
+                  onClick={() => onEventClick(event)}
+                  className={`px-3 py-1.5 rounded text-sm cursor-pointer hover:opacity-80 
+                    ${isUnconfirmed ? 'border border-dashed border-current bg-transparent' : ''} 
+                    ${EVENT_COLORS[event.event_type]}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>{event.title}</span>
+                    <EventIcons event={event} />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
 
       {/* Time grid */}
-      <div className="grid grid-cols-[60px_1fr_60px] max-h-[calc(100vh-280px)] overflow-y-auto">
+      <div className="grid grid-cols-[50px_1fr_50px] max-h-[calc(100vh-260px)] overflow-y-auto">
         {/* Left time column */}
         <div className="border-r border-border/20">
           {hours.map(hour => (
-            <div key={hour} className="h-[60px] px-2 flex items-start pt-1 justify-end text-[10px] text-muted-foreground/50 font-mono">
+            <div key={hour} className="h-[60px] px-1 flex items-start pt-1 justify-end text-[10px] text-muted-foreground/60 font-mono">
               {String(hour).padStart(2, '0')}:00
             </div>
           ))}
@@ -392,15 +500,17 @@ const DayView = ({ date, events, onEventClick, onCellDoubleClick }) => {
             <div 
               key={hour} 
               className="h-[60px] border-b border-dashed border-border/20 hover:bg-accent/10" 
-              onDoubleClick={() => onCellDoubleClick(date, hour)} 
+              onDoubleClick={() => onCellDoubleClick(date, hour)}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, hour)}
             />
           ))}
           
           {/* Current time line */}
           {isToday(date) && (
             <div 
-              className="absolute left-0 right-0 border-t-2 border-violet-500 z-10" 
-              style={{ top: `${(new Date().getHours() - 7 + new Date().getMinutes() / 60) * 60}px` }}
+              className="absolute left-0 right-0 border-t-2 border-violet-500 z-10 pointer-events-none" 
+              style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60) * 60}px` }}
             >
               <div className="absolute -left-1 -top-1.5 w-3 h-3 rounded-full bg-violet-500" />
             </div>
@@ -415,11 +525,13 @@ const DayView = ({ date, events, onEventClick, onCellDoubleClick }) => {
             
             return (
               <div 
-                key={event.id} 
+                key={event.id}
+                draggable
+                onDragStart={(e) => handleDragStart(e, event)}
                 onClick={() => onEventClick(event)} 
                 className={`
                   absolute left-2 right-2 px-3 py-1.5 rounded-lg cursor-pointer 
-                  hover:opacity-90 transition-opacity
+                  hover:opacity-90 transition-opacity group
                   ${isTemplate 
                     ? 'bg-transparent border-2 border-violet-400 text-violet-600 dark:text-violet-300' 
                     : isUnconfirmed 
@@ -441,6 +553,8 @@ const DayView = ({ date, events, onEventClick, onCellDoubleClick }) => {
                   </div>
                   <EventIcons event={event} />
                 </div>
+                {/* Resize handle */}
+                <div className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize opacity-0 group-hover:opacity-100 bg-black/20 rounded-b" />
               </div>
             );
           })}
@@ -449,7 +563,7 @@ const DayView = ({ date, events, onEventClick, onCellDoubleClick }) => {
         {/* Right time column */}
         <div className="border-l border-border/20">
           {hours.map(hour => (
-            <div key={hour} className="h-[60px] px-2 flex items-start pt-1 justify-start text-[10px] text-muted-foreground/50 font-mono">
+            <div key={hour} className="h-[60px] px-1 flex items-start pt-1 justify-start text-[10px] text-muted-foreground/60 font-mono">
               {String(hour).padStart(2, '0')}:00
             </div>
           ))}
