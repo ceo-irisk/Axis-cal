@@ -199,6 +199,26 @@ class EventFieldConfig(BaseModel):
     fields: List[CustomField] = []
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+# ==================== DICTIONARY MODELS ====================
+
+class EventTypeConfig(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    label: str
+    color: str  # Tailwind color class or hex
+    order: int = 0
+    is_active: bool = True
+
+class EventStatusConfig(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    label: str
+    color: str
+    order: int = 0
+    is_active: bool = True
+
 # ==================== HELPERS ====================
 
 def hash_password(password: str) -> str:
