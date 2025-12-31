@@ -1,49 +1,154 @@
-# Test Results - Axis Calendar App
+backend:
+  - task: "Event Creation API with Status Field"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test event creation with new status field (Подтверждено, Не согласовано, Шаблонное событие)"
 
-## Testing Session: December 31, 2025
+  - task: "Event Update API with Status Field"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test event update with different status values"
 
-### Features to Test:
+  - task: "Event Deletion API"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test event deletion for backspace functionality"
 
-1. **Event Selection with Single Click**
-   - Click on event in calendar grid → should select (show violet ring)
-   - Click on another event → should select new one, deselect old
-   - Click on same event again → should deselect
+  - task: "Authentication API with Review Credentials"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test login with admin@example.com / admin123"
 
-2. **Event Deletion with Backspace**
-   - Select event with single click
-   - Press Backspace key
-   - Confirm dialog should appear
-   - Event should be deleted after confirmation
+  - task: "Event Flags Dictionary API"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test dictionaries API for event flags (Заблокировано, Выполнено, Срочно, Видеозвонок)"
 
-3. **Double Click for Editing**
-   - Double click on event in calendar grid
-   - Should open edit modal (not just select)
+  - task: "Event Status Dictionary API"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test if old status dictionary (confirmed/tentative/cancelled) is properly replaced"
 
-4. **Improved Time Picker**
-   - Open event modal
-   - Time picker should have +/- buttons for hours and minutes
-   - No more datetime-local input
+frontend:
+  - task: "Event Selection (Single Click)"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/CalendarGrid.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Frontend testing not performed by testing agent"
 
-5. **Status field replaces is_unconfirmed**
-   - Status dropdown should have: Подтверждено, Не согласовано, Шаблонное событие
-   - "Подтверждено" should be default for new events
-   - "Не согласовано" should show dotted border in calendar
-   - No separate "Не согласовано" toggle
+  - task: "Event Deletion with Backspace"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/CalendarGrid.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Frontend testing not performed by testing agent"
 
-6. **Event Flags in Dictionaries**
-   - Settings → Dictionaries
-   - Should show "Флаги событий" section
-   - Should display: Заблокировано, Выполнено, Срочно, Видеозвонок
-   - Old "Статусы событий" (confirmed/tentative/cancelled) should be removed
+  - task: "Double Click for Editing"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/CalendarGrid.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Frontend testing not performed by testing agent"
 
-### Test Credentials:
-- Email: admin@example.com
-- Password: admin123
+  - task: "Improved Time Picker"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/EventModal.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Frontend testing not performed by testing agent"
 
-### Expected Results:
-- Single click selects event (violet ring highlight)
-- Backspace deletes selected event after confirmation
-- Double click opens edit modal
-- Time picker has improved UI with +/- buttons
-- Status dropdown works correctly
-- Dictionaries show event flags instead of old statuses
+  - task: "Status Field UI"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/EventModal.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Frontend testing not performed by testing agent"
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Event Creation API with Status Field"
+    - "Event Update API with Status Field"
+    - "Authentication API with Review Credentials"
+    - "Event Deletion API"
+    - "Event Flags Dictionary API"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "testing"
+    message: "Starting backend API testing for Axis Calendar features. Focus on new status field implementation and dictionary changes."
