@@ -268,7 +268,7 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], on
               <SelectContent position="popper" sideOffset={4}>
                 <SelectItem value="default">
                   <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-violet-500" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#085C53]" />
                     Основной
                   </div>
                 </SelectItem>
