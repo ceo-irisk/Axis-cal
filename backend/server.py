@@ -908,6 +908,9 @@ async def get_overloaded_days(start_date: str, end_date: str, user: dict = Depen
     
     return overloaded
 
+class EventTypeReorderRequest(BaseModel):
+    type_ids: List[str]
+
 # ==================== EVENT TYPES DICTIONARY ====================
 
 @api_router.get("/dictionaries/event-types")
