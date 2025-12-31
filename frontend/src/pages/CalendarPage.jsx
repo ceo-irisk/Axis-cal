@@ -169,11 +169,21 @@ export default function CalendarPage() {
         isOpen={sidebarOpen} 
         onClose={() => setSidebarOpen(false)} 
         onCalendarsChange={setCalendars}
-        collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        selectedDate={selectedDate}
+        onDateSelect={(date) => {
+          setSelectedDate(date);
+          setCurrentDate(date);
+        }}
+        events={selectedDateEvents}
+        rating={currentRating}
+        violations={currentViolations}
+        onRateDay={handleRateDay}
+        onOpenSurvey={() => setShowSurveyModal(true)}
+        onEventClick={handleEventClick}
+        onCreateEvent={handleCreateEvent}
       />
       
-      <main className={`main-content flex-1 ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`} data-testid="calendar-main">
+      <main className="main-content-full flex-1" data-testid="calendar-main">
         <div className="max-w-full">
           <header className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
@@ -207,10 +217,6 @@ export default function CalendarPage() {
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
                 </button>
               </div>
-              <button onClick={handleCreateEvent} className="btn-primary flex items-center gap-2" data-testid="create-event-button">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-                Событие
-              </button>
             </div>
           </header>
 
@@ -229,16 +235,6 @@ export default function CalendarPage() {
           />
         </div>
       </main>
-
-      <RightPanel
-        selectedDate={selectedDate}
-        events={selectedDateEvents}
-        rating={currentRating}
-        violations={currentViolations}
-        onRateDay={handleRateDay}
-        onOpenSurvey={() => setShowSurveyModal(true)}
-        onEventClick={handleEventClick}
-      />
 
       {showEventModal && (
         <EventModal
