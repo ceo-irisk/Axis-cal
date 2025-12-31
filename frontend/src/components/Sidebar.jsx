@@ -284,19 +284,26 @@ export const Sidebar = ({
                     {allDayEvents.length > 0 && (
                       <div className="space-y-2">
                         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Весь день</p>
-                        {allDayEvents.map((event) => (
-                          <button 
-                            key={event.id} 
-                            onClick={() => onEventClick?.(event)} 
-                            className="w-full text-left p-3 rounded-xl bg-accent/50 hover:bg-accent transition-colors border-l-4 border-violet-500"
-                            data-testid={`sidebar-event-${event.id}`}
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <p className="font-medium text-sm truncate">{event.title}</p>
-                              <EventIcons event={event} />
-                            </div>
-                          </button>
-                        ))}
+                        {allDayEvents.map((event) => {
+                          const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
+                          return (
+                            <button 
+                              key={event.id} 
+                              onClick={() => onEventClick?.(event)} 
+                              className={`w-full text-left p-3 rounded-xl transition-colors ${
+                                isUnconfirmed 
+                                  ? 'border-2 border-dashed border-violet-500 bg-violet-500/5 hover:bg-violet-500/10'
+                                  : 'bg-accent/50 hover:bg-accent border-l-4 border-violet-500'
+                              }`}
+                              data-testid={`sidebar-event-${event.id}`}
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="font-medium text-sm truncate">{event.title}</p>
+                                <EventIcons event={event} />
+                              </div>
+                            </button>
+                          );
+                        })}
                         {timedEvents.length > 0 && (
                           <div className="border-b border-border/50 my-3" />
                         )}
