@@ -10,7 +10,7 @@ import { Switch } from '../components/ui/switch';
 import { getEventFields } from '../lib/api';
 
 const EVENT_TYPES = [
-  { value: 'meeting', label: 'Встреча', color: '#8b5cf6' },
+  { value: 'meeting', label: 'Встреча', color: '#085C53' },
   { value: 'call', label: 'Звонок', color: '#06b6d4' },
   { value: 'personal', label: 'Личное', color: '#f59e0b' },
   { value: 'urgent', label: 'Срочно', color: '#ef4444' },
