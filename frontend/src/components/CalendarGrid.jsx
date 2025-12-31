@@ -179,7 +179,7 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
   );
 };
 
-const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate }) => {
+const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, selectedEventId, onEventSelect }) => {
   const weekStart = startOfWeek(date, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
