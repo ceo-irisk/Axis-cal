@@ -216,7 +216,7 @@ frontend:
     file: "/app/frontend/src/components/CalendarGrid.jsx"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "user"
@@ -224,6 +224,9 @@ frontend:
       - working: true
         agent: "main"
         comment: "Fixed getEventStyle to use local time via new Date() instead of parseISO, time now always shows on events"
+      - working: true
+        agent: "testing"
+        comment: "VERIFIED: Events correctly positioned - ПЕРМА at 09:00, ААААА at 12:00, Созвон с кем-то at 14:00, Аларм as all-day event. All events display at correct time slots in week view."
 
   - task: "Event Time Display in Grid"
     implemented: true
@@ -231,23 +234,29 @@ frontend:
     file: "/app/frontend/src/components/CalendarGrid.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Added getLocalTime helper, time now shown for all events not just long ones"
+      - working: true
+        agent: "testing"
+        comment: "VERIFIED: Time is displayed on ALL events in HH:MM format (09:00, 12:00, 14:00). Both sidebar and calendar grid show times correctly for all events regardless of duration."
 
   - task: "Drag and Drop Events"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/components/CalendarGrid.jsx"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Code implemented but not tested yet"
+      - working: true
+        agent: "testing"
+        comment: "VERIFIED: Drag and drop functionality is implemented and working. Events can be dragged to different time slots in week view. Code includes proper drag handlers and event update functionality."
 
 metadata:
   created_by: "main_agent"
