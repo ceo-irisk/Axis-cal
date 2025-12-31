@@ -179,7 +179,7 @@ const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }
         <div className="p-2 text-center text-[10px] text-muted-foreground border-b border-r border-border/30"></div>
         
         {/* Day headers */}
-        {days.map(day => (
+        {days.map((day, idx) => (
           <div 
             key={day.toISOString()} 
             className={`group border-b border-r border-border/30 ${isSameDay(day, date) ? 'bg-accent/30' : ''}`}
@@ -190,7 +190,7 @@ const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }
                 onClick={() => onDateClick(day)} 
                 className="text-left hover:bg-accent/30 rounded px-1 -ml-1 transition-colors"
               >
-                <p className="text-xs text-muted-foreground uppercase">{format(day, 'EEE', { locale: ru })}</p>
+                <p className="text-xs text-muted-foreground uppercase">{dayNames[idx]}</p>
                 <p className={`text-lg font-semibold ${isToday(day) ? 'text-violet-500' : ''}`}>
                   {format(day, 'd')}
                 </p>
@@ -211,10 +211,6 @@ const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }
                   {event.title}
                 </div>
               ))}
-              {/* Info link placeholder */}
-              <button className="text-[10px] text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity">
-                Инфа о шаблоне
-              </button>
             </div>
           </div>
         ))}
