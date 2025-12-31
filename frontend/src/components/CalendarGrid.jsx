@@ -444,16 +444,16 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
           ))}
         </div>
         
-        {/* Timezone selector - right side */}
-        <div className="flex-shrink-0 w-[200px] p-2 border-b border-border/30 flex items-center justify-center">
-          <TimezoneSelector selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} />
+        {/* Timezone selector - compact right side */}
+        <div className="flex-shrink-0 w-[140px] p-1 border-b border-l border-border/30 flex items-center justify-center">
+          <TimezoneSelector selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} />
         </div>
       </div>
 
       {/* Time grid */}
       <div 
         ref={gridRef}
-        className="flex max-h-[calc(100vh-260px)] overflow-y-auto" 
+        className="flex h-[calc(100vh-220px)] overflow-y-auto" 
       >
         {/* Left time column - fixed width */}
         <div className="flex-shrink-0 w-[50px] border-r border-border/20">
