@@ -3,6 +3,20 @@ import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInte
 import { ru } from 'date-fns/locale';
 import { ChevronDown, Square, CheckCircle2, Zap, Video } from 'lucide-react';
 
+// Helper to parse ISO time and get local hours/minutes
+const getLocalTime = (isoString) => {
+  try {
+    const date = new Date(isoString);
+    return {
+      hours: date.getHours(),
+      minutes: date.getMinutes(),
+      formatted: `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+    };
+  } catch {
+    return { hours: 0, minutes: 0, formatted: '00:00' };
+  }
+};
+
 const EVENT_COLORS = {
   meeting: 'event-meeting',
   call: 'event-call',
