@@ -768,7 +768,6 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
                   absolute px-2 py-1.5 rounded-lg cursor-pointer 
                   hover:opacity-90 transition-opacity group
                   ${eventColorClass}
-                  ${isTemplate ? 'ring-2 ring-[#085C53] ring-inset' : ''}
                   ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
                 `}
                 style={{...getEventStyle(event), ...overlapStyle}} 
