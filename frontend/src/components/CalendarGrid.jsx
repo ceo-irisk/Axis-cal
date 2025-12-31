@@ -50,8 +50,15 @@ const EventIcons = ({ event }) => {
 };
 
 // Template selector dropdown
-const TemplateSelector = ({ day, onSelect }) => {
+const TemplateSelector = ({ day, templates, onApplyTemplate }) => {
   const [open, setOpen] = useState(false);
+  
+  const handleSelect = (template) => {
+    if (template && onApplyTemplate) {
+      onApplyTemplate(template.id, day);
+    }
+    setOpen(false);
+  };
   
   return (
     <div className="relative">
@@ -66,11 +73,28 @@ const TemplateSelector = ({ day, onSelect }) => {
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-lg shadow-lg z-20 py-1 min-w-[120px]">
-            <button className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent" onClick={() => setOpen(false)}>Рабочий день</button>
-            <button className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent" onClick={() => setOpen(false)}>Выходной</button>
-            <button className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent" onClick={() => setOpen(false)}>Отпуск</button>
-            <button className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent text-muted-foreground" onClick={() => setOpen(false)}>Нет шаблона</button>
+          <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-lg shadow-lg z-20 py-1 min-w-[140px]">
+            {templates && templates.length > 0 ? (
+              templates.map(template => (
+                <button 
+                  key={template.id}
+                  className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent" 
+                  onClick={() => handleSelect(template)}
+                >
+                  {template.name}
+                </button>
+              ))
+            ) : (
+              <div className="px-3 py-1.5 text-xs text-muted-foreground">Нет шаблонов</div>
+            )}
+            <div className="border-t border-border mt-1 pt-1">
+              <button 
+                className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent text-muted-foreground" 
+                onClick={() => setOpen(false)}
+              >
+                Нет шаблона
+              </button>
+            </div>
           </div>
         </>
       )}
