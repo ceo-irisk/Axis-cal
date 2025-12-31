@@ -122,6 +122,28 @@ export const Sidebar = ({
   const [selectedTemplateForApply, setSelectedTemplateForApply] = useState(null);
   const [applyDate, setApplyDate] = useState(format(new Date(), 'yyyy-MM-dd'));
 
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const res = await getCalendars();
+        setCalendars(res.data || []);
+        onCalendarsChange?.(res.data || []);
+      } catch (e) { console.error(e); }
+      
+      try {
+        const [typesRes, statusesRes, templatesRes] = await Promise.all([
+          getEventTypes(),
+          getEventStatuses(),
+          getTemplates()
+        ]);
+        setEventTypes(typesRes.data || []);
+        setEventStatuses(statusesRes.data || []);
+        setTemplates(templatesRes.data || []);
+      } catch (e) { console.error(e); }
+    };
+    loadData();
+  }, [onCalendarsChange]);
+
   const fetchCalendars = async () => {
     try {
       const res = await getCalendars();
@@ -142,11 +164,6 @@ export const Sidebar = ({
       setTemplates(templatesRes.data || []);
     } catch (e) { console.error(e); }
   };
-
-  useEffect(() => {
-    fetchCalendars();
-    fetchDictionaries();
-  }, []);
 
   // Event Types handlers
   const handleSaveEventType = async (data) => {
