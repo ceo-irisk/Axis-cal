@@ -726,7 +726,7 @@ export const Sidebar = ({
                   <div className="text-center py-8">
                     <Users className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
                     <p className="text-sm text-muted-foreground mb-4">Управление пользователями</p>
-                    <button onClick={() => navigate('/settings/users')} className="btn-primary text-sm">
+                    <button onClick={() => { onShowUsers?.(); setActiveTab(TABS.EVENTS); }} className="btn-primary text-sm">
                       Открыть
                     </button>
                   </div>
