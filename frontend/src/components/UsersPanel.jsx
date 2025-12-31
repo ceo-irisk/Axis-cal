@@ -124,8 +124,8 @@ const UsersPanel = () => {
                 <tr key={user.id} className="border-b border-border/50 hover:bg-accent/30">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-violet-500/20 flex items-center justify-center">
-                        <User className="w-5 h-5 text-violet-500" />
+                      <div className="w-10 h-10 rounded-full bg-[#085C53]/20 flex items-center justify-center">
+                        <User className="w-5 h-5 text-[#085C53]" />
                       </div>
                       <span className="font-medium">{user.name}</span>
                     </div>
@@ -134,7 +134,7 @@ const UsersPanel = () => {
                   <td className="p-4">
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       user.role === 'admin' 
-                        ? 'bg-violet-500/20 text-violet-600 dark:text-violet-400' 
+                        ? 'bg-[#085C53]/20 text-[#074a44] dark:text-teal-400' 
                         : user.role === 'assistant'
                         ? 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-400'
                         : 'bg-accent text-muted-foreground'
