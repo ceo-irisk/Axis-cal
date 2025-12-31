@@ -524,7 +524,7 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
             <h2 className="text-lg font-semibold">{format(date, 'EEEE, d MMMM', { locale: ru })}</h2>
             <p className="text-sm text-muted-foreground">{dayEvents.length + allDayEvents.length} событий</p>
           </div>
-          <TemplateSelector day={date} />
+          <TemplateSelector day={date} templates={templates} onApplyTemplate={onApplyTemplate} />
         </div>
       </div>
 
