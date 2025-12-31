@@ -287,19 +287,26 @@ class ExecutiveCalendarAPITester:
         self.log_test("Templates - Get templates list", success,
                      "" if success else f"Failed to get templates: {data}")
         
-        # Test create template
+        # Test create template with enhanced event fields
         template_data = {
-            "name": "Daily Standup Template",
+            "name": "Важный день",
             "template_type": "day",
             "events": [
                 {
-                    "title": "Daily Standup",
+                    "title": "Важная встреча",
+                    "description": "Встреча с клиентом",
                     "start_hour": 9,
                     "start_minute": 0,
-                    "end_hour": 9,
-                    "end_minute": 30,
+                    "end_hour": 10,
+                    "end_minute": 0,
                     "event_type": "meeting",
-                    "status": "confirmed"
+                    "status": "confirmed",
+                    "location": "Офис",
+                    "is_blocked": False,
+                    "is_completed": False,
+                    "is_urgent": True,
+                    "is_video_call": False,
+                    "is_unconfirmed": False
                 }
             ],
             "is_active": True
@@ -308,9 +315,257 @@ class ExecutiveCalendarAPITester:
         success, data = self.make_request('POST', '/templates', template_data)
         if success and 'id' in data:
             self.created_template_id = data['id']
-            self.log_test("Templates - Create template", True)
+            self.log_test("Templates - Create template with enhanced fields", True)
+            
+            # Test template editing (PUT endpoint)
+            updated_template_data = {
+                "name": "Важный день (обновлено)",
+                "template_type": "day",
+                "events": [
+                    {
+                        "title": "Обновленная встреча",
+                        "description": "Обновленное описание",
+                        "start_hour": 10,
+                        "start_minute": 30,
+                        "end_hour": 11,
+                        "end_minute": 30,
+                        "event_type": "call",
+                        "status": "tentative",
+                        "location": "Zoom",
+                        "is_blocked": True,
+                        "is_completed": False,
+                        "is_urgent": False,
+                        "is_video_call": True,
+                        "is_unconfirmed": True
+                    }
+                ],
+                "is_active": True
+            }
+            
+            success, update_data = self.make_request('PUT', f'/templates/{self.created_template_id}', updated_template_data)
+            self.log_test("Templates - Edit template (PUT endpoint)", success,
+                         "" if success else f"Failed to update template: {update_data}")
+            
+            if success:
+                # Verify the update was applied
+                success, get_data = self.make_request('GET', '/templates')
+                if success:
+                    updated_template = next((t for t in get_data if t.get('id') == self.created_template_id), None)
+                    if updated_template and updated_template.get('name') == "Важный день (обновлено)":
+                        self.log_test("Templates - Verify template update persisted", True)
+                    else:
+                        self.log_test("Templates - Verify template update persisted", False, 
+                                     "Updated template name not found in templates list")
+                else:
+                    self.log_test("Templates - Verify template update persisted", False, 
+                                 f"Failed to retrieve templates: {get_data}")
+            
         else:
-            self.log_test("Templates - Create template", False, f"Failed to create template: {data}")
+            self.log_test("Templates - Create template with enhanced fields", False, f"Failed to create template: {data}")
+
+    def test_enhanced_event_fields(self):
+        """Test enhanced event fields functionality"""
+        print("\n🔍 Testing Enhanced Event Fields...")
+        
+        # Test create event with all new fields
+        tomorrow = datetime.now() + timedelta(days=1)
+        enhanced_event_data = {
+            "title": "Тестовое событие с расширенными полями",
+            "description": "Описание события с новыми полями",
+            "start_time": tomorrow.replace(hour=14, minute=0, second=0, microsecond=0).isoformat(),
+            "end_time": tomorrow.replace(hour=15, minute=0, second=0, microsecond=0).isoformat(),
+            "event_type": "meeting",
+            "status": "confirmed",
+            "location": "Конференц-зал А",
+            "attendees": ["participant@example.com"],
+            "is_all_day": False,
+            "is_unconfirmed": False,
+            "is_template_event": False,
+            "is_blocked": True,
+            "is_completed": False,
+            "is_urgent": True,
+            "is_video_call": False
+        }
+        
+        success, data = self.make_request('POST', '/events', enhanced_event_data)
+        if success and 'id' in data:
+            event_id = data['id']
+            self.log_test("Enhanced Events - Create event with new fields", True)
+            
+            # Verify all fields were saved correctly
+            success, event_data = self.make_request('GET', f'/events/{event_id}')
+            if success:
+                required_fields = ['location', 'is_blocked', 'is_completed', 'is_urgent', 'is_video_call', 'is_unconfirmed']
+                missing_fields = [field for field in required_fields if field not in event_data]
+                
+                if not missing_fields:
+                    self.log_test("Enhanced Events - Verify new fields saved", True)
+                else:
+                    self.log_test("Enhanced Events - Verify new fields saved", False, 
+                                 f"Missing fields: {missing_fields}")
+            else:
+                self.log_test("Enhanced Events - Verify new fields saved", False, 
+                             f"Failed to retrieve created event: {event_data}")
+            
+            # Clean up
+            self.make_request('DELETE', f'/events/{event_id}')
+            
+        else:
+            self.log_test("Enhanced Events - Create event with new fields", False, 
+                         f"Failed to create enhanced event: {data}")
+
+    def test_dictionary_functionality(self):
+        """Test dictionary management functionality"""
+        print("\n🔍 Testing Dictionary Functionality...")
+        
+        # Test get event types
+        success, data = self.make_request('GET', '/dictionaries/event-types')
+        self.log_test("Dictionaries - Get event types", success,
+                     "" if success else f"Failed to get event types: {data}")
+        
+        if success:
+            original_types = data
+            
+            # Test create new event type
+            new_type_data = {
+                "name": "test_type",
+                "label": "Тестовый тип",
+                "color": "#ff5722"
+            }
+            
+            success, create_data = self.make_request('POST', '/dictionaries/event-types', new_type_data)
+            if success and 'id' in create_data:
+                new_type_id = create_data['id']
+                self.log_test("Dictionaries - Create event type", True)
+                
+                # Test reordering functionality
+                # Get current types to test reordering
+                success, current_types = self.make_request('GET', '/dictionaries/event-types')
+                if success and len(current_types) >= 2:
+                    # Create a reorder list (reverse the order)
+                    type_ids = [t['id'] for t in current_types]
+                    reversed_ids = list(reversed(type_ids))
+                    
+                    success, reorder_data = self.make_request('PUT', '/dictionaries/event-types/reorder', 
+                                                            {"type_ids": reversed_ids})
+                    self.log_test("Dictionaries - Reorder event types", success,
+                                 "" if success else f"Failed to reorder types: {reorder_data}")
+                    
+                    if success:
+                        # Verify the reordering worked
+                        success, reordered_types = self.make_request('GET', '/dictionaries/event-types')
+                        if success:
+                            new_order = [t['id'] for t in reordered_types]
+                            if new_order == reversed_ids:
+                                self.log_test("Dictionaries - Verify reorder persisted", True)
+                            else:
+                                self.log_test("Dictionaries - Verify reorder persisted", False,
+                                             f"Order not updated correctly. Expected: {reversed_ids}, Got: {new_order}")
+                        else:
+                            self.log_test("Dictionaries - Verify reorder persisted", False,
+                                         f"Failed to get types after reorder: {reordered_types}")
+                
+                # Clean up - delete the test type
+                self.make_request('DELETE', f'/dictionaries/event-types/{new_type_id}')
+                
+            else:
+                self.log_test("Dictionaries - Create event type", False, 
+                             f"Failed to create event type: {create_data}")
+        
+        # Test get event statuses
+        success, data = self.make_request('GET', '/dictionaries/event-statuses')
+        self.log_test("Dictionaries - Get event statuses", success,
+                     "" if success else f"Failed to get event statuses: {data}")
+
+    def test_axis_calendar_specific_features(self):
+        """Test Axis Calendar specific features from review request"""
+        print("\n🔍 Testing Axis Calendar Specific Features...")
+        
+        # Test authentication with review request credentials
+        login_data = {
+            "email": "admin@example.com",
+            "password": "admin123"
+        }
+        
+        success, data = self.make_request('POST', '/auth/login', login_data, auth_required=False)
+        
+        if success and 'access_token' in data:
+            # Update token for subsequent requests
+            old_token = self.token
+            self.token = data['access_token']
+            self.log_test("Axis Calendar - Login with review credentials", True)
+            
+            # Test template creation for "Важный день" template
+            important_day_template = {
+                "name": "Важный день",
+                "template_type": "day",
+                "events": [
+                    {
+                        "title": "Важное событие",
+                        "description": "Описание важного события",
+                        "start_hour": 9,
+                        "start_minute": 0,
+                        "end_hour": 10,
+                        "end_minute": 0,
+                        "event_type": "meeting",
+                        "status": "confirmed",
+                        "location": "Переговорная",
+                        "is_blocked": False,
+                        "is_completed": False,
+                        "is_urgent": True,
+                        "is_video_call": False,
+                        "is_unconfirmed": False
+                    }
+                ],
+                "is_active": True
+            }
+            
+            success, template_data = self.make_request('POST', '/templates', important_day_template)
+            if success and 'id' in template_data:
+                template_id = template_data['id']
+                self.log_test("Axis Calendar - Create 'Важный день' template", True)
+                
+                # Test template editing with enhanced fields
+                updated_template = {
+                    "name": "Важный день (обновлено)",
+                    "template_type": "day",
+                    "events": [
+                        {
+                            "title": "Обновленное важное событие",
+                            "description": "Обновленное описание",
+                            "start_hour": 10,
+                            "start_minute": 0,
+                            "end_hour": 11,
+                            "end_minute": 30,
+                            "event_type": "call",
+                            "status": "tentative",
+                            "location": "Zoom",
+                            "is_blocked": True,
+                            "is_completed": False,
+                            "is_urgent": False,
+                            "is_video_call": True,
+                            "is_unconfirmed": True
+                        }
+                    ],
+                    "is_active": True
+                }
+                
+                success, update_data = self.make_request('PUT', f'/templates/{template_id}', updated_template)
+                self.log_test("Axis Calendar - Edit template with enhanced event form", success,
+                             "" if success else f"Failed to update template: {update_data}")
+                
+                # Clean up
+                self.make_request('DELETE', f'/templates/{template_id}')
+            else:
+                self.log_test("Axis Calendar - Create 'Важный день' template", False,
+                             f"Failed to create template: {template_data}")
+            
+            # Restore original token
+            self.token = old_token
+            
+        else:
+            self.log_test("Axis Calendar - Login with review credentials", False,
+                         f"Failed to login with review credentials: {data}")
 
     def test_analytics(self):
         """Test analytics endpoints"""
