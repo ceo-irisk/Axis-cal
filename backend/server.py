@@ -113,6 +113,14 @@ class EventBase(BaseModel):
     custom_fields: Dict[str, Any] = {}
     external_calendar_id: Optional[str] = None
     external_event_id: Optional[str] = None
+    # New fields for enhanced UI
+    is_all_day: bool = False
+    is_unconfirmed: bool = False
+    is_template_event: bool = False
+    is_blocked: bool = False
+    is_completed: bool = False
+    is_urgent: bool = False
+    is_video_call: bool = False
 
 class EventCreate(EventBase):
     pass
