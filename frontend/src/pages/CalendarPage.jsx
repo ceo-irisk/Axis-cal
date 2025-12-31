@@ -191,6 +191,7 @@ export default function CalendarPage() {
   const currentViolations = ruleViolations[selectedDateStr];
 
   const getTitle = () => {
+    if (mainView === MAIN_VIEW.USERS) return 'Пользователи';
     if (view === 'day') return format(selectedDate, 'd MMMM yyyy', { locale: ru });
     if (view === 'week') return `${format(selectedDate, 'd MMM', { locale: ru })} — ${format(addDays(selectedDate, 6), 'd MMM yyyy', { locale: ru })}`;
     return format(currentDate, 'LLLL yyyy', { locale: ru });
@@ -206,6 +207,7 @@ export default function CalendarPage() {
         onDateSelect={(date) => {
           setSelectedDate(date);
           setCurrentDate(date);
+          setMainView(MAIN_VIEW.CALENDAR);
         }}
         events={selectedDateEvents}
         rating={currentRating}
@@ -214,6 +216,9 @@ export default function CalendarPage() {
         onOpenSurvey={() => setShowSurveyModal(true)}
         onEventClick={handleEventClick}
         onCreateEvent={handleCreateEvent}
+        onShowUsers={() => setMainView(MAIN_VIEW.USERS)}
+        onShowCalendar={() => setMainView(MAIN_VIEW.CALENDAR)}
+        mainView={mainView}
       />
       
       <main className="main-content-full flex-1" data-testid="calendar-main">
