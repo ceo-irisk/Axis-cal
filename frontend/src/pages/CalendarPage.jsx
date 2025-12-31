@@ -41,6 +41,18 @@ export default function CalendarPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [defaultEventTime, setDefaultEventTime] = useState(null);
 
+  const handleDeleteEventById = useCallback(async (eventId) => {
+    try {
+      await deleteEvent(eventId);
+      toast.success('Событие удалено');
+      setShowEventModal(false);
+      setSelectedEventId(null);
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      toast.error('Ошибка удаления события');
+    }
+  }, []);
+
   // Handle keyboard events for deleting selected event
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -49,7 +61,7 @@ export default function CalendarPage() {
         const eventToDelete = events.find(ev => ev.id === selectedEventId);
         if (eventToDelete) {
           if (confirm(`Удалить событие "${eventToDelete.title}"?`)) {
-            handleDeleteEvent(selectedEventId);
+            handleDeleteEventById(selectedEventId);
           }
         }
       }
@@ -61,7 +73,7 @@ export default function CalendarPage() {
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedEventId, events, showEventModal]);
+  }, [selectedEventId, events, showEventModal, handleDeleteEventById]);
 
   const handleEventSelect = (eventId) => {
     setSelectedEventId(eventId === selectedEventId ? null : eventId);
