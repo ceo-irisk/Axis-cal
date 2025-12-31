@@ -257,10 +257,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "View Switcher (Day/Week/Month)"
-    - "Event Modal Calendar Select"
-    - "Double Click Event Creation"
-    - "Date Selection Highlighting"
+    - "Event Positioning in Calendar Grid (Week/Day Views)"
+    - "Event Time Display in Grid"
+    - "Drag and Drop Events"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -276,3 +275,22 @@ agent_communication:
       5. Created admin user (admin@example.com / admin123)
       6. Created test calendar "Work" to test calendar selection
       Please test frontend functionality especially view switching and event creation
+  - agent: "main"
+    message: |
+      Fixed event positioning and time display issues (P0 bug):
+      1. Events now correctly positioned according to their local time
+      2. Time is now displayed on ALL events, not just ones >= 1 hour
+      3. Created getLocalTime() helper function for consistent time formatting
+      
+      Changes made to /app/frontend/src/components/CalendarGrid.jsx:
+      - Changed getEventStyle() to use new Date() instead of parseISO() for proper local timezone handling
+      - Modified event rendering to always show time (removed isLong condition)
+      - Added eventTime variable using getLocalTime() helper
+      
+      Test credentials: admin@example.com / admin123
+      
+      Please verify:
+      1. Events display at correct positions matching their time
+      2. Time is shown inside all event cards
+      3. Sidebar shows correct times for events
+      4. Test drag-and-drop functionality to move events
