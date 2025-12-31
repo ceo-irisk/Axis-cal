@@ -1,19 +1,23 @@
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, isToday, parseISO, addMinutes, setHours, setMinutes } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { ChevronDown, Square, CheckCircle2, Zap, Video } from 'lucide-react';
+import { ChevronDown, Square, CheckCircle2, Zap, Video, Globe } from 'lucide-react';
+import { TIMEZONES, getLocalTimezoneOffset, formatShiftedTime } from '../lib/timezones';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
-// Helper to parse ISO time and get local hours/minutes
-const getLocalTime = (isoString) => {
+// Helper to parse ISO time and get local hours/minutes with timezone shift
+const getLocalTime = (isoString, timezoneShift = 0) => {
   try {
     const date = new Date(isoString);
+    const shiftedDate = new Date(date.getTime() + timezoneShift * 60 * 60 * 1000);
     return {
-      hours: date.getHours(),
-      minutes: date.getMinutes(),
-      formatted: `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+      hours: shiftedDate.getHours(),
+      minutes: shiftedDate.getMinutes(),
+      formatted: `${String(shiftedDate.getHours()).padStart(2, '0')}:${String(shiftedDate.getMinutes()).padStart(2, '0')}`,
+      original: `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
     };
   } catch {
-    return { hours: 0, minutes: 0, formatted: '00:00' };
+    return { hours: 0, minutes: 0, formatted: '00:00', original: '00:00' };
   }
 };
 
