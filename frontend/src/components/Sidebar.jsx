@@ -1096,11 +1096,58 @@ export const Sidebar = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Timezone Modal */}
+      <Dialog open={showTimezoneModal} onOpenChange={setShowTimezoneModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Новый часовой пояс</DialogTitle>
+          </DialogHeader>
+          <TimezoneForm 
+            onSave={handleSaveTimezone}
+            onCancel={() => setShowTimezoneModal(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
 
 // ==================== FORM COMPONENTS ====================
+
+const TimezoneForm = ({ onSave, onCancel }) => {
+  const [name, setName] = useState('');
+  const [label, setLabel] = useState('');
+  const [offset, setOffset] = useState(0);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!name.trim() || !label.trim()) return;
+    onSave({ name: name.trim(), label: label.trim(), offset: parseFloat(offset) });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label>Код (латиницей)</Label>
+        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="custom_tz_1" className="mt-1" />
+      </div>
+      <div>
+        <Label>Название</Label>
+        <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Мой часовой пояс (GMT+5)" className="mt-1" />
+      </div>
+      <div>
+        <Label>Смещение от UTC (часы)</Label>
+        <Input type="number" step="0.5" min="-12" max="14" value={offset} onChange={(e) => setOffset(e.target.value)} className="mt-1" />
+        <p className="text-xs text-muted-foreground mt-1">Например: 3 для GMT+3, -5 для GMT-5</p>
+      </div>
+      <DialogFooter>
+        <Button type="button" variant="outline" onClick={onCancel}>Отмена</Button>
+        <Button type="submit">Создать</Button>
+      </DialogFooter>
+    </form>
+  );
+};
 
 const EventTypeForm = ({ initialData, onSave, onCancel }) => {
   const [name, setName] = useState(initialData?.name || '');
