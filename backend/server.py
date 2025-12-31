@@ -1018,6 +1018,34 @@ async def delete_event_status(status_id: str, admin: dict = Depends(require_admi
         raise HTTPException(status_code=404, detail="Event status not found")
     return {"message": "Event status deleted"}
 
+# ==================== CUSTOM TIMEZONES ====================
+
+@api_router.get("/dictionaries/timezones")
+async def get_custom_timezones(current_user: dict = Depends(get_current_user)):
+    timezones = await db.custom_timezones.find({}, {"_id": 0}).to_list(100)
+    return timezones
+
+@api_router.post("/dictionaries/timezones")
+async def create_custom_timezone(name: str, label: str, offset: float, admin: dict = Depends(require_admin)):
+    timezone_data = {
+        "id": str(uuid.uuid4()),
+        "value": name,  # For compatibility with frontend TIMEZONES format
+        "name": name,
+        "label": label,
+        "offset": offset,
+        "is_custom": True
+    }
+    await db.custom_timezones.insert_one(timezone_data)
+    del timezone_data["_id"] if "_id" in timezone_data else None
+    return timezone_data
+
+@api_router.delete("/dictionaries/timezones/{timezone_id}")
+async def delete_custom_timezone(timezone_id: str, admin: dict = Depends(require_admin)):
+    result = await db.custom_timezones.delete_one({"id": timezone_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Timezone not found")
+    return {"message": "Timezone deleted"}
+
 # ==================== HEALTH CHECK ====================
 
 @api_router.get("/")
