@@ -639,15 +639,17 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
           <p className="text-xs text-muted-foreground mb-2">События дня</p>
           <div className="space-y-1">
             {allDayEvents.map(event => {
-              const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
+              const isUnconfirmed = event.status === 'tentative';
               const eventColorClass = isUnconfirmed 
                 ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
                 : (EVENT_COLORS[event.event_type] || 'event-meeting');
+              const isSelected = selectedEventId === event.id;
               return (
                 <div 
                   key={event.id}
-                  onClick={() => onEventClick(event)}
-                  className={`px-3 py-1.5 rounded text-sm cursor-pointer hover:opacity-80 ${eventColorClass}`}
+                  onClick={() => onEventSelect?.(event.id)}
+                  onDoubleClick={() => onEventClick(event)}
+                  className={`px-3 py-1.5 rounded text-sm cursor-pointer hover:opacity-80 ${eventColorClass} ${isSelected ? 'ring-2 ring-violet-500 ring-offset-1' : ''}`}
                 >
                   <div className="flex items-center justify-between">
                     <span>{event.title}</span>
