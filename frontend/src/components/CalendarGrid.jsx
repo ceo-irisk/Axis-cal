@@ -188,33 +188,42 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
   );
 };
 
-// Timezone selector component
-const TimezoneSelector = ({ selectedTimezone, onTimezoneChange }) => {
+// Timezone selector component - compact version
+const TimezoneSelector = ({ selectedTimezone, onTimezoneChange, customTimezones = [] }) => {
+  const allTimezones = [...TIMEZONES, ...customTimezones];
+  const selectedTz = allTimezones.find(tz => tz.value === selectedTimezone);
+  
   return (
-    <div className="flex items-center gap-2">
-      <Globe className="w-4 h-4 text-muted-foreground" />
-      <Select value={selectedTimezone} onValueChange={onTimezoneChange}>
-        <SelectTrigger className="w-[180px] h-8 text-xs">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {TIMEZONES.map(tz => (
-            <SelectItem key={tz.value} value={tz.value} className="text-xs">
-              {tz.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <Select value={selectedTimezone} onValueChange={onTimezoneChange}>
+      <SelectTrigger className="w-[130px] h-7 text-[10px] gap-1">
+        <Globe className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+        <span className="truncate">{selectedTz?.label?.split(' ')[0] || 'UTC'}</span>
+      </SelectTrigger>
+      <SelectContent>
+        {allTimezones.map(tz => (
+          <SelectItem key={tz.value} value={tz.value} className="text-xs">
+            {tz.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 };
 
-const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, selectedEventId, onEventSelect, timezoneShift, selectedTimezone, onTimezoneChange }) => {
+const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, selectedEventId, onEventSelect, timezoneShift, selectedTimezone, onTimezoneChange, customTimezones }) => {
   const weekStart = startOfWeek(date, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
   const hours = Array.from({ length: 24 }, (_, i) => i); // 0:00 - 23:00 (все 24 часа)
   const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  const gridRef = useRef(null);
+  
+  // Auto-scroll to 5:00 on mount
+  useEffect(() => {
+    if (gridRef.current) {
+      gridRef.current.scrollTop = 5 * 60; // 5 hours * 60px per hour
+    }
+  }, []);
   
   // Drag state
   const [draggedEvent, setDraggedEvent] = useState(null);
