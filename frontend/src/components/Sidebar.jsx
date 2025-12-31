@@ -117,11 +117,13 @@ export const Sidebar = ({
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [showApplyModal, setShowApplyModal] = useState(false);
+  const [showTimezoneModal, setShowTimezoneModal] = useState(false);
   const [editingType, setEditingType] = useState(null);
   const [editingStatus, setEditingStatus] = useState(null);
   const [editingTemplate, setEditingTemplate] = useState(null);
   const [selectedTemplateForApply, setSelectedTemplateForApply] = useState(null);
   const [applyDate, setApplyDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [customTimezones, setCustomTimezones] = useState([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -132,18 +134,21 @@ export const Sidebar = ({
       } catch (e) { console.error(e); }
       
       try {
-        const [typesRes, statusesRes, templatesRes] = await Promise.all([
+        const [typesRes, statusesRes, templatesRes, timezonesRes] = await Promise.all([
           getEventTypes(),
           getEventStatuses(),
-          getTemplates()
+          getTemplates(),
+          getCustomTimezones()
         ]);
         setEventTypes(typesRes.data || []);
         setEventStatuses(statusesRes.data || []);
         setTemplates(templatesRes.data || []);
+        setCustomTimezones(timezonesRes.data || []);
+        onCustomTimezonesChange?.(timezonesRes.data || []);
       } catch (e) { console.error(e); }
     };
     loadData();
-  }, [onCalendarsChange]);
+  }, [onCalendarsChange, onCustomTimezonesChange]);
 
   const fetchCalendars = async () => {
     try {
@@ -155,7 +160,7 @@ export const Sidebar = ({
 
   const fetchDictionaries = async () => {
     try {
-      const [typesRes, statusesRes, templatesRes] = await Promise.all([
+      const [typesRes, statusesRes, templatesRes, timezonesRes] = await Promise.all([
         getEventTypes(),
         getEventStatuses(),
         getTemplates()
