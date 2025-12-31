@@ -45,6 +45,15 @@ const TABS = {
   SETTINGS: 'settings'
 };
 
+// Settings sub-tabs
+const SETTINGS_TABS = {
+  USERS: 'users',
+  TEMPLATES: 'templates',
+  EXTERNAL_CALENDARS: 'external_calendars',
+  DICTIONARIES: 'dictionaries',
+  PROFILE: 'profile'
+};
+
 export const Sidebar = ({ 
   isOpen, 
   onClose, 
