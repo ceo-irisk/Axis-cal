@@ -73,10 +73,6 @@ export const Sidebar = ({
   const [hoveredStar, setHoveredStar] = useState(0);
   const [ratingNotes, setRatingNotes] = useState('');
 
-  useEffect(() => {
-    fetchCalendars();
-  }, []);
-
   const fetchCalendars = async () => {
     try {
       const res = await getCalendars();
@@ -84,6 +80,10 @@ export const Sidebar = ({
       onCalendarsChange?.(res.data || []);
     } catch (e) { console.error(e); }
   };
+
+  useEffect(() => {
+    fetchCalendars();
+  }, []);
 
   const handleAddCalendar = async () => {
     if (!newCalName.trim()) return;
