@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { format, addHours } from 'date-fns';
-import { X, Trash2, Clock, MapPin, Users, FileText, Square, CheckCircle2, Zap, Video, CalendarDays } from 'lucide-react';
+import { X, Trash2, Clock, MapPin, Users, FileText, Square, CheckCircle2, Zap, Video, CalendarDays, ChevronUp, ChevronDown } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -19,26 +19,91 @@ const EVENT_TYPES = [
 ];
 
 const STATUS_OPTIONS = [
-  { value: 'confirmed', label: 'Подтверждено' },
-  { value: 'tentative', label: 'Предварительно' },
-  { value: 'cancelled', label: 'Отменено' },
+  { value: 'confirmed', label: 'Подтверждено', description: 'Обычное событие' },
+  { value: 'tentative', label: 'Не согласовано', description: 'Пунктирная рамка' },
+  { value: 'template', label: 'Шаблонное событие', description: 'Из шаблона' },
 ];
+
+// Time picker component
+const TimePicker = ({ value, onChange, label }) => {
+  const [hours, minutes] = value ? value.split(':').map(Number) : [9, 0];
+  
+  const updateTime = (newHours, newMinutes) => {
+    const h = Math.max(0, Math.min(23, newHours));
+    const m = Math.max(0, Math.min(59, newMinutes));
+    onChange(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+  };
+
+  const incrementHour = () => updateTime(hours + 1, minutes);
+  const decrementHour = () => updateTime(hours - 1, minutes);
+  const incrementMinute = () => updateTime(hours, minutes + 15 - (minutes % 15));
+  const decrementMinute = () => updateTime(hours, minutes - 15 + (minutes % 15 === 0 ? 0 : 15 - (minutes % 15)));
+
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <div className="flex items-center gap-1">
+        {/* Hours */}
+        <div className="flex flex-col items-center">
+          <button type="button" onClick={incrementHour} className="p-0.5 hover:bg-accent rounded">
+            <ChevronUp className="w-4 h-4" />
+          </button>
+          <input
+            type="text"
+            value={String(hours).padStart(2, '0')}
+            onChange={(e) => updateTime(parseInt(e.target.value) || 0, minutes)}
+            className="w-10 h-8 text-center text-lg font-mono bg-accent rounded border-0 focus:ring-2 focus:ring-violet-500"
+          />
+          <button type="button" onClick={decrementHour} className="p-0.5 hover:bg-accent rounded">
+            <ChevronDown className="w-4 h-4" />
+          </button>
+        </div>
+        <span className="text-xl font-bold text-muted-foreground">:</span>
+        {/* Minutes */}
+        <div className="flex flex-col items-center">
+          <button type="button" onClick={incrementMinute} className="p-0.5 hover:bg-accent rounded">
+            <ChevronUp className="w-4 h-4" />
+          </button>
+          <input
+            type="text"
+            value={String(minutes).padStart(2, '0')}
+            onChange={(e) => updateTime(hours, parseInt(e.target.value) || 0)}
+            className="w-10 h-8 text-center text-lg font-mono bg-accent rounded border-0 focus:ring-2 focus:ring-violet-500"
+          />
+          <button type="button" onClick={decrementMinute} className="p-0.5 hover:bg-accent rounded">
+            <ChevronDown className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
   if (event) {
+    // Map is_unconfirmed to status for backwards compatibility
+    let status = event.status || 'confirmed';
+    if (event.is_unconfirmed && status === 'confirmed') {
+      status = 'tentative';
+    }
+    if (event.is_template_event) {
+      status = 'template';
+    }
+    
     return {
       title: event.title || '',
       description: event.description || '',
-      start_time: event.start_time?.slice(0, 16) || '',
-      end_time: event.end_time?.slice(0, 16) || '',
+      start_date: event.start_time?.slice(0, 10) || '',
+      start_time_val: event.start_time?.slice(11, 16) || '09:00',
+      end_date: event.end_time?.slice(0, 10) || '',
+      end_time_val: event.end_time?.slice(11, 16) || '10:00',
       event_type: event.event_type || 'meeting',
-      status: event.status || 'confirmed',
+      status: status,
       location: event.location || '',
       attendees: event.attendees || [],
       custom_fields: event.custom_fields || {},
       calendar_id: event.calendar_id || '',
       is_all_day: event.is_all_day || false,
-      is_unconfirmed: event.is_unconfirmed || false,
       is_blocked: event.is_blocked || false,
       is_completed: event.is_completed || false,
       is_urgent: event.is_urgent || false,
@@ -47,15 +112,16 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
   }
   
   const startDate = defaultDate || new Date();
-  const startTime = new Date(startDate);
-  startTime.setHours(defaultHour ?? 9, 0, 0, 0);
-  const endTime = addHours(startTime, 1);
+  const dateStr = format(startDate, 'yyyy-MM-dd');
+  const startHour = defaultHour ?? 9;
   
   return {
     title: '',
     description: '',
-    start_time: format(startTime, "yyyy-MM-dd'T'HH:mm"),
-    end_time: format(endTime, "yyyy-MM-dd'T'HH:mm"),
+    start_date: dateStr,
+    start_time_val: `${String(startHour).padStart(2, '0')}:00`,
+    end_date: dateStr,
+    end_time_val: `${String(startHour + 1).padStart(2, '0')}:00`,
     event_type: 'meeting',
     status: 'confirmed',
     location: '',
@@ -63,7 +129,6 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
     custom_fields: {},
     calendar_id: calendars[0]?.id || '',
     is_all_day: false,
-    is_unconfirmed: false,
     is_blocked: false,
     is_completed: false,
     is_urgent: false,
