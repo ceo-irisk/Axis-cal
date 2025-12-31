@@ -55,7 +55,7 @@ const EventIcons = ({ event }) => {
 };
 
 const CALENDAR_COLORS = [
-  '#8b5cf6', '#06b6d4', '#f59e0b', '#ef4444', '#10b981', '#6366f1', '#ec4899', '#14b8a6'
+  '#085C53', '#06b6d4', '#f59e0b', '#ef4444', '#10b981', '#6366f1', '#ec4899', '#14b8a6'
 ];
 
 // Tab identifiers
