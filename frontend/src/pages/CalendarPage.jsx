@@ -250,6 +250,7 @@ export default function CalendarPage() {
             selectedDate={selectedDate}
             events={events}
             calendars={calendars}
+            templates={templates}
             overloadedDays={overloadedDays}
             ratings={ratings}
             view={view}
@@ -257,6 +258,7 @@ export default function CalendarPage() {
             onCellDoubleClick={handleCellDoubleClick}
             onEventClick={handleEventClick}
             onEventUpdate={handleEventUpdate}
+            onApplyTemplate={handleApplyTemplate}
             loading={loading}
           />
         </div>
