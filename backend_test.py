@@ -618,7 +618,13 @@ class ExecutiveCalendarAPITester:
         self.test_survey_functionality()
         self.test_rules_functionality()
         self.test_admin_functionality()
+        
+        # New feature tests for Axis Calendar
         self.test_templates_functionality()
+        self.test_enhanced_event_fields()
+        self.test_dictionary_functionality()
+        self.test_axis_calendar_specific_features()
+        
         self.test_analytics()
         
         # Cleanup
