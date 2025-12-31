@@ -157,7 +157,13 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
               </div>
               <div className="space-y-1">
                 {dayEvents.map((event) => (
-                  <div key={event.id} onClick={(e) => { e.stopPropagation(); onEventClick(event); }} className={`px-2 py-0.5 rounded text-xs truncate cursor-pointer hover:opacity-80 ${EVENT_COLORS[event.event_type]} ${event.status === 'tentative' && 'event-tentative'}`} data-testid={`event-${event.id}`}>
+                  <div 
+                    key={event.id} 
+                    onClick={(e) => { e.stopPropagation(); onEventSelect?.(event.id); }} 
+                    onDoubleClick={(e) => { e.stopPropagation(); onEventClick(event); }}
+                    className={`px-2 py-0.5 rounded text-xs truncate cursor-pointer hover:opacity-80 ${EVENT_COLORS[event.event_type]} ${event.status === 'tentative' && 'event-tentative'} ${selectedEventId === event.id ? 'ring-2 ring-violet-500 ring-offset-1' : ''}`} 
+                    data-testid={`event-${event.id}`}
+                  >
                     {event.title}
                   </div>
                 ))}
