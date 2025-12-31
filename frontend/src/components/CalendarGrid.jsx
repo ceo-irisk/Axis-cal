@@ -735,12 +735,17 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
             const isLong = duration >= 1;
             const isUnconfirmed = event.status === 'tentative';
             const isTemplate = event.is_template_event;
-            const eventTime = getLocalTime(event.start_time);
+            const eventTime = getLocalTime(event.start_time, timezoneShift);
             const eventColorClass = isUnconfirmed 
               ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
               : (EVENT_COLORS[event.event_type] || 'event-meeting');
             const overlapStyle = getOverlapStyle(event);
             const isSelected = selectedEventId === event.id;
+            
+            // Format time with shift indicator
+            const timeDisplay = timezoneShift !== 0 
+              ? `${eventTime.formatted} (${eventTime.original}${timezoneShift > 0 ? '+' : ''}${timezoneShift})`
+              : eventTime.formatted;
             
             return (
               <div 
@@ -752,10 +757,8 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
                 className={`
                   absolute px-2 py-1.5 rounded-lg cursor-pointer 
                   hover:opacity-90 transition-opacity group
-                  ${isTemplate 
-                    ? 'bg-transparent border-2 border-[#085C53] text-[#074a44] dark:text-teal-300' 
-                    : eventColorClass
-                  }
+                  ${eventColorClass}
+                  ${isTemplate ? 'ring-2 ring-[#085C53] ring-inset' : ''}
                   ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
                 `}
                 style={{...getEventStyle(event), ...overlapStyle}} 
@@ -764,7 +767,7 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <span className="text-xs font-mono opacity-70">
-                      {eventTime.formatted}
+                      {timeDisplay}
                     </span>
                     <span className="font-medium text-sm truncate">{event.title}</span>
                   </div>
