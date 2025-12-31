@@ -376,7 +376,7 @@ export const Sidebar = ({
                 <button onClick={handleLogout} className="p-1 rounded-lg hover:bg-accent" title="Выйти" data-testid="logout-button">
                   <LogOut className="w-4 h-4 text-muted-foreground" />
                 </button>
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xs font-medium text-white">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#085C53] to-indigo-600 flex items-center justify-center text-xs font-medium text-white">
                   {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -388,7 +388,7 @@ export const Sidebar = ({
               </div>
               <button 
                 onClick={onCreateEvent} 
-                className="w-8 h-8 rounded-lg bg-violet-600 hover:bg-violet-700 flex items-center justify-center text-white"
+                className="w-8 h-8 rounded-lg bg-[#074a44] hover:bg-[#063d38] flex items-center justify-center text-white"
                 title="Создать событие"
                 data-testid="create-event-button"
               >
@@ -401,7 +401,7 @@ export const Sidebar = ({
           <div className="p-4 border-b border-border">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">
-                <span className="text-violet-500">{format(calendarMonth, 'LLLL', { locale: ru })}</span>
+                <span className="text-[#085C53]">{format(calendarMonth, 'LLLL', { locale: ru })}</span>
                 {' '}
                 <span className="text-muted-foreground">{format(calendarMonth, 'yyyy')}</span>
               </h2>
@@ -439,8 +439,8 @@ export const Sidebar = ({
                     className={`
                       relative aspect-square flex flex-col items-center justify-center rounded-lg text-sm transition-colors
                       ${!isCurrentMonth ? 'text-muted-foreground/50' : ''}
-                      ${isSelected ? 'bg-violet-600 text-white' : 'hover:bg-accent'}
-                      ${isTodayDate && !isSelected ? 'text-violet-500 font-bold' : ''}
+                      ${isSelected ? 'bg-[#074a44] text-white' : 'hover:bg-accent'}
+                      ${isTodayDate && !isSelected ? 'text-[#085C53] font-bold' : ''}
                     `}
                     data-testid={`mini-cal-day-${format(day, 'yyyy-MM-dd')}`}
                   >
@@ -449,7 +449,7 @@ export const Sidebar = ({
                     {dayEvents.length > 0 && (
                       <div className="absolute bottom-0.5 flex gap-0.5">
                         {dayEvents.slice(0, 3).map((_, i) => (
-                          <div key={i} className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white' : 'bg-violet-500'}`} />
+                          <div key={i} className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white' : 'bg-[#085C53]'}`} />
                         ))}
                       </div>
                     )}
@@ -472,7 +472,7 @@ export const Sidebar = ({
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 py-3 flex flex-col items-center gap-1 text-xs transition-colors ${
                   activeTab === tab.id 
-                    ? 'text-violet-500 border-b-2 border-violet-500 bg-accent/50' 
+                    ? 'text-[#085C53] border-b-2 border-[#085C53] bg-accent/50' 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
                 data-testid={`tab-${tab.id}`}
@@ -510,8 +510,8 @@ export const Sidebar = ({
                               onClick={() => onEventClick?.(event)} 
                               className={`w-full text-left p-3 rounded-xl transition-colors ${
                                 isUnconfirmed 
-                                  ? 'border-2 border-dashed border-violet-500 bg-violet-500/5 hover:bg-violet-500/10'
-                                  : 'bg-accent/50 hover:bg-accent border-l-4 border-violet-500'
+                                  ? 'border-2 border-dashed border-[#085C53] bg-[#085C53]/5 hover:bg-[#085C53]/10'
+                                  : 'bg-accent/50 hover:bg-accent border-l-4 border-[#085C53]'
                               }`}
                               data-testid={`sidebar-event-${event.id}`}
                             >
@@ -542,14 +542,14 @@ export const Sidebar = ({
                               onClick={() => onEventClick?.(event)} 
                               className={`w-full text-left p-3 rounded-xl transition-colors ${
                                 isUnconfirmed 
-                                  ? 'border-2 border-dashed border-violet-500 bg-violet-500/5 hover:bg-violet-500/10'
+                                  ? 'border-2 border-dashed border-[#085C53] bg-[#085C53]/5 hover:bg-[#085C53]/10'
                                   : 'bg-accent hover:bg-border'
                               }`}
                               data-testid={`sidebar-event-${event.id}`}
                             >
                               <div className="flex items-start justify-between gap-2">
                                 <div className="flex items-center gap-2">
-                                  <div className={`w-2 h-2 rounded-full ${isUnconfirmed ? 'border border-violet-500' : 'bg-violet-500'}`} />
+                                  <div className={`w-2 h-2 rounded-full ${isUnconfirmed ? 'border border-[#085C53]' : 'bg-[#085C53]'}`} />
                                   <p className="font-medium text-sm truncate">{event.title}</p>
                                 </div>
                                 <EventIcons event={event} />
@@ -584,7 +584,7 @@ export const Sidebar = ({
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Мои календари</p>
                   <div className="space-y-1">
                     <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-accent/50 group">
-                      <div className="w-3 h-3 rounded-full bg-violet-500" />
+                      <div className="w-3 h-3 rounded-full bg-[#085C53]" />
                       <span className="text-sm flex-1">Основной</span>
                       <Eye className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100" />
                     </div>
@@ -741,32 +741,32 @@ export const Sidebar = ({
                   {isAdmin?.() && (
                     <button 
                       onClick={() => setSettingsTab(SETTINGS_TABS.USERS)} 
-                      className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.USERS ? 'bg-violet-500 text-white' : 'text-muted-foreground hover:bg-accent'}`}
+                      className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.USERS ? 'bg-[#085C53] text-white' : 'text-muted-foreground hover:bg-accent'}`}
                     >
                       Пользователи
                     </button>
                   )}
                   <button 
                     onClick={() => setSettingsTab(SETTINGS_TABS.TEMPLATES)} 
-                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.TEMPLATES ? 'bg-violet-500 text-white' : 'text-muted-foreground hover:bg-accent'}`}
+                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.TEMPLATES ? 'bg-[#085C53] text-white' : 'text-muted-foreground hover:bg-accent'}`}
                   >
                     Шаблоны
                   </button>
                   <button 
                     onClick={() => setSettingsTab(SETTINGS_TABS.DICTIONARIES)} 
-                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.DICTIONARIES ? 'bg-violet-500 text-white' : 'text-muted-foreground hover:bg-accent'}`}
+                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.DICTIONARIES ? 'bg-[#085C53] text-white' : 'text-muted-foreground hover:bg-accent'}`}
                   >
                     Справочники
                   </button>
                   <button 
                     onClick={() => setSettingsTab(SETTINGS_TABS.EXTERNAL_CALENDARS)} 
-                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.EXTERNAL_CALENDARS ? 'bg-violet-500 text-white' : 'text-muted-foreground hover:bg-accent'}`}
+                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.EXTERNAL_CALENDARS ? 'bg-[#085C53] text-white' : 'text-muted-foreground hover:bg-accent'}`}
                   >
                     Календари
                   </button>
                   <button 
                     onClick={() => setSettingsTab(SETTINGS_TABS.PROFILE)} 
-                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.PROFILE ? 'bg-violet-500 text-white' : 'text-muted-foreground hover:bg-accent'}`}
+                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.PROFILE ? 'bg-[#085C53] text-white' : 'text-muted-foreground hover:bg-accent'}`}
                   >
                     Профиль
                   </button>
@@ -807,9 +807,9 @@ export const Sidebar = ({
                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button 
                                   onClick={() => { setSelectedTemplateForApply(template); setShowApplyModal(true); }}
-                                  className="p-1 rounded hover:bg-violet-500/20" title="Применить"
+                                  className="p-1 rounded hover:bg-[#085C53]/20" title="Применить"
                                 >
-                                  <Play className="w-3.5 h-3.5 text-violet-500" />
+                                  <Play className="w-3.5 h-3.5 text-[#085C53]" />
                                 </button>
                                 <button 
                                   onClick={() => { setEditingTemplate(template); setShowTemplateModal(true); }}
@@ -1386,7 +1386,7 @@ const TemplateEventForm = ({ initialData, eventTypes, templateType, onSave, onCa
         <button
           type="button"
           onClick={() => setIsUnconfirmed(!isUnconfirmed)}
-          className={`w-10 h-5 rounded-full transition-colors relative ${isUnconfirmed ? 'bg-violet-500' : 'bg-muted'}`}
+          className={`w-10 h-5 rounded-full transition-colors relative ${isUnconfirmed ? 'bg-[#085C53]' : 'bg-muted'}`}
         >
           <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${isUnconfirmed ? 'left-5' : 'left-0.5'}`} />
         </button>
