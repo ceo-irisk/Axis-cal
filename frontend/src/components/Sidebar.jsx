@@ -268,34 +268,66 @@ export const Sidebar = ({
                 {events.length === 0 ? (
                   <p className="text-sm text-muted-foreground py-8 text-center">Нет событий на этот день</p>
                 ) : (
-                  <div className="space-y-2">
-                    {events.map((event) => (
-                      <button 
-                        key={event.id} 
-                        onClick={() => onEventClick?.(event)} 
-                        className="w-full text-left p-3 rounded-xl bg-accent hover:bg-border transition-colors"
-                        data-testid={`sidebar-event-${event.id}`}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-violet-500" />
-                            <p className="font-medium text-sm truncate">{event.title}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground ml-4">
-                          <span className="flex items-center gap-1 font-mono">
-                            <Clock className="w-3 h-3" />
-                            {event.start_time?.slice(11, 16)}
-                          </span>
-                          {event.location && (
-                            <span className="flex items-center gap-1 truncate">
-                              <MapPin className="w-3 h-3" />
-                              {event.location}
-                            </span>
-                          )}
-                        </div>
-                      </button>
-                    ))}
+                  <div className="space-y-3">
+                    {/* All-day events section */}
+                    {allDayEvents.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Весь день</p>
+                        {allDayEvents.map((event) => (
+                          <button 
+                            key={event.id} 
+                            onClick={() => onEventClick?.(event)} 
+                            className="w-full text-left p-3 rounded-xl bg-accent/50 hover:bg-accent transition-colors border-l-4 border-violet-500"
+                            data-testid={`sidebar-event-${event.id}`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="font-medium text-sm truncate">{event.title}</p>
+                              <EventIcons event={event} />
+                            </div>
+                          </button>
+                        ))}
+                        {timedEvents.length > 0 && (
+                          <div className="border-b border-border/50 my-3" />
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Timed events section */}
+                    {timedEvents.length > 0 && (
+                      <div className="space-y-2">
+                        {allDayEvents.length > 0 && (
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">События</p>
+                        )}
+                        {timedEvents.map((event) => (
+                          <button 
+                            key={event.id} 
+                            onClick={() => onEventClick?.(event)} 
+                            className="w-full text-left p-3 rounded-xl bg-accent hover:bg-border transition-colors"
+                            data-testid={`sidebar-event-${event.id}`}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-violet-500" />
+                                <p className="font-medium text-sm truncate">{event.title}</p>
+                              </div>
+                              <EventIcons event={event} />
+                            </div>
+                            <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground ml-4">
+                              <span className="flex items-center gap-1 font-mono">
+                                <Clock className="w-3 h-3" />
+                                {event.start_time?.slice(11, 16)}
+                              </span>
+                              {event.location && (
+                                <span className="flex items-center gap-1 truncate">
+                                  <MapPin className="w-3 h-3" />
+                                  {event.location}
+                                </span>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
