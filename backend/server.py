@@ -1036,7 +1036,7 @@ async def create_custom_timezone(name: str, label: str, offset: float, admin: di
         "is_custom": True
     }
     await db.custom_timezones.insert_one(timezone_data)
-    del timezone_data["_id"] if "_id" in timezone_data else None
+    timezone_data.pop("_id", None)
     return timezone_data
 
 @api_router.delete("/dictionaries/timezones/{timezone_id}")
