@@ -163,12 +163,33 @@ export const Sidebar = ({
       const [typesRes, statusesRes, templatesRes, timezonesRes] = await Promise.all([
         getEventTypes(),
         getEventStatuses(),
-        getTemplates()
+        getTemplates(),
+        getCustomTimezones()
       ]);
       setEventTypes(typesRes.data || []);
       setEventStatuses(statusesRes.data || []);
       setTemplates(templatesRes.data || []);
+      setCustomTimezones(timezonesRes.data || []);
+      onCustomTimezonesChange?.(timezonesRes.data || []);
     } catch (e) { console.error(e); }
+  };
+
+  // Custom Timezones handlers
+  const handleSaveTimezone = async (data) => {
+    try {
+      await createCustomTimezone(data.name, data.label, data.offset);
+      toast.success('Часовой пояс добавлен');
+      setShowTimezoneModal(false);
+      fetchDictionaries();
+    } catch (e) { toast.error('Ошибка создания'); }
+  };
+
+  const handleDeleteTimezone = async (id) => {
+    try {
+      await deleteCustomTimezone(id);
+      toast.success('Часовой пояс удалён');
+      fetchDictionaries();
+    } catch (e) { toast.error('Ошибка удаления'); }
   };
 
   // Event Types handlers
