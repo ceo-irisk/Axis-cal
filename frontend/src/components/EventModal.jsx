@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { format, addHours } from 'date-fns';
 import { X, Trash2, Clock, MapPin, Users, FileText, Square, CheckCircle2, Zap, Video, CalendarDays } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -24,28 +24,72 @@ const STATUS_OPTIONS = [
   { value: 'cancelled', label: 'Отменено' },
 ];
 
-export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], onSave, onDelete, onClose }) => {
-  const [customFields, setCustomFields] = useState([]);
-  const [formData, setFormData] = useState({
+const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
+  if (event) {
+    return {
+      title: event.title || '',
+      description: event.description || '',
+      start_time: event.start_time?.slice(0, 16) || '',
+      end_time: event.end_time?.slice(0, 16) || '',
+      event_type: event.event_type || 'meeting',
+      status: event.status || 'confirmed',
+      location: event.location || '',
+      attendees: event.attendees || [],
+      custom_fields: event.custom_fields || {},
+      calendar_id: event.calendar_id || '',
+      is_all_day: event.is_all_day || false,
+      is_unconfirmed: event.is_unconfirmed || false,
+      is_blocked: event.is_blocked || false,
+      is_completed: event.is_completed || false,
+      is_urgent: event.is_urgent || false,
+      is_video_call: event.is_video_call || false,
+    };
+  }
+  
+  const startDate = defaultDate || new Date();
+  const startTime = new Date(startDate);
+  startTime.setHours(defaultHour ?? 9, 0, 0, 0);
+  const endTime = addHours(startTime, 1);
+  
+  return {
     title: '',
     description: '',
-    start_time: '',
-    end_time: '',
+    start_time: format(startTime, "yyyy-MM-dd'T'HH:mm"),
+    end_time: format(endTime, "yyyy-MM-dd'T'HH:mm"),
     event_type: 'meeting',
     status: 'confirmed',
     location: '',
     attendees: [],
     custom_fields: {},
-    calendar_id: '',
-    // New fields
+    calendar_id: calendars[0]?.id || '',
     is_all_day: false,
     is_unconfirmed: false,
     is_blocked: false,
     is_completed: false,
     is_urgent: false,
     is_video_call: false,
-  });
+  };
+};
+
+export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], onSave, onDelete, onClose }) => {
+  const [customFields, setCustomFields] = useState([]);
+  
+  const initialData = useMemo(
+    () => getInitialFormData(event, defaultDate, defaultHour, calendars),
+    [event, defaultDate, defaultHour, calendars]
+  );
+  
+  const [formData, setFormData] = useState(initialData);
   const [attendeeInput, setAttendeeInput] = useState('');
+
+  // Update form when event changes
+  useEffect(() => {
+    setFormData(getInitialFormData(event, defaultDate, defaultHour, calendars));
+  }, [event, defaultDate, defaultHour, calendars]);
+
+  useEffect(() => {
+    getEventFields().then(res => setCustomFields(res.data?.fields || [])).catch(console.error);
+  }, []);
 
   useEffect(() => {
     getEventFields().then(res => setCustomFields(res.data?.fields || [])).catch(console.error);
