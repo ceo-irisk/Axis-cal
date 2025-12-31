@@ -52,7 +52,7 @@ const TimePicker = ({ value, onChange, label }) => {
             type="text"
             value={String(hours).padStart(2, '0')}
             onChange={(e) => updateTime(parseInt(e.target.value) || 0, minutes)}
-            className="w-10 h-8 text-center text-lg font-mono bg-accent rounded border-0 focus:ring-2 focus:ring-violet-500"
+            className="w-10 h-8 text-center text-lg font-mono bg-accent rounded border-0 focus:ring-2 focus:ring-[#085C53]"
           />
           <button type="button" onClick={decrementHour} className="p-0.5 hover:bg-accent rounded">
             <ChevronDown className="w-4 h-4" />
@@ -68,7 +68,7 @@ const TimePicker = ({ value, onChange, label }) => {
             type="text"
             value={String(minutes).padStart(2, '0')}
             onChange={(e) => updateTime(hours, parseInt(e.target.value) || 0)}
-            className="w-10 h-8 text-center text-lg font-mono bg-accent rounded border-0 focus:ring-2 focus:ring-violet-500"
+            className="w-10 h-8 text-center text-lg font-mono bg-accent rounded border-0 focus:ring-2 focus:ring-[#085C53]"
           />
           <button type="button" onClick={decrementMinute} className="p-0.5 hover:bg-accent rounded">
             <ChevronDown className="w-4 h-4" />
