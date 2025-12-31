@@ -102,9 +102,9 @@ const TemplateSelector = ({ day, templates, onApplyTemplate }) => {
   );
 };
 
-export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, overloadedDays, ratings, view, onDateClick, onCellDoubleClick, onEventClick, onEventUpdate, loading }) => {
-  if (view === 'day') return <DayView date={selectedDate} events={events} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} />;
-  if (view === 'week') return <WeekView date={selectedDate} events={events} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} />;
+export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, templates, overloadedDays, ratings, view, onDateClick, onCellDoubleClick, onEventClick, onEventUpdate, onApplyTemplate, loading }) => {
+  if (view === 'day') return <DayView date={selectedDate} events={events} templates={templates} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} />;
+  if (view === 'week') return <WeekView date={selectedDate} events={events} templates={templates} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} />;
   return <MonthView currentDate={currentDate} selectedDate={selectedDate} events={events} overloadedDays={overloadedDays} ratings={ratings} onDateClick={onDateClick} onCellDoubleClick={onCellDoubleClick} onEventClick={onEventClick} />;
 };
 
