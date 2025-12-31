@@ -124,10 +124,13 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
 };
 
 const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }) => {
-  const weekStart = startOfWeek(date, { weekStartsOn: 0 }); // Воскресенье первый
-  const weekEnd = endOfWeek(date, { weekStartsOn: 0 });
+  const weekStart = startOfWeek(date, { weekStartsOn: 1 }); // Понедельник первый
+  const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
   const hours = Array.from({ length: 13 }, (_, i) => i + 7); // 7:00 - 19:00
+
+  // Day name abbreviations
+  const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
   const getEventStyle = (event) => {
     try {
