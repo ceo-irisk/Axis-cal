@@ -229,7 +229,6 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
   // Drag state
   const [draggedEvent, setDraggedEvent] = useState(null);
   const [resizingEvent, setResizingEvent] = useState(null);
-  const gridRef = useRef(null);
 
   const getEventStyle = (event) => {
     try {
