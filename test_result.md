@@ -1,75 +1,93 @@
 backend:
   - task: "Event Creation API with Status Field"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Need to test event creation with new status field (Подтверждено, Не согласовано, Шаблонное событие)"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: Event creation with status field works correctly. Tested 'confirmed' (Подтверждено), 'tentative' (Не согласовано), and template events. All status values save correctly and tentative events get proper pattern for dotted border."
 
   - task: "Event Update API with Status Field"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Need to test event update with different status values"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: Event update with status changes works correctly. Tested updating from 'confirmed' to 'tentative' - status and pattern fields update properly."
 
   - task: "Event Deletion API"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Need to test event deletion for backspace functionality"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: Event deletion API works correctly. DELETE /api/events/{id} endpoint functions properly for backspace deletion feature."
 
   - task: "Authentication API with Review Credentials"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Need to test login with admin@example.com / admin123"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: Authentication with admin@example.com / admin123 works correctly. User exists and login returns valid JWT token."
 
   - task: "Event Flags Dictionary API"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Need to test dictionaries API for event flags (Заблокировано, Выполнено, Срочно, Видеозвонок)"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: Event flags functionality works correctly. All flags (is_blocked, is_completed, is_urgent, is_video_call) save and retrieve properly from API."
 
   - task: "Event Status Dictionary API"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Need to test if old status dictionary (confirmed/tentative/cancelled) is properly replaced"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: Event status dictionary API works correctly. GET /api/dictionaries/event-statuses returns default statuses (confirmed, tentative, cancelled) with proper labels."
 
 frontend:
   - task: "Event Selection (Single Click)"
