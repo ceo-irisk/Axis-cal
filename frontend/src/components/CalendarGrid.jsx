@@ -188,7 +188,28 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
   );
 };
 
-const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, selectedEventId, onEventSelect }) => {
+// Timezone selector component
+const TimezoneSelector = ({ selectedTimezone, onTimezoneChange }) => {
+  return (
+    <div className="flex items-center gap-2">
+      <Globe className="w-4 h-4 text-muted-foreground" />
+      <Select value={selectedTimezone} onValueChange={onTimezoneChange}>
+        <SelectTrigger className="w-[180px] h-8 text-xs">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {TIMEZONES.map(tz => (
+            <SelectItem key={tz.value} value={tz.value} className="text-xs">
+              {tz.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+};
+
+const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, selectedEventId, onEventSelect, timezoneShift, selectedTimezone, onTimezoneChange }) => {
   const weekStart = startOfWeek(date, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
