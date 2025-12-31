@@ -684,6 +684,7 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
             const eventColorClass = isUnconfirmed 
               ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
               : (EVENT_COLORS[event.event_type] || 'event-meeting');
+            const overlapStyle = getOverlapStyle(event);
             
             return (
               <div 
@@ -692,14 +693,14 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
                 onDragStart={(e) => handleDragStart(e, event)}
                 onClick={() => onEventClick(event)} 
                 className={`
-                  absolute left-2 right-2 px-3 py-1.5 rounded-lg cursor-pointer 
+                  absolute px-2 py-1.5 rounded-lg cursor-pointer 
                   hover:opacity-90 transition-opacity group
                   ${isTemplate 
                     ? 'bg-transparent border-2 border-violet-400 text-violet-600 dark:text-violet-300' 
                     : eventColorClass
                   }
                 `}
-                style={getEventStyle(event)} 
+                style={{...getEventStyle(event), ...overlapStyle}} 
                 data-testid={`event-${event.id}`}
               >
                 <div className="flex items-center justify-between">
