@@ -475,7 +475,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
         ref={gridRef}
         className="flex h-[calc(100vh-220px)] overflow-y-auto" 
       >
-        {/* Left time column - fixed width */}
+        {/* Left time column - fixed width - same as header */}
         <div className="flex-shrink-0 w-[50px] border-r border-border/20">
           {hours.map(hour => (
             <div key={hour} className="h-[60px] px-1 flex items-start pt-1 justify-end text-[10px] text-muted-foreground/60 font-mono">
@@ -484,7 +484,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
           ))}
         </div>
 
-        {/* Day columns - flexible width */}
+        {/* Day columns - flexible width - same as header grid */}
         <div className="flex-1 grid" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
           {days.map((day, dayIdx) => {
             const dayEvents = getDayEvents(day);
