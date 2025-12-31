@@ -1166,6 +1166,12 @@ const TemplateEventForm = ({ initialData, eventTypes, templateType, onSave, onCa
   const [endHour, setEndHour] = useState(initialData?.end_hour ?? 10);
   const [endMinute, setEndMinute] = useState(initialData?.end_minute ?? 0);
   const [dayOfWeek, setDayOfWeek] = useState(initialData?.day_of_week ?? 0);
+  const [location, setLocation] = useState(initialData?.location || '');
+  const [isBlocked, setIsBlocked] = useState(initialData?.is_blocked || false);
+  const [isCompleted, setIsCompleted] = useState(initialData?.is_completed || false);
+  const [isUrgent, setIsUrgent] = useState(initialData?.is_urgent || false);
+  const [isVideoCall, setIsVideoCall] = useState(initialData?.is_video_call || false);
+  const [isUnconfirmed, setIsUnconfirmed] = useState(initialData?.is_unconfirmed || false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -1178,7 +1184,13 @@ const TemplateEventForm = ({ initialData, eventTypes, templateType, onSave, onCa
       start_minute: parseInt(startMinute),
       end_hour: parseInt(endHour),
       end_minute: parseInt(endMinute),
-      day_of_week: parseInt(dayOfWeek)
+      day_of_week: parseInt(dayOfWeek),
+      location,
+      is_blocked: isBlocked,
+      is_completed: isCompleted,
+      is_urgent: isUrgent,
+      is_video_call: isVideoCall,
+      is_unconfirmed: isUnconfirmed
     });
   };
 
@@ -1253,6 +1265,76 @@ const TemplateEventForm = ({ initialData, eventTypes, templateType, onSave, onCa
             <Input type="number" min="0" max="59" step="5" value={endMinute} onChange={(e) => setEndMinute(e.target.value)} className="w-16" />
           </div>
         </div>
+      </div>
+
+      {/* Location */}
+      <div>
+        <Label className="flex items-center gap-1">
+          <MapPin className="w-3 h-3" />Место
+        </Label>
+        <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Офис / Zoom / etc" className="mt-1" />
+      </div>
+
+      {/* Event flags */}
+      <div>
+        <Label className="mb-2 block">Флаги события</Label>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setIsBlocked(!isBlocked)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs transition-colors ${
+              isBlocked ? 'bg-red-500/20 text-red-500 border border-red-500/50' : 'bg-accent hover:bg-accent/80'
+            }`}
+          >
+            <Square className="w-3 h-3" />
+            Заблокировано
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsCompleted(!isCompleted)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs transition-colors ${
+              isCompleted ? 'bg-green-500/20 text-green-500 border border-green-500/50' : 'bg-accent hover:bg-accent/80'
+            }`}
+          >
+            <CheckCircle2 className="w-3 h-3" />
+            Выполнено
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsUrgent(!isUrgent)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs transition-colors ${
+              isUrgent ? 'bg-amber-500/20 text-amber-500 border border-amber-500/50' : 'bg-accent hover:bg-accent/80'
+            }`}
+          >
+            <Zap className="w-3 h-3" />
+            Срочно
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsVideoCall(!isVideoCall)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs transition-colors ${
+              isVideoCall ? 'bg-blue-500/20 text-blue-500 border border-blue-500/50' : 'bg-accent hover:bg-accent/80'
+            }`}
+          >
+            <Video className="w-3 h-3" />
+            Видеозвонок
+          </button>
+        </div>
+      </div>
+
+      {/* Unconfirmed toggle */}
+      <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-accent/50">
+        <div className="flex items-center gap-2">
+          <span className="text-sm">Не согласовано</span>
+          <span className="text-xs text-muted-foreground">(пунктирная рамка)</span>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsUnconfirmed(!isUnconfirmed)}
+          className={`w-10 h-5 rounded-full transition-colors relative ${isUnconfirmed ? 'bg-violet-500' : 'bg-muted'}`}
+        >
+          <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${isUnconfirmed ? 'left-5' : 'left-0.5'}`} />
+        </button>
       </div>
 
       <DialogFooter>
