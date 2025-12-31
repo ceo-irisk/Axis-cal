@@ -492,7 +492,7 @@ export const Sidebar = ({
                 </div>
 
                 {/* End Day Button */}
-                {isToday && (
+                {isTodayDate && (
                   <button onClick={onOpenSurvey} className="w-full btn-secondary flex items-center justify-center gap-2">
                     <FileText className="w-4 h-4" />
                     Завершить день
