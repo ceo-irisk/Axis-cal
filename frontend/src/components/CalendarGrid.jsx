@@ -415,6 +415,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
   // Column widths as constants for consistency
   const COL_LEFT = 'w-[50px]';
   const COL_RIGHT = 'w-[140px]';
+  const SCROLLBAR_WIDTH = 'w-[8px]'; // Reserve space for scrollbar
 
   return (
     <div className="card-glass overflow-hidden" data-testid="week-view">
