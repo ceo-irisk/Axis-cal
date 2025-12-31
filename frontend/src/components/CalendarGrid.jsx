@@ -469,7 +469,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                         absolute px-1 py-1 rounded-md text-xs cursor-pointer 
                         hover:opacity-90 transition-opacity overflow-hidden group
                         ${isTemplate 
-                          ? 'bg-transparent border-2 border-dashed border-violet-500 text-violet-600 dark:text-violet-300' 
+                          ? 'bg-transparent border-2 border-violet-500 text-violet-600 dark:text-violet-300' 
                           : eventColorClass
                         }
                       `} 
