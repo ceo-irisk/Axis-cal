@@ -449,6 +449,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                 const eventColorClass = isUnconfirmed 
                   ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
                   : (EVENT_COLORS[event.event_type] || 'event-meeting');
+                const overlapStyle = getOverlapStyle(event, dayEvents);
                 
                 return (
                   <div 
@@ -457,14 +458,14 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                     onDragStart={(e) => handleDragStart(e, event)}
                     onClick={() => onEventClick(event)} 
                     className={`
-                      absolute left-0.5 right-0.5 px-1.5 py-1 rounded-md text-xs cursor-pointer 
+                      absolute px-1 py-1 rounded-md text-xs cursor-pointer 
                       hover:opacity-90 transition-opacity overflow-hidden group
                       ${isTemplate 
                         ? 'bg-transparent border-2 border-violet-400 text-violet-600 dark:text-violet-300' 
                         : eventColorClass
                       }
                     `} 
-                    style={getEventStyle(event)} 
+                    style={{...getEventStyle(event), ...overlapStyle}} 
                     data-testid={`event-${event.id}`}
                   >
                     <div className="flex items-start justify-between gap-1 h-full">
