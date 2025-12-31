@@ -139,11 +139,13 @@ export default function CalendarPage() {
 
   const handleEventClick = (event) => {
     setSelectedEvent(event);
+    setSelectedEventId(null);
     setShowEventModal(true);
   };
 
   const handleCreateEvent = () => {
     setSelectedEvent(null);
+    setSelectedEventId(null);
     setDefaultEventTime(null);
     setShowEventModal(true);
   };
