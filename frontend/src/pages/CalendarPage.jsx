@@ -6,7 +6,6 @@ import {
 } from '../lib/api';
 import Sidebar from '../components/Sidebar';
 import CalendarGrid from '../components/CalendarGrid';
-import RightPanel from '../components/RightPanel';
 import EventModal from '../components/EventModal';
 import SurveyModal from '../components/SurveyModal';
 import { format, startOfMonth, endOfMonth, addMonths, subMonths, addWeeks, subWeeks, addDays, subDays } from 'date-fns';
