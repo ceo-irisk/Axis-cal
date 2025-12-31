@@ -20,6 +20,7 @@ export default function CalendarPage() {
   const [view, setView] = useState('week'); // По умолчанию неделя
   const [events, setEvents] = useState([]);
   const [calendars, setCalendars] = useState([]);
+  const [templates, setTemplates] = useState([]);
   const [ratings, setRatings] = useState({});
   const [overloadedDays, setOverloadedDays] = useState([]);
   const [ruleViolations, setRuleViolations] = useState({});
