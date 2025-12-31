@@ -352,25 +352,27 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
         {days.map((day, idx) => (
           <div 
             key={day.toISOString()} 
-            className={`group border-b border-r border-border/30 overflow-hidden ${isSameDay(day, date) ? 'bg-violet-500/10' : ''}`}
+            className={`group border-b border-r border-border/30 ${isSameDay(day, date) ? 'bg-violet-500/10' : ''}`}
           >
-            <div className="flex items-center justify-between p-2 gap-1">
+            {/* Day header - centered, fixed layout */}
+            <div className="p-2 text-center relative">
               <button 
                 onClick={() => onDateClick(day)} 
-                className="text-left hover:bg-accent/30 rounded px-1 -ml-1 transition-colors flex-shrink-0"
+                className="hover:bg-accent/30 rounded px-2 py-0.5 transition-colors inline-block"
               >
                 <p className="text-xs text-muted-foreground uppercase">{dayNames[idx]}</p>
                 <p className={`text-lg font-semibold ${isToday(day) ? 'text-violet-500' : ''}`}>
                   {format(day, 'd')}
                 </p>
               </button>
-              <div className="flex-shrink-0">
+              {/* Template selector - absolute positioned in corner */}
+              <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <TemplateSelector day={day} templates={templates} onApplyTemplate={onApplyTemplate} />
               </div>
             </div>
             
             {/* All-day events row */}
-            <div className="min-h-[24px] px-1 pb-1 space-y-0.5">
+            <div className="min-h-[24px] px-1 pb-1 space-y-0.5 overflow-hidden">
               {getAllDayEvents(day).map(event => {
                 const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
                 const eventColorClass = isUnconfirmed 
