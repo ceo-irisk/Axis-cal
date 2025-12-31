@@ -90,13 +90,17 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
       status = 'template';
     }
     
+    // Parse ISO dates and convert to local time
+    const startDateTime = event.start_time ? new Date(event.start_time) : new Date();
+    const endDateTime = event.end_time ? new Date(event.end_time) : new Date();
+    
     return {
       title: event.title || '',
       description: event.description || '',
-      start_date: event.start_time?.slice(0, 10) || '',
-      start_time_val: event.start_time?.slice(11, 16) || '09:00',
-      end_date: event.end_time?.slice(0, 10) || '',
-      end_time_val: event.end_time?.slice(11, 16) || '10:00',
+      start_date: format(startDateTime, 'yyyy-MM-dd'),
+      start_time_val: format(startDateTime, 'HH:mm'),
+      end_date: format(endDateTime, 'yyyy-MM-dd'),
+      end_time_val: format(endDateTime, 'HH:mm'),
       event_type: event.event_type || 'meeting',
       status: status,
       location: event.location || '',
