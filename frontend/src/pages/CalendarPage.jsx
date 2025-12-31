@@ -47,6 +47,8 @@ export default function CalendarPage() {
       toast.success('Событие удалено');
       setShowEventModal(false);
       setSelectedEventId(null);
+      // Remove event from local state immediately
+      setEvents(prev => prev.filter(e => e.id !== eventId));
     } catch (error) {
       console.error('Error deleting event:', error);
       toast.error('Ошибка удаления события');
