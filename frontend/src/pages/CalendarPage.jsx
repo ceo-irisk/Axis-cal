@@ -223,57 +223,63 @@ export default function CalendarPage() {
       
       <main className="main-content-full flex-1" data-testid="calendar-main">
         <div className="max-w-full">
-          <header className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-lg hover:bg-accent">
-                <Menu className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight capitalize">{getTitle()}</h1>
-                <p className="text-muted-foreground text-sm mt-0.5">
-                  {format(selectedDate, 'EEEE, d MMMM', { locale: ru })}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              {/* View switcher */}
-              <div className="flex bg-accent rounded-lg p-1 mr-2">
-                {['month', 'week', 'day'].map(v => (
-                  <button key={v} onClick={() => setView(v)} className={`px-3 py-1.5 text-sm rounded-md transition-colors ${view === v ? 'bg-background shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'}`} data-testid={`view-${v}`}>
-                    {v === 'month' ? 'Месяц' : v === 'week' ? 'Неделя' : 'День'}
+          {mainView === MAIN_VIEW.CALENDAR ? (
+            <>
+              <header className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-lg hover:bg-accent">
+                    <Menu className="w-5 h-5" />
                   </button>
-                ))}
-              </div>
+                  <div>
+                    <h1 className="text-2xl font-semibold tracking-tight capitalize">{getTitle()}</h1>
+                    <p className="text-muted-foreground text-sm mt-0.5">
+                      {format(selectedDate, 'EEEE, d MMMM', { locale: ru })}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  {/* View switcher */}
+                  <div className="flex bg-accent rounded-lg p-1 mr-2">
+                    {['month', 'week', 'day'].map(v => (
+                      <button key={v} onClick={() => setView(v)} className={`px-3 py-1.5 text-sm rounded-md transition-colors ${view === v ? 'bg-background shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'}`} data-testid={`view-${v}`}>
+                        {v === 'month' ? 'Месяц' : v === 'week' ? 'Неделя' : 'День'}
+                      </button>
+                    ))}
+                  </div>
 
-              <button onClick={handleToday} className="btn-secondary text-sm" data-testid="today-button">Сегодня</button>
-              <div className="flex items-center">
-                <button onClick={() => handleNavigate('prev')} className="p-2 rounded-lg hover:bg-accent transition-colors" data-testid="prev-button">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
-                </button>
-                <button onClick={() => handleNavigate('next')} className="p-2 rounded-lg hover:bg-accent transition-colors" data-testid="next-button">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-                </button>
-              </div>
-            </div>
-          </header>
+                  <button onClick={handleToday} className="btn-secondary text-sm" data-testid="today-button">Сегодня</button>
+                  <div className="flex items-center">
+                    <button onClick={() => handleNavigate('prev')} className="p-2 rounded-lg hover:bg-accent transition-colors" data-testid="prev-button">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                    </button>
+                    <button onClick={() => handleNavigate('next')} className="p-2 rounded-lg hover:bg-accent transition-colors" data-testid="next-button">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                    </button>
+                  </div>
+                </div>
+              </header>
 
-          <CalendarGrid
-            currentDate={currentDate}
-            selectedDate={selectedDate}
-            events={events}
-            calendars={calendars}
-            templates={templates}
-            overloadedDays={overloadedDays}
-            ratings={ratings}
-            view={view}
-            onDateClick={handleDateClick}
-            onCellDoubleClick={handleCellDoubleClick}
-            onEventClick={handleEventClick}
-            onEventUpdate={handleEventUpdate}
-            onApplyTemplate={handleApplyTemplate}
-            loading={loading}
-          />
+              <CalendarGrid
+                currentDate={currentDate}
+                selectedDate={selectedDate}
+                events={events}
+                calendars={calendars}
+                templates={templates}
+                overloadedDays={overloadedDays}
+                ratings={ratings}
+                view={view}
+                onDateClick={handleDateClick}
+                onCellDoubleClick={handleCellDoubleClick}
+                onEventClick={handleEventClick}
+                onEventUpdate={handleEventUpdate}
+                onApplyTemplate={handleApplyTemplate}
+                loading={loading}
+              />
+            </>
+          ) : mainView === MAIN_VIEW.USERS ? (
+            <UsersPanel />
+          ) : null}
         </div>
       </main>
 
