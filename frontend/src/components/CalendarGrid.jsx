@@ -547,12 +547,10 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
           })}
         </div>
 
-        {/* Right time column - fixed width */}
-        <div className="flex-shrink-0 w-[50px] border-l border-border/20">
+        {/* Right spacer for timezone selector width */}
+        <div className="flex-shrink-0 w-[200px] border-l border-border/20">
           {hours.map(hour => (
-            <div key={hour} className="h-[60px] px-1 flex items-start pt-1 justify-start text-[10px] text-muted-foreground/60 font-mono">
-              {String(hour).padStart(2, '0')}:00
-            </div>
+            <div key={hour} className="h-[60px]"></div>
           ))}
         </div>
       </div>
@@ -560,7 +558,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
   );
 };
 
-const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, selectedEventId, onEventSelect }) => {
+const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, selectedEventId, onEventSelect, timezoneShift, selectedTimezone, onTimezoneChange }) => {
   const hours = Array.from({ length: 24 }, (_, i) => i); // Все 24 часа
   const dayEvents = events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd')) && !e.is_all_day);
   const allDayEvents = events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd')) && e.is_all_day);
@@ -571,10 +569,10 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
     try {
       const start = new Date(event.start_time);
       const end = new Date(event.end_time);
-      // Use local time for positioning
-      const startHour = start.getHours() + start.getMinutes() / 60;
+      // Apply timezone shift for positioning
+      const shiftedStartHour = start.getHours() + start.getMinutes() / 60 + timezoneShift;
       const duration = (end - start) / 3600000;
-      const topOffset = startHour * 60;
+      const topOffset = shiftedStartHour * 60;
       return { top: `${topOffset}px`, height: `${Math.max(duration * 60, 30)}px` };
     } catch { return { top: '0px', height: '60px' }; }
   };
