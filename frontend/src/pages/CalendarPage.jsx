@@ -172,6 +172,7 @@ export default function CalendarPage() {
       await deleteEvent(eventId);
       toast.success('Событие удалено');
       setShowEventModal(false);
+      setSelectedEventId(null);
       fetchData();
     } catch (error) {
       console.error('Error deleting event:', error);
