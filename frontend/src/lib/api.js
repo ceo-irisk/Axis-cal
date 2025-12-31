@@ -145,4 +145,45 @@ export const deleteCalendar = (id) => api.delete(`/calendars/${id}`);
 export const getOverloadedDays = (startDate, endDate) => 
   api.get(`/analytics/overloaded-days?start_date=${startDate}&end_date=${endDate}`);
 
+// Dictionaries - Event Types
+export const getEventTypes = () => api.get('/dictionaries/event-types');
+export const createEventType = (name, label, color) => {
+  const params = new URLSearchParams();
+  params.append('name', name);
+  params.append('label', label);
+  params.append('color', color);
+  return api.post(`/dictionaries/event-types?${params.toString()}`);
+};
+export const updateEventType = (id, name, label, color, order = 0, isActive = true) => {
+  const params = new URLSearchParams();
+  params.append('name', name);
+  params.append('label', label);
+  params.append('color', color);
+  params.append('order', order);
+  params.append('is_active', isActive);
+  return api.put(`/dictionaries/event-types/${id}?${params.toString()}`);
+};
+export const deleteEventType = (id) => api.delete(`/dictionaries/event-types/${id}`);
+export const reorderEventTypes = (typeIds) => api.put('/dictionaries/event-types/reorder', typeIds);
+
+// Dictionaries - Event Statuses
+export const getEventStatuses = () => api.get('/dictionaries/event-statuses');
+export const createEventStatus = (name, label, color) => {
+  const params = new URLSearchParams();
+  params.append('name', name);
+  params.append('label', label);
+  params.append('color', color);
+  return api.post(`/dictionaries/event-statuses?${params.toString()}`);
+};
+export const updateEventStatus = (id, name, label, color, order = 0, isActive = true) => {
+  const params = new URLSearchParams();
+  params.append('name', name);
+  params.append('label', label);
+  params.append('color', color);
+  params.append('order', order);
+  params.append('is_active', isActive);
+  return api.put(`/dictionaries/event-statuses/${id}?${params.toString()}`);
+};
+export const deleteEventStatus = (id) => api.delete(`/dictionaries/event-statuses/${id}`);
+
 export default api;
