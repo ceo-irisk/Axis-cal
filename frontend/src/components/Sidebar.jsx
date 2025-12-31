@@ -316,34 +316,41 @@ export const Sidebar = ({
                         {allDayEvents.length > 0 && (
                           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">События</p>
                         )}
-                        {timedEvents.map((event) => (
-                          <button 
-                            key={event.id} 
-                            onClick={() => onEventClick?.(event)} 
-                            className="w-full text-left p-3 rounded-xl bg-accent hover:bg-border transition-colors"
-                            data-testid={`sidebar-event-${event.id}`}
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-violet-500" />
-                                <p className="font-medium text-sm truncate">{event.title}</p>
+                        {timedEvents.map((event) => {
+                          const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
+                          return (
+                            <button 
+                              key={event.id} 
+                              onClick={() => onEventClick?.(event)} 
+                              className={`w-full text-left p-3 rounded-xl transition-colors ${
+                                isUnconfirmed 
+                                  ? 'border-2 border-dashed border-violet-500 bg-violet-500/5 hover:bg-violet-500/10'
+                                  : 'bg-accent hover:bg-border'
+                              }`}
+                              data-testid={`sidebar-event-${event.id}`}
+                            >
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex items-center gap-2">
+                                  <div className={`w-2 h-2 rounded-full ${isUnconfirmed ? 'border border-violet-500' : 'bg-violet-500'}`} />
+                                  <p className="font-medium text-sm truncate">{event.title}</p>
+                                </div>
+                                <EventIcons event={event} />
                               </div>
-                              <EventIcons event={event} />
-                            </div>
-                            <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground ml-4">
-                              <span className="flex items-center gap-1 font-mono">
-                                <Clock className="w-3 h-3" />
-                                {event.start_time?.slice(11, 16)}
-                              </span>
-                              {event.location && (
-                                <span className="flex items-center gap-1 truncate">
-                                  <MapPin className="w-3 h-3" />
-                                  {event.location}
+                              <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground ml-4">
+                                <span className="flex items-center gap-1 font-mono">
+                                  <Clock className="w-3 h-3" />
+                                  {event.start_time?.slice(11, 16)}
                                 </span>
-                              )}
-                            </div>
-                          </button>
-                        ))}
+                                {event.location && (
+                                  <span className="flex items-center gap-1 truncate">
+                                    <MapPin className="w-3 h-3" />
+                                    {event.location}
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
