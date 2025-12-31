@@ -186,4 +186,15 @@ export const updateEventStatus = (id, name, label, color, order = 0, isActive = 
 };
 export const deleteEventStatus = (id) => api.delete(`/dictionaries/event-statuses/${id}`);
 
+// Custom Timezones
+export const getCustomTimezones = () => api.get('/dictionaries/timezones');
+export const createCustomTimezone = (name, label, offset) => {
+  const params = new URLSearchParams();
+  params.append('name', name);
+  params.append('label', label);
+  params.append('offset', offset);
+  return api.post(`/dictionaries/timezones?${params.toString()}`);
+};
+export const deleteCustomTimezone = (id) => api.delete(`/dictionaries/timezones/${id}`);
+
 export default api;
