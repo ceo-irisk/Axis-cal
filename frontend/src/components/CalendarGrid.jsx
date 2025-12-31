@@ -26,6 +26,16 @@ const EVENT_COLORS = {
   deep_work: 'event-deep-work',
 };
 
+// Unconfirmed event colors with dashed border
+const UNCONFIRMED_EVENT_COLORS = {
+  meeting: 'event-unconfirmed-meeting',
+  call: 'event-unconfirmed-call',
+  personal: 'event-unconfirmed-personal',
+  urgent: 'event-unconfirmed-urgent',
+  travel: 'event-unconfirmed-travel',
+  deep_work: 'event-unconfirmed-deep-work',
+};
+
 // Event status icons
 const EventIcons = ({ event }) => {
   const icons = [];
