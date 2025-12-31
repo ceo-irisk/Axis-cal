@@ -549,6 +549,9 @@ const DayView = ({ date, events, onEventClick, onCellDoubleClick, onEventUpdate 
             const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
             const isTemplate = event.is_template_event;
             const eventTime = getLocalTime(event.start_time);
+            const eventColorClass = isUnconfirmed 
+              ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
+              : (EVENT_COLORS[event.event_type] || 'event-meeting');
             
             return (
               <div 
@@ -561,9 +564,7 @@ const DayView = ({ date, events, onEventClick, onCellDoubleClick, onEventUpdate 
                   hover:opacity-90 transition-opacity group
                   ${isTemplate 
                     ? 'bg-transparent border-2 border-violet-400 text-violet-600 dark:text-violet-300' 
-                    : isUnconfirmed 
-                      ? 'border-2 border-dashed ' + EVENT_COLORS[event.event_type]
-                      : EVENT_COLORS[event.event_type]
+                    : eventColorClass
                   }
                 `}
                 style={getEventStyle(event)} 
