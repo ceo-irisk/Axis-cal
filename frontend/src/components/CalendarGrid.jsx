@@ -523,6 +523,47 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
     } catch { return { top: '0px', height: '60px' }; }
   };
 
+  // Calculate horizontal positions for overlapping events
+  const getOverlapStyle = (event) => {
+    try {
+      const eventStart = new Date(event.start_time).getTime();
+      const eventEnd = new Date(event.end_time).getTime();
+      
+      // Find all events that overlap with this one
+      const overlapping = dayEvents.filter(e => {
+        const eStart = new Date(e.start_time).getTime();
+        const eEnd = new Date(e.end_time).getTime();
+        return (eStart < eventEnd && eEnd > eventStart);
+      });
+      
+      overlapping.sort((a, b) => {
+        const aStart = new Date(a.start_time).getTime();
+        const bStart = new Date(b.start_time).getTime();
+        if (aStart !== bStart) return aStart - bStart;
+        return (a.id || '').localeCompare(b.id || '');
+      });
+      
+      const position = overlapping.findIndex(e => e.id === event.id);
+      const total = overlapping.length;
+      
+      if (total <= 1) {
+        return { left: '8px', right: '8px', width: 'auto' };
+      }
+      
+      const widthPercent = (100 / total) - 2;
+      const leftPercent = position * (100 / total) + 1;
+      
+      return { 
+        left: `${leftPercent}%`, 
+        width: `${widthPercent}%`,
+        right: 'auto'
+      };
+    } catch {
+      return { left: '8px', right: '8px', width: 'auto' };
+    }
+  };
+  };
+
   const getEventDuration = (event) => {
     try {
       const start = parseISO(event.start_time);
