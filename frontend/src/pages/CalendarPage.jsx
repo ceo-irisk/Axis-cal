@@ -3,19 +3,27 @@ import { useAuth } from '../lib/auth';
 import { 
   getEvents, createEvent, updateEvent, deleteEvent, 
   getRatings, createRating, checkDayRules, getOverloadedDays, getCalendars,
-  getTemplates, applyTemplate
+  getTemplates, applyTemplate, getUsers, createUser, updateUser, deleteUser
 } from '../lib/api';
 import Sidebar from '../components/Sidebar';
 import CalendarGrid from '../components/CalendarGrid';
 import EventModal from '../components/EventModal';
 import SurveyModal from '../components/SurveyModal';
+import UsersPanel from '../components/UsersPanel';
 import { format, startOfMonth, endOfMonth, addMonths, subMonths, addWeeks, subWeeks, addDays, subDays } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { Menu } from 'lucide-react';
 
+// Main view types
+const MAIN_VIEW = {
+  CALENDAR: 'calendar',
+  USERS: 'users'
+};
+
 export default function CalendarPage() {
   const { user } = useAuth();
+  const [mainView, setMainView] = useState(MAIN_VIEW.CALENDAR);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState('week'); // По умолчанию неделя
   const [events, setEvents] = useState([]);
