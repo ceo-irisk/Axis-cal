@@ -383,19 +383,6 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], on
             </div>
           </div>
 
-          {/* Unconfirmed toggle */}
-          <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-accent/50">
-            <div className="flex items-center gap-2">
-              <span className="text-sm">Не согласовано</span>
-              <span className="text-xs text-muted-foreground">(пунктирная рамка)</span>
-            </div>
-            <Switch 
-              checked={formData.is_unconfirmed} 
-              onCheckedChange={(checked) => setFormData({ ...formData, is_unconfirmed: checked })}
-              data-testid="event-unconfirmed-switch"
-            />
-          </div>
-
           {/* Location */}
           <div>
             <Label className="text-xs text-muted-foreground flex items-center gap-1 mb-1.5">
