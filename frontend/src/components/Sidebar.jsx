@@ -1038,7 +1038,7 @@ export const Sidebar = ({
 const EventTypeForm = ({ initialData, onSave, onCancel }) => {
   const [name, setName] = useState(initialData?.name || '');
   const [label, setLabel] = useState(initialData?.label || '');
-  const [color, setColor] = useState(initialData?.color || '#8b5cf6');
+  const [color, setColor] = useState(initialData?.color || '#085C53');
 
   const handleSubmit = (e) => {
     e.preventDefault();
