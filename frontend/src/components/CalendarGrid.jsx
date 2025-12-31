@@ -64,11 +64,10 @@ const TemplateSelector = ({ day, templates, onApplyTemplate }) => {
     <div className="relative">
       <button 
         onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
-        className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="p-1 text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded opacity-0 group-hover:opacity-100 transition-all"
         title="Выбрать шаблон"
       >
-        <span className="text-[10px]">Шаблон</span>
-        <ChevronDown className="w-3 h-3" />
+        <ChevronDown className="w-3.5 h-3.5" />
       </button>
       {open && (
         <>
