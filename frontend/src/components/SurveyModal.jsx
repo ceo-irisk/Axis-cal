@@ -109,10 +109,10 @@ export const SurveyModal = ({ date, onClose, onComplete }) => {
         {showSummary && existingResponse?.ai_summary ? (
           <div className="space-y-6">
             {/* AI Summary */}
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-violet-500/10 to-indigo-500/10 border border-violet-500/20">
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-[#085C53]/10 to-indigo-500/10 border border-[#085C53]/20">
               <div className="flex items-center gap-2 mb-4">
-                <FileText className="w-5 h-5 text-violet-400" />
-                <h3 className="font-medium text-violet-300">AI-отчёт дня</h3>
+                <FileText className="w-5 h-5 text-teal-400" />
+                <h3 className="font-medium text-teal-300">AI-отчёт дня</h3>
               </div>
               <div 
                 className="prose prose-invert prose-sm max-w-none"
