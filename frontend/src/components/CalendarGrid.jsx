@@ -756,12 +756,8 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
           {dayEvents.map(event => {
             const duration = getEventDuration(event);
             const isLong = duration >= 1;
-            const isUnconfirmed = event.status === 'tentative';
-            const isTemplate = event.is_template_event;
             const eventTime = getLocalTime(event.start_time, timezoneShift);
-            const eventColorClass = isUnconfirmed 
-              ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
-              : (EVENT_COLORS[event.event_type] || 'event-meeting');
+            const eventColorClass = getEventColorClass(event);
             const overlapStyle = getOverlapStyle(event);
             const isSelected = selectedEventId === event.id;
             
