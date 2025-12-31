@@ -53,7 +53,7 @@ export default function LoginPage() {
       <div className="relative w-full max-w-md animate-fade-in">
         <div className="card-glass rounded-3xl p-8">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl mb-4 overflow-hidden">
+            <div className="inline-flex items-center justify-center w-36 h-36 rounded-2xl mb-4 overflow-hidden">
               <img src="/logo.png" alt="Axis" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-2xl font-semibold tracking-tight mb-2 text-[var(--primary-text)]">
