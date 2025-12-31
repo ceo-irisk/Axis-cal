@@ -292,31 +292,45 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], on
             />
           </div>
 
-          {/* Time row - hidden if all day */}
+          {/* Date and Time - hidden if all day */}
           {!formData.is_all_day && (
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs text-muted-foreground flex items-center gap-1 mb-1.5">
-                  <Clock className="w-3 h-3" />Начало
-                </Label>
-                <Input 
-                  type="datetime-local" 
-                  value={formData.start_time} 
-                  onChange={(e) => setFormData({ ...formData, start_time: e.target.value })} 
-                  required 
-                  data-testid="event-start-input" 
-                />
+            <div className="space-y-4">
+              {/* Date row */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-1.5 block">Дата начала</Label>
+                  <Input 
+                    type="date" 
+                    value={formData.start_date} 
+                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value, end_date: e.target.value })} 
+                    required 
+                    data-testid="event-start-date" 
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-1.5 block">Дата окончания</Label>
+                  <Input 
+                    type="date" 
+                    value={formData.end_date} 
+                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} 
+                    required 
+                    data-testid="event-end-date" 
+                  />
+                </div>
               </div>
-              <div>
-                <Label className="text-xs text-muted-foreground flex items-center gap-1 mb-1.5">
-                  <Clock className="w-3 h-3" />Конец
-                </Label>
-                <Input 
-                  type="datetime-local" 
-                  value={formData.end_time} 
-                  onChange={(e) => setFormData({ ...formData, end_time: e.target.value })} 
-                  required 
-                  data-testid="event-end-input" 
+              
+              {/* Time row with improved time picker */}
+              <div className="flex items-end gap-6 justify-center p-4 rounded-xl bg-accent/30">
+                <TimePicker 
+                  label="Начало" 
+                  value={formData.start_time_val} 
+                  onChange={(val) => setFormData({ ...formData, start_time_val: val })} 
+                />
+                <span className="text-lg text-muted-foreground mb-4">→</span>
+                <TimePicker 
+                  label="Конец" 
+                  value={formData.end_time_val} 
+                  onChange={(val) => setFormData({ ...formData, end_time_val: val })} 
                 />
               </div>
             </div>
@@ -324,7 +338,7 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], on
 
           {/* Event flags/icons */}
           <div>
-            <Label className="text-xs text-muted-foreground mb-2 block">Статус события</Label>
+            <Label className="text-xs text-muted-foreground mb-2 block">Флаги события</Label>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
