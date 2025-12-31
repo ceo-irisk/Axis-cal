@@ -5,12 +5,13 @@ import {
   getCalendars, addCalendar, deleteCalendar,
   getEventTypes, createEventType, updateEventType, deleteEventType,
   getEventStatuses, createEventStatus, updateEventStatus, deleteEventStatus,
-  getTemplates, createTemplate, updateTemplate, deleteTemplate, applyTemplate
+  getTemplates, createTemplate, updateTemplate, deleteTemplate, applyTemplate,
+  getCustomTimezones, createCustomTimezone, deleteCustomTimezone
 } from '../lib/api';
 import { 
   Sun, Moon, LogOut, Plus, Trash2, Eye, EyeOff, ChevronLeft, ChevronRight, ChevronUp, ChevronDown,
   Calendar, LayoutGrid, Settings, Star, AlertTriangle, Clock, MapPin, FileText,
-  Users, Layout as LayoutIcon, Square, CheckCircle2, Zap, Video, Book, Edit2, Play, ArrowLeft, Palette, GripVertical
+  Users, Layout as LayoutIcon, Square, CheckCircle2, Zap, Video, Book, Edit2, Play, ArrowLeft, Palette, GripVertical, Globe
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
