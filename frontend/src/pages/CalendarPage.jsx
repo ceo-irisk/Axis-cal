@@ -5,6 +5,7 @@ import {
   getRatings, createRating, checkDayRules, getOverloadedDays, getCalendars,
   getTemplates, applyTemplate, getUsers, createUser, updateUser, deleteUser
 } from '../lib/api';
+import { getLocalTimezoneName } from '../lib/timezones';
 import Sidebar from '../components/Sidebar';
 import CalendarGrid from '../components/CalendarGrid';
 import EventModal from '../components/EventModal';
@@ -40,6 +41,7 @@ export default function CalendarPage() {
   const [showSurveyModal, setShowSurveyModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [defaultEventTime, setDefaultEventTime] = useState(null);
+  const [selectedTimezone, setSelectedTimezone] = useState(() => getLocalTimezoneName());
 
   const handleDeleteEventById = useCallback(async (eventId) => {
     try {
