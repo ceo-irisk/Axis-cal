@@ -517,6 +517,8 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
             "event_type": event_template.get("event_type", "meeting"),
             "status": event_template.get("status", "confirmed"),
             "color": event_template.get("color"),
+            "is_template_event": True,  # Mark as template event
+            "template_id": template_id,  # Reference to source template
             "created_by": user["id"],
             "created_at": datetime.now(timezone.utc).isoformat(),
             "updated_at": datetime.now(timezone.utc).isoformat()
