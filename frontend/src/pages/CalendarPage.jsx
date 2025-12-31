@@ -165,6 +165,18 @@ export default function CalendarPage() {
     }
   };
 
+  const handleApplyTemplate = async (templateId, targetDate) => {
+    try {
+      const dateStr = format(targetDate, 'yyyy-MM-dd');
+      await applyTemplate(templateId, dateStr);
+      toast.success('Шаблон применён');
+      fetchData();
+    } catch (error) {
+      console.error('Error applying template:', error);
+      toast.error('Ошибка применения шаблона');
+    }
+  };
+
   const selectedDateStr = format(selectedDate, 'yyyy-MM-dd');
   const selectedDateEvents = events.filter(e => e.start_time?.startsWith(selectedDateStr));
   const currentRating = ratings[selectedDateStr];
