@@ -184,7 +184,7 @@ export const Sidebar = ({
             
             {/* Week days header */}
             <div className="grid grid-cols-7 gap-1 mb-1">
-              {['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'].map(day => (
+              {weekDayNames.map(day => (
                 <div key={day} className="text-center text-xs text-muted-foreground font-medium py-1">
                   {day}
                 </div>
