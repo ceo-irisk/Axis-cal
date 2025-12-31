@@ -412,12 +412,16 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
     document.addEventListener('mouseup', handleMouseUp);
   };
 
+  // Column widths as constants for consistency
+  const COL_LEFT = 'w-[50px]';
+  const COL_RIGHT = 'w-[140px]';
+
   return (
     <div className="card-glass overflow-hidden" data-testid="week-view">
       {/* Header with day names and dates */}
       <div className="flex">
         {/* Left spacer for time column */}
-        <div className="flex-shrink-0 w-[50px] p-2 text-center text-[10px] text-muted-foreground border-b border-r border-border/30"></div>
+        <div className={`flex-shrink-0 ${COL_LEFT} p-2 text-center text-[10px] text-muted-foreground border-b border-r border-border/30`}></div>
         
         {/* Day headers */}
         <div className="flex-1 grid border-b border-border/30" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
@@ -464,8 +468,8 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
           ))}
         </div>
         
-        {/* Timezone selector - compact right side */}
-        <div className="flex-shrink-0 w-[140px] p-1 border-b border-l border-border/30 flex items-center justify-center">
+        {/* Timezone selector - right side */}
+        <div className={`flex-shrink-0 ${COL_RIGHT} p-1 border-b border-l border-border/30 flex items-center justify-center`}>
           <TimezoneSelector selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} />
         </div>
       </div>
@@ -475,8 +479,8 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
         ref={gridRef}
         className="flex h-[calc(100vh-220px)] overflow-y-auto" 
       >
-        {/* Left time column - fixed width - same as header */}
-        <div className="flex-shrink-0 w-[50px] border-r border-border/20">
+        {/* Left time column */}
+        <div className={`flex-shrink-0 ${COL_LEFT} border-r border-border/20`}>
           {hours.map(hour => (
             <div key={hour} className="h-[60px] px-1 flex items-start pt-1 justify-end text-[10px] text-muted-foreground/60 font-mono">
               {String(hour).padStart(2, '0')}:00
@@ -484,7 +488,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
           ))}
         </div>
 
-        {/* Day columns - flexible width - same as header grid */}
+        {/* Day columns */}
         <div className="flex-1 grid" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
           {days.map((day, dayIdx) => {
             const dayEvents = getDayEvents(day);
