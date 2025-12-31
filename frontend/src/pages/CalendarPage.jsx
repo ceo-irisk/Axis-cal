@@ -40,10 +40,11 @@ export default function CalendarPage() {
       const startStr = format(start, 'yyyy-MM-dd');
       const endStr = format(end, 'yyyy-MM-dd');
 
-      const [eventsRes, ratingsRes, overloadedRes] = await Promise.all([
+      const [eventsRes, ratingsRes, overloadedRes, templatesRes] = await Promise.all([
         getEvents(startStr, endStr),
         getRatings(startStr, endStr),
-        getOverloadedDays(startStr, endStr)
+        getOverloadedDays(startStr, endStr),
+        getTemplates()
       ]);
 
       setEvents(eventsRes.data || []);
@@ -51,6 +52,7 @@ export default function CalendarPage() {
       (ratingsRes.data || []).forEach(r => { ratingsMap[r.date] = r; });
       setRatings(ratingsMap);
       setOverloadedDays(overloadedRes.data || []);
+      setTemplates(templatesRes.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Ошибка загрузки данных');
