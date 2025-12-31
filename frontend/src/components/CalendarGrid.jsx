@@ -208,6 +208,49 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
     });
   };
 
+  // Calculate horizontal positions for overlapping events
+  const getOverlapStyle = (event, dayEvents) => {
+    try {
+      const eventStart = new Date(event.start_time).getTime();
+      const eventEnd = new Date(event.end_time).getTime();
+      
+      // Find all events that overlap with this one
+      const overlapping = dayEvents.filter(e => {
+        const eStart = new Date(e.start_time).getTime();
+        const eEnd = new Date(e.end_time).getTime();
+        return (eStart < eventEnd && eEnd > eventStart);
+      });
+      
+      // Sort overlapping events by start time, then by id for consistency
+      overlapping.sort((a, b) => {
+        const aStart = new Date(a.start_time).getTime();
+        const bStart = new Date(b.start_time).getTime();
+        if (aStart !== bStart) return aStart - bStart;
+        return (a.id || '').localeCompare(b.id || '');
+      });
+      
+      // Find this event's position in the overlapping group
+      const position = overlapping.findIndex(e => e.id === event.id);
+      const total = overlapping.length;
+      
+      if (total <= 1) {
+        return { left: '2px', right: '2px', width: 'auto' };
+      }
+      
+      // Calculate width and position (leave small gap between events)
+      const widthPercent = (100 / total) - 1;
+      const leftPercent = position * (100 / total);
+      
+      return { 
+        left: `${leftPercent}%`, 
+        width: `${widthPercent}%`,
+        right: 'auto'
+      };
+    } catch {
+      return { left: '2px', right: '2px', width: 'auto' };
+    }
+  };
+
   const getAllDayEvents = (day) => {
     return events.filter(e => {
       const dateStr = format(day, 'yyyy-MM-dd');
