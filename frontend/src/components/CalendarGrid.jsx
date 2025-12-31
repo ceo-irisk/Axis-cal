@@ -459,20 +459,22 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                 {dayEvents.map(event => {
                   const duration = getEventDuration(event);
                   const isLong = duration >= 1;
-                  const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
+                  const isUnconfirmed = event.status === 'tentative';
                   const isTemplate = event.is_template_event;
                   const eventTime = getLocalTime(event.start_time);
                   const eventColorClass = isUnconfirmed 
                     ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
                     : (EVENT_COLORS[event.event_type] || 'event-meeting');
                   const overlapStyle = getOverlapStyle(event, dayEvents);
+                  const isSelected = selectedEventId === event.id;
                   
                   return (
                     <div 
                       key={event.id} 
                       draggable
                       onDragStart={(e) => handleDragStart(e, event)}
-                      onClick={() => onEventClick(event)} 
+                      onClick={(e) => { e.stopPropagation(); onEventSelect?.(event.id); }}
+                      onDoubleClick={(e) => { e.stopPropagation(); onEventClick(event); }}
                       className={`
                         absolute px-1 py-1 rounded-md text-xs cursor-pointer 
                         hover:opacity-90 transition-opacity overflow-hidden group
@@ -480,6 +482,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                           ? 'bg-transparent border-2 border-violet-500 text-violet-600 dark:text-violet-300' 
                           : eventColorClass
                         }
+                        ${isSelected ? 'ring-2 ring-violet-500 ring-offset-1 z-20' : ''}
                       `} 
                       style={{...getEventStyle(event), ...overlapStyle}} 
                       data-testid={`event-${event.id}`}
