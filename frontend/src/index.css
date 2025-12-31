@@ -115,7 +115,7 @@
   @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
 }
 
-.badge-meeting { @apply bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300; }
+.badge-meeting { @apply bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300; }
 .badge-call { @apply bg-cyan-100 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-300; }
 .badge-personal { @apply bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300; }
 .badge-urgent { @apply bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300; }
@@ -125,7 +125,7 @@
 .badge-confirmed { @apply bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300; }
 
 /* ===== Events ===== */
-.event-meeting { @apply border-l-[3px] border-l-violet-500 bg-violet-50 dark:bg-violet-500/10; }
+.event-meeting { @apply border-l-[3px] border-l-[#085C53] bg-teal-50 dark:bg-[#085C53]/10; }
 .event-call { @apply border-l-[3px] border-l-cyan-500 bg-cyan-50 dark:bg-cyan-500/10; }
 .event-personal { @apply border-l-[3px] border-l-amber-500 bg-amber-50 dark:bg-amber-500/10; }
 .event-urgent { @apply border-l-[3px] border-l-red-500 bg-red-50 dark:bg-red-500/10; }
@@ -134,7 +134,7 @@
 
 /* Unconfirmed events - bright dashed border all around */
 .event-unconfirmed-meeting { 
-  @apply border-2 border-dashed border-violet-500 bg-transparent dark:bg-violet-500/5; 
+  @apply border-2 border-dashed border-[#085C53] bg-transparent dark:bg-[#085C53]/5; 
 }
 .event-unconfirmed-call { 
   @apply border-2 border-dashed border-cyan-500 bg-transparent dark:bg-cyan-500/5; 
