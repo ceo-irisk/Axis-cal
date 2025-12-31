@@ -273,7 +273,7 @@ export const Sidebar = ({
   const myCalendars = calendars.filter(c => c.provider === 'custom');
   const externalCalendars = calendars.filter(c => c.provider !== 'custom');
 
-  const handleLogout = () => { logout(); navigate('/login'); };
+  const handleLogout = () => { logout(); };
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
   // Mini calendar helpers
