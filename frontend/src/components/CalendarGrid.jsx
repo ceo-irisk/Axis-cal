@@ -537,6 +537,7 @@ const DayView = ({ date, events, onEventClick, onCellDoubleClick, onEventUpdate 
             const isLong = duration >= 1;
             const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
             const isTemplate = event.is_template_event;
+            const eventTime = getLocalTime(event.start_time);
             
             return (
               <div 
@@ -559,11 +560,9 @@ const DayView = ({ date, events, onEventClick, onCellDoubleClick, onEventUpdate 
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
-                    {isLong && (
-                      <span className="text-xs font-mono opacity-70">
-                        {event.start_time?.slice(11, 16)}
-                      </span>
-                    )}
+                    <span className="text-xs font-mono opacity-70">
+                      {eventTime.formatted}
+                    </span>
                     <span className="font-medium text-sm truncate">{event.title}</span>
                   </div>
                   <EventIcons event={event} />
