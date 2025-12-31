@@ -132,6 +132,26 @@
 .event-travel { @apply border-l-[3px] border-l-emerald-500 bg-emerald-50 dark:bg-emerald-500/10; }
 .event-deep-work { @apply border-l-[3px] border-l-indigo-500 bg-indigo-50 dark:bg-indigo-500/10; }
 
+/* Unconfirmed events - bright dashed border all around */
+.event-unconfirmed-meeting { 
+  @apply border-2 border-dashed border-violet-500 bg-transparent dark:bg-violet-500/5; 
+}
+.event-unconfirmed-call { 
+  @apply border-2 border-dashed border-cyan-500 bg-transparent dark:bg-cyan-500/5; 
+}
+.event-unconfirmed-personal { 
+  @apply border-2 border-dashed border-amber-500 bg-transparent dark:bg-amber-500/5; 
+}
+.event-unconfirmed-urgent { 
+  @apply border-2 border-dashed border-red-500 bg-transparent dark:bg-red-500/5; 
+}
+.event-unconfirmed-travel { 
+  @apply border-2 border-dashed border-emerald-500 bg-transparent dark:bg-emerald-500/5; 
+}
+.event-unconfirmed-deep-work { 
+  @apply border-2 border-dashed border-indigo-500 bg-transparent dark:bg-indigo-500/5; 
+}
+
 .event-tentative {
   background: repeating-linear-gradient(45deg, transparent, transparent 4px, hsl(var(--muted)) 4px, hsl(var(--muted)) 8px);
 }
