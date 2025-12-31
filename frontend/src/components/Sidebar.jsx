@@ -223,6 +223,41 @@ export const Sidebar = ({
     } catch (e) { toast.error('Ошибка удаления'); }
   };
 
+  // Reorder handlers
+  const handleMoveType = async (index, direction) => {
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= eventTypes.length) return;
+    
+    const newTypes = [...eventTypes];
+    const temp = newTypes[index];
+    newTypes[index] = newTypes[newIndex];
+    newTypes[newIndex] = temp;
+    
+    // Update order values
+    try {
+      await updateEventType(newTypes[index].id, newTypes[index].name, newTypes[index].label, newTypes[index].color, index);
+      await updateEventType(newTypes[newIndex].id, newTypes[newIndex].name, newTypes[newIndex].label, newTypes[newIndex].color, newIndex);
+      fetchDictionaries();
+    } catch (e) { toast.error('Ошибка изменения порядка'); }
+  };
+
+  const handleMoveStatus = async (index, direction) => {
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= eventStatuses.length) return;
+    
+    const newStatuses = [...eventStatuses];
+    const temp = newStatuses[index];
+    newStatuses[index] = newStatuses[newIndex];
+    newStatuses[newIndex] = temp;
+    
+    // Update order values
+    try {
+      await updateEventStatus(newStatuses[index].id, newStatuses[index].name, newStatuses[index].label, newStatuses[index].color, index);
+      await updateEventStatus(newStatuses[newIndex].id, newStatuses[newIndex].name, newStatuses[newIndex].label, newStatuses[newIndex].color, newIndex);
+      fetchDictionaries();
+    } catch (e) { toast.error('Ошибка изменения порядка'); }
+  };
+
   // Templates handlers
   const handleSaveTemplate = async (data) => {
     try {
