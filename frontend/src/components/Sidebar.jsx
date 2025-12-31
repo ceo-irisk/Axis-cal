@@ -886,50 +886,36 @@ export const Sidebar = ({
                     </div>
 
                     <div className="border-t border-border pt-4">
-                      {/* Event Statuses */}
+                      {/* Event Flags - placeholder for future API */}
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-sm font-medium">Статусы событий</h3>
-                        <button 
-                          onClick={() => { setEditingStatus(null); setShowStatusModal(true); }}
-                          className="p-1.5 rounded-lg hover:bg-accent"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
+                        <h3 className="text-sm font-medium">Флаги событий</h3>
                       </div>
-                      <div className="space-y-1">
-                        {eventStatuses.map((status, index) => (
-                          <div key={status.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/50 group">
-                            {/* Reorder buttons */}
-                            <div className="flex flex-col gap-0.5 opacity-0 group-hover:opacity-100">
-                              <button 
-                                onClick={() => handleMoveStatus(index, 'up')}
-                                disabled={index === 0}
-                                className={`p-0.5 rounded hover:bg-background ${index === 0 ? 'opacity-30 cursor-not-allowed' : ''}`}
-                              >
-                                <ChevronUp className="w-3 h-3" />
-                              </button>
-                              <button 
-                                onClick={() => handleMoveStatus(index, 'down')}
-                                disabled={index === eventStatuses.length - 1}
-                                className={`p-0.5 rounded hover:bg-background ${index === eventStatuses.length - 1 ? 'opacity-30 cursor-not-allowed' : ''}`}
-                              >
-                                <ChevronDown className="w-3 h-3" />
-                              </button>
-                            </div>
-                            <div className="w-4 h-4 rounded" style={{ backgroundColor: status.color }} />
-                            <span className="flex-1 text-sm">{status.label}</span>
-                            <code className="text-xs text-muted-foreground">{status.name}</code>
-                            <div className="flex gap-1 opacity-0 group-hover:opacity-100">
-                              <button onClick={() => { setEditingStatus(status); setShowStatusModal(true); }} className="p-1 rounded hover:bg-background">
-                                <Edit2 className="w-3 h-3" />
-                              </button>
-                              <button onClick={() => handleDeleteEventStatus(status.id)} className="p-1 rounded hover:bg-red-500/20">
-                                <Trash2 className="w-3 h-3 text-red-500" />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
+                      <p className="text-xs text-muted-foreground mb-2">
+                        Настройка флагов для событий (заблокировано, выполнено, срочно, видеозвонок)
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 p-2 rounded-lg bg-accent/30">
+                          <Square className="w-4 h-4 text-red-500 fill-red-500" />
+                          <span className="flex-1 text-sm">Заблокировано</span>
+                          <span className="text-xs text-muted-foreground">is_blocked</span>
+                        </div>
+                        <div className="flex items-center gap-2 p-2 rounded-lg bg-accent/30">
+                          <CheckCircle2 className="w-4 h-4 text-green-500" />
+                          <span className="flex-1 text-sm">Выполнено</span>
+                          <span className="text-xs text-muted-foreground">is_completed</span>
+                        </div>
+                        <div className="flex items-center gap-2 p-2 rounded-lg bg-accent/30">
+                          <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
+                          <span className="flex-1 text-sm">Срочно</span>
+                          <span className="text-xs text-muted-foreground">is_urgent</span>
+                        </div>
+                        <div className="flex items-center gap-2 p-2 rounded-lg bg-accent/30">
+                          <Video className="w-4 h-4 text-blue-500" />
+                          <span className="flex-1 text-sm">Видеозвонок</span>
+                          <span className="text-xs text-muted-foreground">is_video_call</span>
+                        </div>
                       </div>
+                      <p className="text-xs text-amber-500 mt-3 text-center">Редактирование флагов — скоро</p>
                     </div>
                   </div>
                 )}
