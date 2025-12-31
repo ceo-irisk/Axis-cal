@@ -556,10 +556,12 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
           })}
         </div>
 
-        {/* Right spacer for timezone selector width */}
-        <div className="flex-shrink-0 w-[200px] border-l border-border/20">
+        {/* Right time column - fixed width */}
+        <div className="flex-shrink-0 w-[50px] border-l border-border/20">
           {hours.map(hour => (
-            <div key={hour} className="h-[60px]"></div>
+            <div key={hour} className="h-[60px] px-1 flex items-start pt-1 justify-start text-[10px] text-muted-foreground/60 font-mono">
+              {String(hour).padStart(2, '0')}:00
+            </div>
           ))}
         </div>
       </div>
@@ -567,7 +569,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
   );
 };
 
-const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, selectedEventId, onEventSelect, timezoneShift, selectedTimezone, onTimezoneChange }) => {
+const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, selectedEventId, onEventSelect, timezoneShift, selectedTimezone, onTimezoneChange, customTimezones }) => {
   const hours = Array.from({ length: 24 }, (_, i) => i); // Все 24 часа
   const dayEvents = events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd')) && !e.is_all_day);
   const allDayEvents = events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd')) && e.is_all_day);
