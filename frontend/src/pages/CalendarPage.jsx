@@ -316,6 +316,8 @@ export default function CalendarPage() {
                 selectedEventId={selectedEventId}
                 onEventSelect={handleEventSelect}
                 loading={loading}
+                selectedTimezone={selectedTimezone}
+                onTimezoneChange={setSelectedTimezone}
               />
             </>
           ) : mainView === MAIN_VIEW.USERS ? (
