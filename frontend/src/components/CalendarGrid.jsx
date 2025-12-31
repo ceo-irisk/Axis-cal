@@ -161,7 +161,7 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
                     key={event.id} 
                     onClick={(e) => { e.stopPropagation(); onEventSelect?.(event.id); }} 
                     onDoubleClick={(e) => { e.stopPropagation(); onEventClick(event); }}
-                    className={`px-2 py-0.5 rounded text-xs truncate cursor-pointer hover:opacity-80 ${EVENT_COLORS[event.event_type]} ${event.status === 'tentative' && 'event-tentative'} ${selectedEventId === event.id ? 'ring-2 ring-violet-500 ring-offset-1' : ''}`} 
+                    className={`px-2 py-0.5 rounded text-xs truncate cursor-pointer hover:opacity-80 ${EVENT_COLORS[event.event_type]} ${event.status === 'tentative' && 'event-tentative'} ${selectedEventId === event.id ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`} 
                     data-testid={`event-${event.id}`}
                   >
                     {event.title}
@@ -361,7 +361,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
           {days.map((day, idx) => (
             <div 
               key={day.toISOString()} 
-              className={`group border-r border-border/30 ${isSameDay(day, date) ? 'bg-violet-500/10' : ''}`}
+              className={`group border-r border-border/30 ${isSameDay(day, date) ? 'bg-[#085C53]/10' : ''}`}
             >
               {/* Day header - centered, fixed layout */}
               <div className="p-2 text-center relative">
@@ -370,7 +370,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                   className="hover:bg-accent/30 rounded px-2 py-0.5 transition-colors inline-block"
                 >
                   <p className="text-xs text-muted-foreground uppercase">{dayNames[idx]}</p>
-                  <p className={`text-lg font-semibold ${isToday(day) ? 'text-violet-500' : ''}`}>
+                  <p className={`text-lg font-semibold ${isToday(day) ? 'text-[#085C53]' : ''}`}>
                     {format(day, 'd')}
                   </p>
                 </button>
@@ -393,7 +393,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                       key={event.id}
                       onClick={() => onEventSelect?.(event.id)}
                       onDoubleClick={() => onEventClick(event)}
-                      className={`px-2 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 ${eventColorClass} ${isSelected ? 'ring-2 ring-violet-500 ring-offset-1' : ''}`}
+                      className={`px-2 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 ${eventColorClass} ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
                     >
                       {event.title}
                     </div>
@@ -432,7 +432,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
             return (
               <div 
                 key={day.toISOString()} 
-                className={`relative border-r border-border/20 ${isSelectedCol ? 'bg-violet-500/5' : ''}`}
+                className={`relative border-r border-border/20 ${isSelectedCol ? 'bg-[#085C53]/5' : ''}`}
               >
                 {/* Hour cells */}
                 {hours.map(hour => (
@@ -448,10 +448,10 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                 {/* Current time line */}
                 {isTodayCol && (
                   <div 
-                    className="absolute left-0 right-0 border-t-2 border-violet-500 z-10 pointer-events-none" 
+                    className="absolute left-0 right-0 border-t-2 border-[#085C53] z-10 pointer-events-none" 
                     style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60) * 60}px` }}
                   >
-                    <div className="absolute -left-1 -top-1.5 w-3 h-3 rounded-full bg-violet-500" />
+                    <div className="absolute -left-1 -top-1.5 w-3 h-3 rounded-full bg-[#085C53]" />
                   </div>
                 )}
 
@@ -479,10 +479,10 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                         absolute px-1 py-1 rounded-md text-xs cursor-pointer 
                         hover:opacity-90 transition-opacity overflow-hidden group
                         ${isTemplate 
-                          ? 'bg-transparent border-2 border-violet-500 text-violet-600 dark:text-violet-300' 
+                          ? 'bg-transparent border-2 border-[#085C53] text-[#074a44] dark:text-teal-300' 
                           : eventColorClass
                         }
-                        ${isSelected ? 'ring-2 ring-violet-500 ring-offset-1 z-20' : ''}
+                        ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
                       `} 
                       style={{...getEventStyle(event), ...overlapStyle}} 
                       data-testid={`event-${event.id}`}
@@ -649,7 +649,7 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
                   key={event.id}
                   onClick={() => onEventSelect?.(event.id)}
                   onDoubleClick={() => onEventClick(event)}
-                  className={`px-3 py-1.5 rounded text-sm cursor-pointer hover:opacity-80 ${eventColorClass} ${isSelected ? 'ring-2 ring-violet-500 ring-offset-1' : ''}`}
+                  className={`px-3 py-1.5 rounded text-sm cursor-pointer hover:opacity-80 ${eventColorClass} ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
                 >
                   <div className="flex items-center justify-between">
                     <span>{event.title}</span>
@@ -688,10 +688,10 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
           {/* Current time line */}
           {isToday(date) && (
             <div 
-              className="absolute left-0 right-0 border-t-2 border-violet-500 z-10 pointer-events-none" 
+              className="absolute left-0 right-0 border-t-2 border-[#085C53] z-10 pointer-events-none" 
               style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60) * 60}px` }}
             >
-              <div className="absolute -left-1 -top-1.5 w-3 h-3 rounded-full bg-violet-500" />
+              <div className="absolute -left-1 -top-1.5 w-3 h-3 rounded-full bg-[#085C53]" />
             </div>
           )}
 
@@ -719,10 +719,10 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
                   absolute px-2 py-1.5 rounded-lg cursor-pointer 
                   hover:opacity-90 transition-opacity group
                   ${isTemplate 
-                    ? 'bg-transparent border-2 border-violet-500 text-violet-600 dark:text-violet-300' 
+                    ? 'bg-transparent border-2 border-[#085C53] text-[#074a44] dark:text-teal-300' 
                     : eventColorClass
                   }
-                  ${isSelected ? 'ring-2 ring-violet-500 ring-offset-1 z-20' : ''}
+                  ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
                 `}
                 style={{...getEventStyle(event), ...overlapStyle}} 
                 data-testid={`event-${event.id}`}
