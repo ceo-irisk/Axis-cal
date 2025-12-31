@@ -65,14 +65,15 @@
 
 /* ===== Layout ===== */
 .sidebar {
-  @apply w-[260px] bg-card border-r border-border h-screen fixed left-0 top-0 z-50 flex flex-col;
+  @apply w-[300px] bg-card border-r border-border h-screen fixed left-0 top-0 z-50 flex flex-col;
   transition: all 0.3s ease;
 }
 
-.sidebar.collapsed {
-  @apply w-[72px];
+.main-content-full {
+  @apply ml-[300px] min-h-screen p-6 bg-background transition-all duration-300;
 }
 
+/* Legacy - for settings pages */
 .main-content {
   @apply ml-[260px] min-h-screen p-6 bg-background transition-all duration-300;
   margin-right: 320px;
