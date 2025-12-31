@@ -353,19 +353,21 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
         {days.map((day, idx) => (
           <div 
             key={day.toISOString()} 
-            className={`group border-b border-r border-border/30 ${isSameDay(day, date) ? 'bg-violet-500/10' : ''}`}
+            className={`group border-b border-r border-border/30 overflow-hidden ${isSameDay(day, date) ? 'bg-violet-500/10' : ''}`}
           >
-            <div className="flex items-start justify-between p-2">
+            <div className="flex items-center justify-between p-2 gap-1">
               <button 
                 onClick={() => onDateClick(day)} 
-                className="text-left hover:bg-accent/30 rounded px-1 -ml-1 transition-colors"
+                className="text-left hover:bg-accent/30 rounded px-1 -ml-1 transition-colors flex-shrink-0"
               >
                 <p className="text-xs text-muted-foreground uppercase">{dayNames[idx]}</p>
                 <p className={`text-lg font-semibold ${isToday(day) ? 'text-violet-500' : ''}`}>
                   {format(day, 'd')}
                 </p>
               </button>
-              <TemplateSelector day={day} templates={templates} onApplyTemplate={onApplyTemplate} />
+              <div className="flex-shrink-0">
+                <TemplateSelector day={day} templates={templates} onApplyTemplate={onApplyTemplate} />
+              </div>
             </div>
             
             {/* All-day events row */}
