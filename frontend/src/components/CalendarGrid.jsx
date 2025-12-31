@@ -704,7 +704,7 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
                   absolute px-2 py-1.5 rounded-lg cursor-pointer 
                   hover:opacity-90 transition-opacity group
                   ${isTemplate 
-                    ? 'bg-transparent border-2 border-violet-400 text-violet-600 dark:text-violet-300' 
+                    ? 'bg-transparent border-2 border-dashed border-violet-500 text-violet-600 dark:text-violet-300' 
                     : eventColorClass
                   }
                 `}
