@@ -441,7 +441,7 @@ class ExecutiveCalendarAPITester:
                     reversed_ids = list(reversed(type_ids))
                     
                     success, reorder_data = self.make_request('PUT', '/dictionaries/event-types/reorder', 
-                                                            reversed_ids)
+                                                            {"type_ids": reversed_ids})
                     self.log_test("Dictionaries - Reorder event types", success,
                                  "" if success else f"Failed to reorder types: {reorder_data}")
                     
