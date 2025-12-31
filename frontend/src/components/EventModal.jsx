@@ -158,10 +158,20 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], on
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Combine date and time
+    const startDateTime = `${formData.start_date}T${formData.start_time_val}`;
+    const endDateTime = `${formData.end_date}T${formData.end_time_val}`;
+    
+    // Map status to is_template_event flag
+    const isTemplate = formData.status === 'template';
+    const actualStatus = isTemplate ? 'confirmed' : formData.status;
+    
     onSave({
       ...formData,
-      start_time: new Date(formData.start_time).toISOString(),
-      end_time: new Date(formData.end_time).toISOString(),
+      start_time: new Date(startDateTime).toISOString(),
+      end_time: new Date(endDateTime).toISOString(),
+      status: actualStatus,
+      is_template_event: isTemplate,
     });
   };
 
