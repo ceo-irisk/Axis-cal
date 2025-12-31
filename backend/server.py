@@ -908,27 +908,6 @@ async def get_overloaded_days(start_date: str, end_date: str, user: dict = Depen
     
     return overloaded
 
-# ==================== TEMPLATE UPDATE ROUTE ====================
-
-@api_router.put("/templates/{template_id}")
-async def update_template(template_id: str, name: str, template_type: str, events: List[Dict[str, Any]], user: dict = Depends(get_current_user)):
-    existing = await db.templates.find_one({"id": template_id}, {"_id": 0})
-    if not existing:
-        raise HTTPException(status_code=404, detail="Template not found")
-    
-    result = await db.templates.update_one(
-        {"id": template_id},
-        {"$set": {
-            "name": name,
-            "template_type": template_type,
-            "events": events,
-            "updated_at": datetime.now(timezone.utc).isoformat()
-        }}
-    )
-    
-    updated = await db.templates.find_one({"id": template_id}, {"_id": 0})
-    return updated
-
 # ==================== EVENT TYPES DICTIONARY ====================
 
 @api_router.get("/dictionaries/event-types")
