@@ -88,11 +88,13 @@ export const Sidebar = ({
   onRateDay,
   onOpenSurvey,
   onEventClick,
-  onCreateEvent
+  onCreateEvent,
+  onShowUsers,
+  onShowCalendar,
+  mainView
 }) => {
   const { user, logout, isAdmin } = useAuth();
   const { theme, setTheme } = useTheme();
-  const navigate = useNavigate();
   
   const [calendars, setCalendars] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
