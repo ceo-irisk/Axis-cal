@@ -796,7 +796,7 @@ async def check_day_rules(date: str, user: dict = Depends(get_current_user)):
                     start = datetime.fromisoformat(event["start_time"].replace("Z", "+00:00"))
                     end = datetime.fromisoformat(event["end_time"].replace("Z", "+00:00"))
                     total_minutes += (end - start).total_seconds() / 60
-                except:
+                except (ValueError, KeyError, TypeError):
                     pass
             
             total_hours = total_minutes / 60
@@ -821,7 +821,7 @@ async def check_day_rules(date: str, user: dict = Depends(get_current_user)):
                             "message": f"Недостаточный перерыв между '{sorted_events[i].get('title', '')}' и '{sorted_events[i+1].get('title', '')}': {int(gap_minutes)} мин",
                             "severity": "medium"
                         })
-                except:
+                except (ValueError, KeyError, TypeError):
                     pass
     
     return {
