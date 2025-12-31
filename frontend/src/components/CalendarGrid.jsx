@@ -225,10 +225,10 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
     try {
       const start = new Date(event.start_time);
       const end = new Date(event.end_time);
-      // Use local time for positioning
-      const startHour = start.getHours() + start.getMinutes() / 60;
+      // Apply timezone shift for positioning
+      const shiftedStartHour = start.getHours() + start.getMinutes() / 60 + timezoneShift;
       const duration = (end - start) / 3600000;
-      const topOffset = startHour * 60; // Position based on local time
+      const topOffset = shiftedStartHour * 60;
       return { 
         top: `${topOffset}px`, 
         height: `${Math.max(duration * 60, 24)}px` 
