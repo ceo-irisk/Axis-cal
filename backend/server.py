@@ -964,8 +964,8 @@ async def delete_event_type(type_id: str, admin: dict = Depends(require_admin)):
     return {"message": "Event type deleted"}
 
 @api_router.put("/dictionaries/event-types/reorder")
-async def reorder_event_types(type_ids: List[str], admin: dict = Depends(require_admin)):
-    for idx, type_id in enumerate(type_ids):
+async def reorder_event_types(request: EventTypeReorderRequest, admin: dict = Depends(require_admin)):
+    for idx, type_id in enumerate(request.type_ids):
         await db.event_types.update_one({"id": type_id}, {"$set": {"order": idx}})
     return {"message": "Event types reordered"}
 
