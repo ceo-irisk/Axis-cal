@@ -322,7 +322,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                   {format(day, 'd')}
                 </p>
               </button>
-              <TemplateSelector day={day} />
+              <TemplateSelector day={day} templates={templates} onApplyTemplate={onApplyTemplate} />
             </div>
             
             {/* All-day events row */}
