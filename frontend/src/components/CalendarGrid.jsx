@@ -412,8 +412,9 @@ const DayView = ({ date, events, onEventClick, onCellDoubleClick, onEventUpdate 
 
   const getEventStyle = (event) => {
     try {
-      const start = parseISO(event.start_time);
-      const end = parseISO(event.end_time);
+      const start = new Date(event.start_time);
+      const end = new Date(event.end_time);
+      // Use local time for positioning
       const startHour = start.getHours() + start.getMinutes() / 60;
       const duration = (end - start) / 3600000;
       const topOffset = startHour * 60;
