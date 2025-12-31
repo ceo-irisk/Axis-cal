@@ -246,7 +246,12 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], on
                 </SelectTrigger>
                 <SelectContent position="popper" sideOffset={4}>
                   {STATUS_OPTIONS.map(s => (
-                    <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                    <SelectItem key={s.value} value={s.value}>
+                      <div className="flex flex-col">
+                        <span>{s.label}</span>
+                        <span className="text-xs text-muted-foreground">{s.description}</span>
+                      </div>
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
