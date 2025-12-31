@@ -521,12 +521,8 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                 {dayEvents.map(event => {
                   const duration = getEventDuration(event);
                   const isLong = duration >= 1;
-                  const isUnconfirmed = event.status === 'tentative';
-                  const isTemplate = event.is_template_event;
                   const eventTime = getLocalTime(event.start_time, timezoneShift);
-                  const eventColorClass = isUnconfirmed 
-                    ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
-                    : (EVENT_COLORS[event.event_type] || 'event-meeting');
+                  const eventColorClass = getEventColorClass(event);
                   const overlapStyle = getOverlapStyle(event, dayEvents);
                   const isSelected = selectedEventId === event.id;
                   
