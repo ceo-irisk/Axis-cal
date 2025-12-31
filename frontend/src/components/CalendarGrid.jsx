@@ -494,12 +494,17 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                   const isLong = duration >= 1;
                   const isUnconfirmed = event.status === 'tentative';
                   const isTemplate = event.is_template_event;
-                  const eventTime = getLocalTime(event.start_time);
+                  const eventTime = getLocalTime(event.start_time, timezoneShift);
                   const eventColorClass = isUnconfirmed 
                     ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
                     : (EVENT_COLORS[event.event_type] || 'event-meeting');
                   const overlapStyle = getOverlapStyle(event, dayEvents);
                   const isSelected = selectedEventId === event.id;
+                  
+                  // Format time with shift indicator
+                  const timeDisplay = timezoneShift !== 0 
+                    ? `${eventTime.formatted} (${eventTime.original}${timezoneShift > 0 ? '+' : ''}${timezoneShift})`
+                    : eventTime.formatted;
                   
                   return (
                     <div 
@@ -511,10 +516,8 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                       className={`
                         absolute px-1 py-1 rounded-md text-xs cursor-pointer 
                         hover:opacity-90 transition-opacity overflow-hidden group
-                        ${isTemplate 
-                          ? 'bg-transparent border-2 border-[#085C53] text-[#074a44] dark:text-teal-300' 
-                          : eventColorClass
-                        }
+                        ${eventColorClass}
+                        ${isTemplate ? 'ring-2 ring-[#085C53] ring-inset' : ''}
                         ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
                       `} 
                       style={{...getEventStyle(event), ...overlapStyle}} 
@@ -523,7 +526,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                       <div className="flex items-start justify-between gap-1 h-full">
                         <div className="flex-1 min-w-0 flex flex-col">
                           <span className="text-[10px] font-mono opacity-70">
-                            {eventTime.formatted}
+                            {timeDisplay}
                           </span>
                           <span className={`font-medium leading-tight ${isLong ? 'text-[11px]' : 'text-[10px]'}`}>
                             {event.title}
