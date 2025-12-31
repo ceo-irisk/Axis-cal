@@ -536,13 +536,14 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
           <div className="space-y-1">
             {allDayEvents.map(event => {
               const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
+              const eventColorClass = isUnconfirmed 
+                ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
+                : (EVENT_COLORS[event.event_type] || 'event-meeting');
               return (
                 <div 
                   key={event.id}
                   onClick={() => onEventClick(event)}
-                  className={`px-3 py-1.5 rounded text-sm cursor-pointer hover:opacity-80 
-                    ${isUnconfirmed ? 'border border-dashed border-current bg-transparent' : ''} 
-                    ${EVENT_COLORS[event.event_type]}`}
+                  className={`px-3 py-1.5 rounded text-sm cursor-pointer hover:opacity-80 ${eventColorClass}`}
                 >
                   <div className="flex items-center justify-between">
                     <span>{event.title}</span>
