@@ -229,7 +229,7 @@ const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }
         <div className="border-r border-border/20">
           {hours.map(hour => (
             <div key={hour} className="h-[60px] px-2 flex items-start pt-1 justify-end text-[10px] text-muted-foreground/50 font-mono">
-              {hour} AM
+              {String(hour).padStart(2, '0')}:00
             </div>
           ))}
         </div>
@@ -312,7 +312,7 @@ const WeekView = ({ date, events, onDateClick, onEventClick, onCellDoubleClick }
         <div className="border-l border-border/20">
           {hours.map(hour => (
             <div key={hour} className="h-[60px] px-2 flex items-start pt-1 justify-start text-[10px] text-muted-foreground/50 font-mono">
-              {hour} AM
+              {String(hour).padStart(2, '0')}:00
             </div>
           ))}
         </div>
@@ -382,7 +382,7 @@ const DayView = ({ date, events, onEventClick, onCellDoubleClick }) => {
         <div className="border-r border-border/20">
           {hours.map(hour => (
             <div key={hour} className="h-[60px] px-2 flex items-start pt-1 justify-end text-[10px] text-muted-foreground/50 font-mono">
-              {hour} AM
+              {String(hour).padStart(2, '0')}:00
             </div>
           ))}
         </div>
@@ -451,7 +451,7 @@ const DayView = ({ date, events, onEventClick, onCellDoubleClick }) => {
         <div className="border-l border-border/20">
           {hours.map(hour => (
             <div key={hour} className="h-[60px] px-2 flex items-start pt-1 justify-start text-[10px] text-muted-foreground/50 font-mono">
-              {hour} AM
+              {String(hour).padStart(2, '0')}:00
             </div>
           ))}
         </div>
