@@ -21,6 +21,7 @@ const getLocalTime = (isoString, timezoneShift = 0) => {
   }
 };
 
+// Confirmed events - left border + fill
 const EVENT_COLORS = {
   meeting: 'event-meeting',
   call: 'event-call',
@@ -30,7 +31,7 @@ const EVENT_COLORS = {
   deep_work: 'event-deep-work',
 };
 
-// Unconfirmed event colors with dashed border
+// Unconfirmed events - dashed border + fill
 const UNCONFIRMED_EVENT_COLORS = {
   meeting: 'event-unconfirmed-meeting',
   call: 'event-unconfirmed-call',
@@ -38,6 +39,29 @@ const UNCONFIRMED_EVENT_COLORS = {
   urgent: 'event-unconfirmed-urgent',
   travel: 'event-unconfirmed-travel',
   deep_work: 'event-unconfirmed-deep-work',
+};
+
+// Template events - solid border, no fill
+const TEMPLATE_EVENT_COLORS = {
+  meeting: 'event-template-meeting',
+  call: 'event-template-call',
+  personal: 'event-template-personal',
+  urgent: 'event-template-urgent',
+  travel: 'event-template-travel',
+  deep_work: 'event-template-deep-work',
+};
+
+// Get event color class based on status and type
+const getEventColorClass = (event) => {
+  const type = event.event_type || 'meeting';
+  
+  if (event.is_template_event) {
+    return TEMPLATE_EVENT_COLORS[type] || 'event-template-meeting';
+  }
+  if (event.status === 'tentative') {
+    return UNCONFIRMED_EVENT_COLORS[type] || 'event-unconfirmed-meeting';
+  }
+  return EVENT_COLORS[type] || 'event-meeting';
 };
 
 // Event status icons
