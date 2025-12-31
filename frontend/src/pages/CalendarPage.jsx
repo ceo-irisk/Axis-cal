@@ -138,6 +138,17 @@ export default function CalendarPage() {
     }
   };
 
+  const handleEventUpdate = async (eventData) => {
+    try {
+      await updateEvent(eventData.id, eventData);
+      toast.success('Событие перемещено');
+      fetchData();
+    } catch (error) {
+      console.error('Error updating event:', error);
+      toast.error('Ошибка перемещения события');
+    }
+  };
+
   const handleRateDay = async (rating, notes) => {
     try {
       const dateStr = format(selectedDate, 'yyyy-MM-dd');
