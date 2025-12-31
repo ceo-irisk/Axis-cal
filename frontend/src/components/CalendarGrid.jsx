@@ -398,11 +398,10 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
       {/* Time grid */}
       <div 
         ref={gridRef}
-        className="grid max-h-[calc(100vh-260px)] overflow-y-auto" 
-        style={{ gridTemplateColumns: '50px repeat(7, 1fr) 50px' }}
+        className="flex max-h-[calc(100vh-260px)] overflow-y-auto" 
       >
-        {/* Left time column */}
-        <div className="border-r border-border/20">
+        {/* Left time column - fixed width */}
+        <div className="flex-shrink-0 w-[50px] border-r border-border/20">
           {hours.map(hour => (
             <div key={hour} className="h-[60px] px-1 flex items-start pt-1 justify-end text-[10px] text-muted-foreground/60 font-mono">
               {String(hour).padStart(2, '0')}:00
@@ -410,92 +409,94 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
           ))}
         </div>
 
-        {/* Day columns */}
-        {days.map((day, dayIdx) => {
-          const dayEvents = getDayEvents(day);
-          const isTodayCol = isToday(day);
-          const isSelectedCol = isSameDay(day, date);
-          
-          return (
-            <div 
-              key={day.toISOString()} 
-              className={`relative border-r border-border/20 ${isSelectedCol ? 'bg-violet-500/5' : ''}`}
-            >
-              {/* Hour cells */}
-              {hours.map(hour => (
-                <div 
-                  key={hour} 
-                  className="h-[60px] border-b border-dashed border-border/20 hover:bg-accent/10" 
-                  onDoubleClick={() => onCellDoubleClick(day, hour)}
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, day, hour)}
-                />
-              ))}
-              
-              {/* Current time line */}
-              {isTodayCol && (
-                <div 
-                  className="absolute left-0 right-0 border-t-2 border-violet-500 z-10 pointer-events-none" 
-                  style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60) * 60}px` }}
-                >
-                  <div className="absolute -left-1 -top-1.5 w-3 h-3 rounded-full bg-violet-500" />
-                </div>
-              )}
-
-              {/* Events */}
-              {dayEvents.map(event => {
-                const duration = getEventDuration(event);
-                const isLong = duration >= 1;
-                const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
-                const isTemplate = event.is_template_event;
-                const eventTime = getLocalTime(event.start_time);
-                const eventColorClass = isUnconfirmed 
-                  ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
-                  : (EVENT_COLORS[event.event_type] || 'event-meeting');
-                const overlapStyle = getOverlapStyle(event, dayEvents);
-                
-                return (
+        {/* Day columns - flexible width */}
+        <div className="flex-1 grid" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
+          {days.map((day, dayIdx) => {
+            const dayEvents = getDayEvents(day);
+            const isTodayCol = isToday(day);
+            const isSelectedCol = isSameDay(day, date);
+            
+            return (
+              <div 
+                key={day.toISOString()} 
+                className={`relative border-r border-border/20 ${isSelectedCol ? 'bg-violet-500/5' : ''}`}
+              >
+                {/* Hour cells */}
+                {hours.map(hour => (
                   <div 
-                    key={event.id} 
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, event)}
-                    onClick={() => onEventClick(event)} 
-                    className={`
-                      absolute px-1 py-1 rounded-md text-xs cursor-pointer 
-                      hover:opacity-90 transition-opacity overflow-hidden group
-                      ${isTemplate 
-                        ? 'bg-transparent border-2 border-violet-400 text-violet-600 dark:text-violet-300' 
-                        : eventColorClass
-                      }
-                    `} 
-                    style={{...getEventStyle(event), ...overlapStyle}} 
-                    data-testid={`event-${event.id}`}
+                    key={hour} 
+                    className="h-[60px] border-b border-dashed border-border/20 hover:bg-accent/10" 
+                    onDoubleClick={() => onCellDoubleClick(day, hour)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, day, hour)}
+                  />
+                ))}
+                
+                {/* Current time line */}
+                {isTodayCol && (
+                  <div 
+                    className="absolute left-0 right-0 border-t-2 border-violet-500 z-10 pointer-events-none" 
+                    style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60) * 60}px` }}
                   >
-                    <div className="flex items-start justify-between gap-1 h-full">
-                      <div className="flex-1 min-w-0 flex flex-col">
-                        <span className="text-[10px] font-mono opacity-70">
-                          {eventTime.formatted}
-                        </span>
-                        <span className={`font-medium leading-tight ${isLong ? 'text-[11px]' : 'text-[10px]'}`}>
-                          {event.title}
-                        </span>
-                      </div>
-                      <EventIcons event={event} />
-                    </div>
-                    {/* Resize handle */}
-                    <div 
-                      className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize opacity-0 group-hover:opacity-100 bg-black/20 rounded-b"
-                      onMouseDown={(e) => handleResizeStart(e, event, day)}
-                    />
+                    <div className="absolute -left-1 -top-1.5 w-3 h-3 rounded-full bg-violet-500" />
                   </div>
-                );
-              })}
-            </div>
-          );
-        })}
+                )}
 
-        {/* Right time column */}
-        <div className="border-l border-border/20">
+                {/* Events */}
+                {dayEvents.map(event => {
+                  const duration = getEventDuration(event);
+                  const isLong = duration >= 1;
+                  const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
+                  const isTemplate = event.is_template_event;
+                  const eventTime = getLocalTime(event.start_time);
+                  const eventColorClass = isUnconfirmed 
+                    ? (UNCONFIRMED_EVENT_COLORS[event.event_type] || 'event-unconfirmed-meeting')
+                    : (EVENT_COLORS[event.event_type] || 'event-meeting');
+                  const overlapStyle = getOverlapStyle(event, dayEvents);
+                  
+                  return (
+                    <div 
+                      key={event.id} 
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, event)}
+                      onClick={() => onEventClick(event)} 
+                      className={`
+                        absolute px-1 py-1 rounded-md text-xs cursor-pointer 
+                        hover:opacity-90 transition-opacity overflow-hidden group
+                        ${isTemplate 
+                          ? 'bg-transparent border-2 border-violet-400 text-violet-600 dark:text-violet-300' 
+                          : eventColorClass
+                        }
+                      `} 
+                      style={{...getEventStyle(event), ...overlapStyle}} 
+                      data-testid={`event-${event.id}`}
+                    >
+                      <div className="flex items-start justify-between gap-1 h-full">
+                        <div className="flex-1 min-w-0 flex flex-col">
+                          <span className="text-[10px] font-mono opacity-70">
+                            {eventTime.formatted}
+                          </span>
+                          <span className={`font-medium leading-tight ${isLong ? 'text-[11px]' : 'text-[10px]'}`}>
+                            {event.title}
+                          </span>
+                        </div>
+                        <EventIcons event={event} />
+                      </div>
+                      {/* Resize handle */}
+                      <div 
+                        className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize opacity-0 group-hover:opacity-100 bg-black/20 rounded-b"
+                        onMouseDown={(e) => handleResizeStart(e, event, day)}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Right time column - fixed width */}
+        <div className="flex-shrink-0 w-[50px] border-l border-border/20">
           {hours.map(hour => (
             <div key={hour} className="h-[60px] px-1 flex items-start pt-1 justify-start text-[10px] text-muted-foreground/60 font-mono">
               {String(hour).padStart(2, '0')}:00
