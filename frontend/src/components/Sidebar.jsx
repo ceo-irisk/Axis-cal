@@ -1267,6 +1267,15 @@ export const Sidebar = ({
           />
         </DialogContent>
       </Dialog>
+      
+      {/* Calendar Permissions Modal */}
+      {showPermissionsModal && selectedCalendarForPermissions && (
+        <CalendarPermissionsModal
+          calendar={selectedCalendarForPermissions}
+          onClose={() => { setShowPermissionsModal(false); setSelectedCalendarForPermissions(null); }}
+          onUpdate={() => fetchCalendars()}
+        />
+      )}
     </>
   );
 };
