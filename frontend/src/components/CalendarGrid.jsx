@@ -813,6 +813,7 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
             const isLong = duration >= 1;
             const eventTime = getLocalTime(event.start_time, timezoneShift);
             const eventColorClass = getEventColorClass(event);
+            const dynamicStyle = getEventDynamicStyle(event, eventTypes);
             const overlapStyle = getOverlapStyle(event);
             const isSelected = selectedEventId === event.id;
             
@@ -834,7 +835,7 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
                   ${eventColorClass}
                   ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
                 `}
-                style={{...getEventStyle(event), ...overlapStyle}} 
+                style={{...getEventStyle(event), ...overlapStyle, ...(dynamicStyle || {})}} 
                 data-testid={`event-${event.id}`}
               >
                 <div className="flex items-center justify-between">
