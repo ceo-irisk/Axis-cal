@@ -339,6 +339,7 @@ export default function CalendarPage() {
                 onEventClick={handleEventClick}
                 onEventUpdate={handleEventUpdate}
                 onApplyTemplate={handleApplyTemplate}
+                onRemoveTemplate={handleRemoveTemplate}
                 onEventDelete={handleDeleteEvent}
                 selectedEventId={selectedEventId}
                 onEventSelect={handleEventSelect}
