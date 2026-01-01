@@ -330,6 +330,7 @@ export default function CalendarPage() {
                 selectedTimezone={selectedTimezone}
                 onTimezoneChange={setSelectedTimezone}
                 customTimezones={customTimezones}
+                eventTypes={eventTypes}
               />
             </>
           ) : mainView === MAIN_VIEW.USERS ? (
