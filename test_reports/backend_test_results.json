@@ -1,9 +1,9 @@
 {
-  "timestamp": "2025-12-31T05:25:02.837800",
-  "total_tests": 38,
-  "passed_tests": 38,
-  "failed_tests": 0,
-  "success_rate": 100.0,
+  "timestamp": "2026-01-01T00:24:59.228614",
+  "total_tests": 47,
+  "passed_tests": 46,
+  "failed_tests": 1,
+  "success_rate": 97.87234042553192,
   "test_results": [
     {
       "test": "Health - Root endpoint",
@@ -205,6 +205,60 @@
     },
     {
       "test": "Axis Calendar - Edit template with enhanced event form",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Recurring Events - Create daily recurring event",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Recurring Events - Get recurring events",
+      "success": false,
+      "details": "Failed to get recurring events: {'status_code': 520, 'text': 'Internal Server Error'}",
+      "response_data": null
+    },
+    {
+      "test": "Recurring Events - Create workdays recurring event",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "ICS Subscriptions - Get subscriptions list",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "ICS Subscriptions - Create subscription",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "ICS Subscriptions - Fetch subscription events",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "ICS Subscriptions - Update subscription",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "ICS Subscriptions - Get all ICS events",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "ICS Subscriptions - Delete subscription",
       "success": true,
       "details": "",
       "response_data": null
