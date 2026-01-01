@@ -166,6 +166,7 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
     is_video_call: false,
     recurrence_type: 'none',
     recurrence_end_date: '',
+    recurrence_custom_days: [],
   };
 };
 
