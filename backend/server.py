@@ -1336,18 +1336,7 @@ async def get_user_events(
     
     return events
 
-        raise HTTPException(status_code=403, detail="Not calendar owner")
-    
-    if calendar.get("is_default") and not calendar.get("is_public"):
-        raise HTTPException(status_code=400, detail="Cannot share private calendar")
-    
-    # Validate permission level
-    if permission_level not in ["read", "edit", "full"]:
-        raise HTTPException(status_code=400, detail="Invalid permission level")
-    
-    # Find target user
-    target_user = await db.users.find_one({"email": user_email})
-    if not target_user:
+@api_router.post("/calendars/{calendar_id}/share")
         raise HTTPException(status_code=404, detail="User not found")
     
     if target_user["id"] == owner["id"]:
