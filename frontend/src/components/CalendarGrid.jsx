@@ -502,8 +502,8 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                     {format(day, 'd')}
                   </p>
                 </button>
-                {/* Template selector - absolute positioned in corner */}
-                <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* Template selector - always visible if template applied, otherwise on hover */}
+                <div className="absolute top-1 right-1">
                   <TemplateSelector day={day} templates={templates} appliedTemplates={appliedTemplates} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} />
                 </div>
               </div>
