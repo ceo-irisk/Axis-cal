@@ -225,7 +225,7 @@ export const getEventsWithRecurring = (startDate, endDate) => {
   const params = new URLSearchParams();
   if (startDate) params.append('start_date', startDate);
   if (endDate) params.append('end_date', endDate);
-  return api.get(`/events/recurring?${params.toString()}`);
+  return api.get(`/recurring-events?${params.toString()}`);
 };
 
 export default api;
