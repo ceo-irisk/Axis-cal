@@ -493,6 +493,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
               <div className="min-h-[24px] px-1 pb-1 space-y-0.5 overflow-hidden">
                 {getAllDayEvents(day).map(event => {
                   const eventColorClass = getEventColorClass(event);
+                  const dynamicStyle = getEventDynamicStyle(event, eventTypes);
                   const isSelected = selectedEventId === event.id;
                   return (
                     <div 
@@ -500,6 +501,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                       onClick={() => onEventSelect?.(event.id)}
                       onDoubleClick={() => onEventClick(event)}
                       className={`px-2 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 ${eventColorClass} ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
+                      style={dynamicStyle || {}}
                     >
                       {event.title}
                     </div>
