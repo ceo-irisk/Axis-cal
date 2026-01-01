@@ -112,6 +112,7 @@ export default function CalendarPage() {
       setRatings(ratingsMap);
       setOverloadedDays(overloadedRes.data || []);
       setTemplates(templatesRes.data || []);
+      setEventTypes(eventTypesRes.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Ошибка загрузки данных');
