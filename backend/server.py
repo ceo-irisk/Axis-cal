@@ -121,6 +121,7 @@ class EventBase(BaseModel):
     pattern: Optional[str] = None  # for tentative events
     location: Optional[str] = None
     attendees: List[str] = []
+    calendar_id: Optional[str] = None  # User's calendar
     custom_fields: Dict[str, Any] = {}
     external_calendar_id: Optional[str] = None
     external_event_id: Optional[str] = None
@@ -171,6 +172,14 @@ class CalendarPermission(BaseModel):
     user_id: str  # User who has access
     permission_level: str  # "read", "edit", "full"
     granted_by: str  # User who granted access
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class UserSubscription(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str  # Who is subscribing
+    target_user_id: str  # Who they're subscribing to
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class TemplateBase(BaseModel):
