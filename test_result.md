@@ -216,3 +216,137 @@ agent_communication:
     message: "Added recurring events and ICS subscriptions functionality. Need to test: 1) Recurring events API (/api/recurring-events) generates instances correctly 2) ICS subscriptions CRUD (/api/ics-subscriptions) 3) Event creation with recurrence_type field"
   - agent: "testing"
     message: "✅ RECURRING EVENTS & ICS SUBSCRIPTIONS TESTING COMPLETE: All new APIs working correctly. Recurring events API generates instances properly for all recurrence types (daily, workdays, weekly, monthly, yearly). ICS subscriptions CRUD operations work with proper URL validation. Event creation with recurrence_type field functions correctly. Fixed timezone comparison issue in recurring instances generation. All 47 tests passed with 100% success rate."
+  - task: "Backend Refactoring - Authentication Routes"
+    implemented: true
+    working: true
+    file: "backend/routes/auth.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Testing refactored authentication routes after monolithic server.py split"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: POST /api/auth/login works correctly for both admin@example.com and user@company.com. GET /api/auth/me returns current user info. Invalid login properly rejected with 401."
+
+  - task: "Backend Refactoring - Users Routes"
+    implemented: true
+    working: false
+    file: "backend/routes/users.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Testing refactored user management routes"
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL: POST /users returns 520 error due to MongoDB ObjectId serialization issue. After insert_one(), the dict contains _id field with ObjectId which is not JSON serializable. GET /users works. Default calendars (Открытый, Закрытый) are NOT being created for new users. PUT /users has validation issue with role field."
+
+  - task: "Backend Refactoring - Events Routes"
+    implemented: true
+    working: false
+    file: "backend/routes/events.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Testing refactored event management routes"
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL: POST /events returns 520 error due to MongoDB ObjectId serialization issue. After insert_one(event_dict), the dict contains _id field with ObjectId. GET /events works with permissions filtering. GET /events/{id}, PUT /events/{id}, DELETE /events/{id} not tested due to creation failure."
+
+  - task: "Backend Refactoring - Calendars Routes"
+    implemented: true
+    working: false
+    file: "backend/routes/calendars.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Testing refactored calendar management routes"
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL: POST /calendars returns 520 error due to MongoDB ObjectId serialization issue. GET /calendars works correctly (returns own + subscribed calendars). Calendar permissions endpoints not fully tested due to creation failure."
+
+  - task: "Backend Refactoring - Subscriptions Routes"
+    implemented: true
+    working: false
+    file: "backend/routes/calendars.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Testing refactored user subscriptions routes"
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL: POST /subscriptions returns 520 error due to MongoDB ObjectId serialization issue. GET /subscriptions works correctly."
+
+  - task: "Backend Refactoring - Templates Routes"
+    implemented: true
+    working: false
+    file: "backend/routes/templates.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Testing refactored template management routes"
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL: POST /templates returns 520 error due to MongoDB ObjectId serialization issue. GET /templates works. Template apply, GET /templates/applied, and DELETE endpoints not tested due to creation failure."
+
+  - task: "Backend Refactoring - Dictionaries Routes"
+    implemented: true
+    working: false
+    file: "backend/routes/dictionaries.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Testing refactored dictionary management routes"
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL: POST /dictionaries/event-types returns 520 error due to MongoDB ObjectId serialization issue. GET /dictionaries/event-types, GET /dictionaries/event-statuses, and GET /dictionaries/timezones all work correctly."
+
+  - task: "Backend Refactoring - Recurring Events Routes"
+    implemented: true
+    working: true
+    file: "backend/routes/other.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Testing refactored recurring events routes"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: GET /recurring-events works correctly, generates recurring instances with proper date filtering."
+
+  - task: "Backend Refactoring - Permissions Service"
+    implemented: true
+    working: true
+    file: "backend/services/permissions.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Testing permissions filtering for closed calendars"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: Events are properly filtered by permissions. Closed calendar events should show as 'Занято' to non-owners."
