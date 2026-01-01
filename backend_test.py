@@ -561,6 +561,140 @@ class ExecutiveCalendarAPITester:
             self.log_test("Axis Calendar - Login with review credentials", False,
                          f"Failed to login with review credentials: {data}")
 
+    def test_recurring_events(self):
+        """Test recurring events functionality"""
+        print("\n🔍 Testing Recurring Events...")
+        
+        # Test create event with recurrence
+        tomorrow = datetime.now() + timedelta(days=1)
+        recurring_event_data = {
+            "title": "Daily Standup Meeting",
+            "description": "Daily team standup",
+            "start_time": tomorrow.replace(hour=9, minute=0, second=0, microsecond=0).isoformat(),
+            "end_time": tomorrow.replace(hour=9, minute=30, second=0, microsecond=0).isoformat(),
+            "event_type": "meeting",
+            "status": "confirmed",
+            "location": "Conference Room A",
+            "recurrence_type": "daily",
+            "recurrence_end_date": (tomorrow + timedelta(days=7)).isoformat()
+        }
+        
+        success, data = self.make_request('POST', '/events', recurring_event_data)
+        if success and 'id' in data:
+            recurring_event_id = data['id']
+            self.log_test("Recurring Events - Create daily recurring event", True)
+            
+            # Test get recurring events with instances
+            start_date = tomorrow.strftime('%Y-%m-%d')
+            end_date = (tomorrow + timedelta(days=10)).strftime('%Y-%m-%d')
+            
+            success, recurring_data = self.make_request('GET', f'/recurring-events?start_date={start_date}&end_date={end_date}')
+            if success:
+                # Check if recurring instances are generated
+                recurring_instances = [e for e in recurring_data if e.get('recurrence_parent_id') == recurring_event_id]
+                if len(recurring_instances) > 0:
+                    self.log_test("Recurring Events - Generate recurring instances", True)
+                else:
+                    self.log_test("Recurring Events - Generate recurring instances", False, 
+                                 "No recurring instances found in response")
+            else:
+                self.log_test("Recurring Events - Get recurring events", False,
+                             f"Failed to get recurring events: {recurring_data}")
+            
+            # Test workdays recurrence
+            workdays_event_data = {
+                "title": "Workdays Meeting",
+                "description": "Monday to Friday meeting",
+                "start_time": tomorrow.replace(hour=14, minute=0, second=0, microsecond=0).isoformat(),
+                "end_time": tomorrow.replace(hour=15, minute=0, second=0, microsecond=0).isoformat(),
+                "event_type": "meeting",
+                "status": "confirmed",
+                "recurrence_type": "workdays",
+                "recurrence_end_date": (tomorrow + timedelta(days=14)).isoformat()
+            }
+            
+            success, workdays_data = self.make_request('POST', '/events', workdays_event_data)
+            if success and 'id' in workdays_data:
+                self.log_test("Recurring Events - Create workdays recurring event", True)
+                # Clean up
+                self.make_request('DELETE', f'/events/{workdays_data["id"]}')
+            else:
+                self.log_test("Recurring Events - Create workdays recurring event", False,
+                             f"Failed to create workdays event: {workdays_data}")
+            
+            # Clean up
+            self.make_request('DELETE', f'/events/{recurring_event_id}')
+            
+        else:
+            self.log_test("Recurring Events - Create daily recurring event", False,
+                         f"Failed to create recurring event: {data}")
+
+    def test_ics_subscriptions(self):
+        """Test ICS subscriptions functionality"""
+        print("\n🔍 Testing ICS Subscriptions...")
+        
+        # Test get ICS subscriptions (should be empty initially)
+        success, data = self.make_request('GET', '/ics-subscriptions')
+        self.log_test("ICS Subscriptions - Get subscriptions list", success,
+                     "" if success else f"Failed to get subscriptions: {data}")
+        
+        # Test create ICS subscription with a test URL
+        # Using a mock ICS URL for testing
+        test_ics_url = "https://calendar.google.com/calendar/ical/en.usa%23holiday%40group.v.calendar.google.com/public/basic.ics"
+        subscription_data = {
+            "url": test_ics_url,
+            "name": "Test Calendar Subscription",
+            "color": "#ff5722"
+        }
+        
+        success, data = self.make_request('POST', '/ics-subscriptions', subscription_data)
+        if success and 'id' in data:
+            subscription_id = data['id']
+            self.log_test("ICS Subscriptions - Create subscription", True)
+            
+            # Test get specific subscription events
+            start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            end_date = (datetime.now() + timedelta(days=30)).strftime('%Y-%m-%d')
+            
+            success, events_data = self.make_request('GET', f'/ics-subscriptions/{subscription_id}/events?start_date={start_date}&end_date={end_date}')
+            self.log_test("ICS Subscriptions - Fetch subscription events", success,
+                         "" if success else f"Failed to fetch events: {events_data}")
+            
+            # Test update subscription
+            update_data = {
+                "name": "Updated Test Calendar",
+                "color": "#2196f3"
+            }
+            success, updated_data = self.make_request('PUT', f'/ics-subscriptions/{subscription_id}?name=Updated Test Calendar&color=%232196f3')
+            self.log_test("ICS Subscriptions - Update subscription", success,
+                         "" if success else f"Failed to update subscription: {updated_data}")
+            
+            # Test get all ICS events
+            success, all_events = self.make_request('GET', f'/ics-subscriptions/all-events?start_date={start_date}&end_date={end_date}')
+            self.log_test("ICS Subscriptions - Get all ICS events", success,
+                         "" if success else f"Failed to get all ICS events: {all_events}")
+            
+            # Test delete subscription
+            success, delete_data = self.make_request('DELETE', f'/ics-subscriptions/{subscription_id}')
+            self.log_test("ICS Subscriptions - Delete subscription", success,
+                         "" if success else f"Failed to delete subscription: {delete_data}")
+            
+        else:
+            # If the test URL fails, try with a simpler test
+            self.log_test("ICS Subscriptions - Create subscription", False,
+                         f"Failed to create subscription (may be due to network/URL): {data}")
+            
+            # Test with invalid URL to check validation
+            invalid_subscription = {
+                "url": "https://invalid-url-test.com/not-ics",
+                "name": "Invalid Test",
+                "color": "#ff0000"
+            }
+            
+            success, invalid_data = self.make_request('POST', '/ics-subscriptions', invalid_subscription, expected_status=400)
+            self.log_test("ICS Subscriptions - Reject invalid URL", success,
+                         "" if success else f"Should have rejected invalid URL: {invalid_data}")
+
     def test_analytics(self):
         """Test analytics endpoints"""
         print("\n🔍 Testing Analytics...")
