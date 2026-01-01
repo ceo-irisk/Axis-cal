@@ -665,6 +665,47 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
     
     return {"created_events": created_events}
 
+@api_router.delete("/templates/applied/{date}")
+async def remove_template_from_day(date: str, user: dict = Depends(get_current_user)):
+    """Remove template from a specific day and delete all template events for that day"""
+    # Find applied template
+    applied = await db.applied_templates.find_one({
+        "user_id": user["id"],
+        "date": date
+    })
+    
+    if not applied:
+        raise HTTPException(status_code=404, detail="No template applied to this day")
+    
+    template_id = applied.get("template_id")
+    
+    # Delete all events from this template on this day
+    result = await db.events.delete_many({
+        "created_by": user["id"],
+        "template_id": template_id,
+        "start_time": {"$gte": f"{date}T00:00:00", "$lte": f"{date}T23:59:59"}
+    })
+    
+    # Remove applied template record
+    await db.applied_templates.delete_one({"id": applied["id"]})
+    
+    return {"message": f"Template removed from {date}", "deleted_events": result.deleted_count}
+
+@api_router.get("/templates/applied")
+async def get_applied_templates(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    user: dict = Depends(get_current_user)
+):
+    """Get all applied templates for date range"""
+    query = {"user_id": user["id"]}
+    
+    if start_date and end_date:
+        query["date"] = {"$gte": start_date, "$lte": end_date}
+    
+    applied = await db.applied_templates.find(query, {"_id": 0}).to_list(1000)
+    return applied
+
 # ==================== DAY RATING ROUTES ====================
 
 @api_router.post("/ratings")
