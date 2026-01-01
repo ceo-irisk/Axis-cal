@@ -598,6 +598,9 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
     
     created_events = []
     base_date = datetime.fromisoformat(target_date)
+    # Ensure base_date has timezone
+    if base_date.tzinfo is None:
+        base_date = base_date.replace(tzinfo=timezone.utc)
     
     for event_template in template.get("events", []):
         start_offset = timedelta(hours=event_template.get("start_hour", 9), minutes=event_template.get("start_minute", 0))
@@ -609,12 +612,16 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
         else:
             event_date = base_date
         
+        # Calculate start and end times with timezone
+        start_time = event_date.replace(hour=0, minute=0, second=0, microsecond=0) + start_offset
+        end_time = event_date.replace(hour=0, minute=0, second=0, microsecond=0) + end_offset
+        
         event_dict = {
             "id": str(uuid.uuid4()),
             "title": event_template.get("title", "Событие"),
             "description": event_template.get("description"),
-            "start_time": (event_date.replace(hour=0, minute=0, second=0, microsecond=0) + start_offset).isoformat(),
-            "end_time": (event_date.replace(hour=0, minute=0, second=0, microsecond=0) + end_offset).isoformat(),
+            "start_time": start_time.isoformat(),
+            "end_time": end_time.isoformat(),
             "event_type": event_template.get("event_type", "meeting"),
             "status": event_template.get("status", "confirmed"),
             "color": event_template.get("color"),
