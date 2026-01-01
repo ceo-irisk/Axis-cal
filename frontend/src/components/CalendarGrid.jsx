@@ -276,7 +276,7 @@ const TimezoneSelector = ({ selectedTimezone, onTimezoneChange, customTimezones 
   );
 };
 
-const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, selectedEventId, onEventSelect, timezoneShift, selectedTimezone, onTimezoneChange, customTimezones, eventTypes }) => {
+const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventId, onEventSelect, timezoneShift, selectedTimezone, onTimezoneChange, customTimezones, eventTypes }) => {
   const weekStart = startOfWeek(date, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
@@ -637,7 +637,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
   );
 };
 
-const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, selectedEventId, onEventSelect, timezoneShift, selectedTimezone, onTimezoneChange, customTimezones, eventTypes }) => {
+const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventId, onEventSelect, timezoneShift, selectedTimezone, onTimezoneChange, customTimezones, eventTypes }) => {
   const hours = Array.from({ length: 24 }, (_, i) => i); // Все 24 часа
   const dayEvents = events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd')) && !e.is_all_day);
   const allDayEvents = events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd')) && e.is_all_day);
