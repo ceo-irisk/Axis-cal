@@ -16,7 +16,7 @@ const PERMISSION_LEVELS = [
 export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
   const [permissions, setPermissions] = useState([]);
   const [users, setUsers] = useState([]);
-  const [newUserEmail, setNewUserEmail] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState('');
   const [newPermissionLevel, setNewPermissionLevel] = useState('read');
   const [loading, setLoading] = useState(true);
 
@@ -42,11 +42,15 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
 
   const handleGrant = async (e) => {
     e.preventDefault();
-    if (!newUserEmail.trim()) return;
+    if (!selectedUserId) return;
+    
+    // Find user email
+    const selectedUser = users.find(u => u.id === selectedUserId);
+    if (!selectedUser) return;
     
     try {
-      await grantCalendarPermission(calendar.id, newUserEmail.trim(), newPermissionLevel);
-      setNewUserEmail('');
+      await grantCalendarPermission(calendar.id, selectedUser.email, newPermissionLevel);
+      setSelectedUserId('');
       setNewPermissionLevel('read');
       loadData();
       onUpdate?.();
@@ -134,14 +138,24 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
             
             <form onSubmit={handleGrant} className="space-y-3">
               <div>
-                <Label className="text-xs text-muted-foreground">Email пользователя</Label>
-                <Input 
-                  type="email"
-                  value={newUserEmail}
-                  onChange={(e) => setNewUserEmail(e.target.value)}
-                  placeholder="user@example.com"
-                  className="mt-1"
-                />
+                <Label className="text-xs text-muted-foreground">Выберите пользователя</Label>
+                <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Выберите пользователя" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {users
+                      .filter(u => !permissions.find(p => p.user_id === u.id))
+                      .map(user => (
+                        <SelectItem key={user.id} value={user.id}>
+                          <div>
+                            <p className="font-medium">{user.name}</p>
+                            <p className="text-xs text-muted-foreground">{user.email}</p>
+                          </div>
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
               </div>
               
               <div>
