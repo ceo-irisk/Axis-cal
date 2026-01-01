@@ -519,12 +519,24 @@ async def update_event(event_id: str, event_data: EventCreate, user: dict = Depe
     
     update_data = event_data.model_dump()
     update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
-    update_data["start_time"] = update_data["start_time"].isoformat()
-    update_data["end_time"] = update_data["end_time"].isoformat()
+    
+    # Ensure datetime fields have timezone info
+    start_time = update_data["start_time"]
+    if start_time.tzinfo is None:
+        start_time = start_time.replace(tzinfo=timezone.utc)
+    update_data["start_time"] = start_time.isoformat()
+    
+    end_time = update_data["end_time"]
+    if end_time.tzinfo is None:
+        end_time = end_time.replace(tzinfo=timezone.utc)
+    update_data["end_time"] = end_time.isoformat()
     
     # Handle recurrence_end_date
     if update_data.get("recurrence_end_date"):
-        update_data["recurrence_end_date"] = update_data["recurrence_end_date"].isoformat()
+        rec_end = update_data["recurrence_end_date"]
+        if rec_end.tzinfo is None:
+            rec_end = rec_end.replace(tzinfo=timezone.utc)
+        update_data["recurrence_end_date"] = rec_end.isoformat()
     
     if update_data["status"] == EventStatus.TENTATIVE:
         update_data["pattern"] = "tentative"
