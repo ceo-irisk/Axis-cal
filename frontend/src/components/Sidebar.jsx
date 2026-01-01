@@ -534,7 +534,7 @@ export const Sidebar = ({
                                 body: JSON.stringify({
                                   email: u.email,
                                   password: u.email === 'admin@example.com' ? 'admin123' : 
-                                           u.email === 'admin@company.com' ? 'Admin123!' :
+                                           u.email === 'admin@company.com' ? 'admin123' :
                                            u.email === 'user@company.com' ? 'user123' : 'password123'
                                 })
                               });
