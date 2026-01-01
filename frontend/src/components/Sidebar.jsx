@@ -590,20 +590,28 @@ export const Sidebar = ({
                         )}
                         {timedEvents.map((event) => {
                           const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
+                          const eventColor = getEventTypeColor(event);
                           return (
                             <button 
                               key={event.id} 
                               onClick={() => onEventClick?.(event)} 
                               className={`w-full text-left p-3 rounded-xl transition-colors ${
                                 isUnconfirmed 
-                                  ? 'border-2 border-dashed border-[#085C53] bg-[#085C53]/5 hover:bg-[#085C53]/10'
+                                  ? 'border-2 border-dashed bg-transparent hover:bg-accent/10'
                                   : 'bg-accent hover:bg-border'
                               }`}
+                              style={isUnconfirmed ? { borderColor: eventColor } : {}}
                               data-testid={`sidebar-event-${event.id}`}
                             >
                               <div className="flex items-start justify-between gap-2">
                                 <div className="flex items-center gap-2">
-                                  <div className={`w-2 h-2 rounded-full ${isUnconfirmed ? 'border border-[#085C53]' : 'bg-[#085C53]'}`} />
+                                  <div 
+                                    className={`w-2 h-2 rounded-full ${isUnconfirmed ? 'border' : ''}`} 
+                                    style={{ 
+                                      backgroundColor: isUnconfirmed ? 'transparent' : eventColor,
+                                      borderColor: isUnconfirmed ? eventColor : 'transparent'
+                                    }}
+                                  />
                                   <p className="font-medium text-sm truncate">{event.title}</p>
                                 </div>
                                 <EventIcons event={event} />
