@@ -36,6 +36,26 @@ import {
   DialogTitle,
   DialogFooter,
 } from './ui/dialog';
+import CalendarPermissionsModal from './CalendarPermissionsModal';
+
+// Available calendar icons
+const CALENDAR_ICONS = {
+  'calendar': Calendar,
+  'book-open': BookOpen,
+  'lock': Lock,
+  'briefcase': Briefcase,
+  'home': Home,
+  'target': Target,
+  'plane': Plane,
+  'heart': Heart,
+  'coffee': Coffee,
+  'dumbbell': Dumbbell,
+  'graduation-cap': GraduationCap,
+  'shopping-cart': ShoppingCart,
+  'mail': Mail,
+  'phone': Phone,
+  'settings': Settings2,
+};
 
 // Helper to format event time in local timezone
 const formatEventTime = (isoString) => {
