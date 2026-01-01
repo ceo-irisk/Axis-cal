@@ -4,7 +4,7 @@ import {
   getEvents, createEvent, updateEvent, deleteEvent, 
   getRatings, createRating, checkDayRules, getOverloadedDays, getCalendars,
   getTemplates, applyTemplate, getUsers, createUser, updateUser, deleteUser,
-  getEventsWithRecurring, getAllICSEvents, getEventTypes
+  getEventsWithRecurring, getAllICSEvents, getEventTypes, getAppliedTemplates, removeTemplateFromDay
 } from '../lib/api';
 import { getLocalTimezoneName } from '../lib/timezones';
 import Sidebar from '../components/Sidebar';
