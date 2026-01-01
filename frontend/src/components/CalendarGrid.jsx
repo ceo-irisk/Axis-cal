@@ -574,6 +574,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                   const isLong = duration >= 1;
                   const eventTime = getLocalTime(event.start_time, timezoneShift);
                   const eventColorClass = getEventColorClass(event);
+                  const dynamicStyle = getEventDynamicStyle(event, eventTypes);
                   const overlapStyle = getOverlapStyle(event, dayEvents);
                   const isSelected = selectedEventId === event.id;
                   
@@ -595,7 +596,7 @@ const WeekView = ({ date, events, templates, onDateClick, onEventClick, onCellDo
                         ${eventColorClass}
                         ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
                       `} 
-                      style={{...getEventStyle(event), ...overlapStyle}} 
+                      style={{...getEventStyle(event), ...overlapStyle, ...(dynamicStyle || {})}} 
                       data-testid={`event-${event.id}`}
                     >
                       <div className="flex items-start justify-between gap-1 h-full">
