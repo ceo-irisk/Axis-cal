@@ -38,7 +38,7 @@ const UNCONFIRMED_EVENT_COLORS = {
   personal: 'event-unconfirmed-personal',
   urgent: 'event-unconfirmed-urgent',
   travel: 'event-unconfirmed-travel',
-  deep_work: 'event-unconfirmed-deep-work',
+  deep_work: 'event-unconfirmed-deep_work',
 };
 
 // Template events - solid border, no fill
@@ -51,9 +51,45 @@ const TEMPLATE_EVENT_COLORS = {
   deep_work: 'event-template-deep-work',
 };
 
-// Get event color class based on status and type
+// Generate dynamic styles for custom event types
+const getEventDynamicStyle = (event, eventTypes) => {
+  const type = event.event_type || 'meeting';
+  
+  // Find the event type config
+  const eventTypeConfig = eventTypes?.find(et => et.name === type);
+  if (!eventTypeConfig) return null;
+  
+  const color = eventTypeConfig.color || '#085C53';
+  
+  // If it's a predefined type, return null (use CSS classes)
+  if (EVENT_COLORS[type]) return null;
+  
+  // Generate dynamic styles for custom types
+  if (event.is_template_event) {
+    return {
+      border: `2px solid ${color}`,
+      background: 'transparent'
+    };
+  }
+  if (event.status === 'tentative') {
+    return {
+      border: `2px dashed ${color}`,
+      background: 'transparent'
+    };
+  }
+  // Confirmed style
+  return {
+    borderLeft: `3px solid ${color}`,
+    background: `${color}15` // 15 = ~8% opacity in hex
+  };
+};
+
+// Get event color class based on status and type (for predefined types)
 const getEventColorClass = (event) => {
   const type = event.event_type || 'meeting';
+  
+  // Only return CSS class if it's a predefined type
+  if (!EVENT_COLORS[type]) return '';
   
   if (event.is_template_event) {
     return TEMPLATE_EVENT_COLORS[type] || 'event-template-meeting';
