@@ -258,10 +258,8 @@ export const Sidebar = ({
     try {
       if (editingStatus?.id && !editingStatus.id.startsWith('default-')) {
         await updateEventStatus(editingStatus.id, data.name, data.label, data.color, data.order || 0);
-        toast.success('Статус события обновлён');
       } else {
         await createEventStatus(data.name, data.label, data.color);
-        toast.success('Статус события создан');
       }
       setShowStatusModal(false);
       setEditingStatus(null);
@@ -274,10 +272,8 @@ export const Sidebar = ({
       toast.error('Нельзя удалить стандартный статус');
       return;
     }
-    if (!confirm('Удалить статус события?')) return;
     try {
       await deleteEventStatus(id);
-      toast.success('Статус события удалён');
       fetchDictionaries();
     } catch (e) { toast.error('Ошибка удаления'); }
   };
@@ -322,10 +318,8 @@ export const Sidebar = ({
     try {
       if (editingTemplate?.id) {
         await updateTemplate(editingTemplate.id, data);
-        toast.success('Шаблон обновлён');
       } else {
         await createTemplate(data);
-        toast.success('Шаблон создан');
       }
       setShowTemplateModal(false);
       setEditingTemplate(null);
@@ -334,10 +328,8 @@ export const Sidebar = ({
   };
 
   const handleDeleteTemplate = async (id) => {
-    if (!confirm('Удалить шаблон?')) return;
     try {
       await deleteTemplate(id);
-      toast.success('Шаблон удалён');
       fetchDictionaries();
     } catch (e) { toast.error('Ошибка удаления'); }
   };
@@ -345,8 +337,7 @@ export const Sidebar = ({
   const handleApplyTemplate = async () => {
     if (!selectedTemplateForApply || !applyDate) return;
     try {
-      const result = await applyTemplate(selectedTemplateForApply.id, applyDate);
-      toast.success(`Создано ${result.data.created_events?.length || 0} событий`);
+      await applyTemplate(selectedTemplateForApply.id, applyDate);
       setShowApplyModal(false);
       setSelectedTemplateForApply(null);
     } catch (e) { toast.error('Ошибка применения шаблона'); }
