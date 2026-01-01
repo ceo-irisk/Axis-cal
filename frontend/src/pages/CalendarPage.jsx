@@ -97,9 +97,14 @@ export default function CalendarPage() {
       const startStr = format(start, 'yyyy-MM-dd');
       const endStr = format(end, 'yyyy-MM-dd');
 
+      // If viewing another user's calendar, load their events
+      const eventsPromise = viewingUserId 
+        ? getUserEvents(viewingUserId, startStr, endStr)
+        : getEventsWithRecurring(startStr, endStr);
+
       const [eventsRes, icsEventsRes, ratingsRes, overloadedRes, templatesRes, eventTypesRes, appliedTemplatesRes] = await Promise.all([
-        getEventsWithRecurring(startStr, endStr),
-        getAllICSEvents(startStr, endStr).catch(() => ({ data: [] })),
+        eventsPromise,
+        viewingUserId ? Promise.resolve({ data: [] }) : getAllICSEvents(startStr, endStr).catch(() => ({ data: [] })),
         getRatings(startStr, endStr),
         getOverloadedDays(startStr, endStr),
         getTemplates(),
@@ -107,8 +112,10 @@ export default function CalendarPage() {
         getAppliedTemplates(startStr, endStr)
       ]);
 
-      // Combine local events with ICS events
-      const allEvents = [...(eventsRes.data || []), ...(icsEventsRes.data || [])];
+      // Combine local events with ICS events (only for own calendar)
+      const allEvents = viewingUserId 
+        ? (eventsRes.data || [])
+        : [...(eventsRes.data || []), ...(icsEventsRes.data || [])];
       setEvents(allEvents);
       
       const ratingsMap = {};
@@ -124,7 +131,7 @@ export default function CalendarPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentDate]);
+  }, [currentDate, viewingUserId]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
