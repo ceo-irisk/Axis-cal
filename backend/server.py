@@ -1087,14 +1087,17 @@ async def get_calendars(user: dict = Depends(get_current_user)):
     return own_calendars + shared_calendars
 
 @api_router.post("/calendars")
-async def add_calendar(name: str, provider: str, color: str, pattern: Optional[str] = None, user: dict = Depends(get_current_user)):
+async def add_calendar(name: str, color: str, icon: str = "calendar", user: dict = Depends(get_current_user)):
     calendar_dict = {
         "id": str(uuid.uuid4()),
         "user_id": user["id"],
         "name": name,
-        "provider": provider,
+        "provider": "custom",
         "color": color,
-        "pattern": pattern,
+        "icon": icon,
+        "is_default": False,
+        "is_public": True,
+        "pattern": None,
         "is_active": True,
         "sync_enabled": False,
         "credentials": {},
