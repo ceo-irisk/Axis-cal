@@ -216,10 +216,8 @@ export const Sidebar = ({
   };
 
   const handleDeleteICSSubscription = async (id) => {
-    if (!confirm('Отключить внешний календарь?')) return;
     try {
       await deleteICSSubscription(id);
-      toast.success('Календарь отключён');
       fetchDictionaries();
     } catch (e) { toast.error('Ошибка удаления'); }
   };
@@ -355,11 +353,9 @@ export const Sidebar = ({
   };
 
   const handleDeleteCalendar = async (id) => {
-    if (!confirm('Удалить календарь?')) return;
     try {
       await deleteCalendar(id);
       fetchCalendars();
-      toast.success('Календарь удалён');
     } catch (e) { toast.error('Ошибка удаления'); }
   };
 
