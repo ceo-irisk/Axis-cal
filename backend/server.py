@@ -445,6 +445,10 @@ async def create_event(event_data: EventCreate, user: dict = Depends(get_current
     event_dict["start_time"] = event_dict["start_time"].isoformat()
     event_dict["end_time"] = event_dict["end_time"].isoformat()
     
+    # Handle recurrence_end_date
+    if event_dict.get("recurrence_end_date"):
+        event_dict["recurrence_end_date"] = event_dict["recurrence_end_date"].isoformat()
+    
     # Set pattern for tentative events
     if event_dict["status"] == EventStatus.TENTATIVE:
         event_dict["pattern"] = "tentative"
@@ -488,6 +492,10 @@ async def update_event(event_id: str, event_data: EventCreate, user: dict = Depe
     update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
     update_data["start_time"] = update_data["start_time"].isoformat()
     update_data["end_time"] = update_data["end_time"].isoformat()
+    
+    # Handle recurrence_end_date
+    if update_data.get("recurrence_end_date"):
+        update_data["recurrence_end_date"] = update_data["recurrence_end_date"].isoformat()
     
     if update_data["status"] == EventStatus.TENTATIVE:
         update_data["pattern"] = "tentative"
