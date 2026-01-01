@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { format, addHours } from 'date-fns';
-import { X, Trash2, Clock, MapPin, Users, FileText, Square, CheckCircle2, Zap, Video, CalendarDays, ChevronUp, ChevronDown } from 'lucide-react';
+import { X, Trash2, Clock, MapPin, Users, FileText, Square, CheckCircle2, Zap, Video, CalendarDays, ChevronUp, ChevronDown, Repeat } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -22,6 +22,15 @@ const STATUS_OPTIONS = [
   { value: 'confirmed', label: 'Подтверждено', description: 'Обычное событие' },
   { value: 'tentative', label: 'Не согласовано', description: 'Пунктирная рамка' },
   { value: 'template', label: 'Шаблонное событие', description: 'Из шаблона' },
+];
+
+const RECURRENCE_OPTIONS = [
+  { value: 'none', label: 'Не повторять' },
+  { value: 'daily', label: 'Каждый день' },
+  { value: 'workdays', label: 'Каждый рабочий день (Пн-Пт)' },
+  { value: 'weekly', label: 'Каждую неделю' },
+  { value: 'monthly', label: 'Каждый месяц' },
+  { value: 'yearly', label: 'Каждый год' },
 ];
 
 // Time picker component
