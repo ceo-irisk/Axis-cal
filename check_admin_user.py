@@ -5,7 +5,7 @@ import sys
 
 def test_admin_user_creation():
     """Test if admin@example.com user exists or needs to be created"""
-    base_url = "https://smartplan-8.preview.emergentagent.com"
+    base_url = "https://teamschedule-24.preview.emergentagent.com"
     
     # First try to login with admin@example.com
     login_data = {
