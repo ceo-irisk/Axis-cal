@@ -122,7 +122,7 @@ export const Sidebar = ({
   viewingUserId,
   onViewingUserChange
 }) => {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, switchUser } = useAuth();
   const { theme, setTheme } = useTheme();
   
   // Get event type color

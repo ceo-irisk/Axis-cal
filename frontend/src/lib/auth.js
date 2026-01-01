@@ -46,8 +46,18 @@ export const AuthProvider = ({ children }) => {
   const isAssistant = () => user?.role === 'assistant';
   const canManage = () => isAdmin() || isManager();
 
+  // Quick user switch for testing (uses stored credentials)
+  const switchUser = (userData, accessToken) => {
+    localStorage.setItem('token', accessToken);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setToken(accessToken);
+    setUser(userData);
+    // Reload page to reset all state
+    window.location.reload();
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, loginUser, logout, isAdmin, isManager, isAssistant, canManage }}>
+    <AuthContext.Provider value={{ user, token, loading, loginUser, logout, isAdmin, isManager, isAssistant, canManage, switchUser }}>
       {children}
     </AuthContext.Provider>
   );
