@@ -1363,7 +1363,7 @@ async def get_events_with_recurring(
                 if event_start_dt >= start_dt and event_start_dt <= end_dt:
                     if event_id not in processed_parent_ids:
                         result_events.append(event)
-            except:
+            except (ValueError, TypeError):
                 pass
         
         # Generate recurring instances
