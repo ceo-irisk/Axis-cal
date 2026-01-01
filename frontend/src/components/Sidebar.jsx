@@ -208,6 +208,32 @@ export const Sidebar = ({
       setCalendars(res.data || []);
       onCalendarsChange?.(res.data || []);
     } catch (e) { console.error(e); }
+
+  // Subscriptions handlers
+  const handleAddSubscription = async () => {
+    if (!selectedUserForSub) return;
+    try {
+      await createSubscription(selectedUserForSub);
+      setSelectedUserForSub('');
+      setShowAddSubscription(false);
+      // Reload subscriptions
+      const subsRes = await getSubscriptions();
+      setSubscriptions(subsRes.data || []);
+    } catch (e) { toast.error('Ошибка подписки'); }
+  };
+
+  const handleDeleteSubscription = async (targetUserId) => {
+    try {
+      await deleteSubscription(targetUserId);
+      const subsRes = await getSubscriptions();
+      setSubscriptions(subsRes.data || []);
+      // Reset viewing if was viewing this user
+      if (viewingUserId === targetUserId) {
+        onViewingUserChange?.(null);
+      }
+    } catch (e) { toast.error('Ошибка отписки'); }
+  };
+
   };
 
   const fetchDictionaries = async () => {
