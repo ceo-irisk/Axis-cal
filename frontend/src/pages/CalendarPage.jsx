@@ -318,6 +318,7 @@ export default function CalendarPage() {
                 events={events}
                 calendars={calendars}
                 templates={templates}
+                appliedTemplates={appliedTemplates}
                 overloadedDays={overloadedDays}
                 ratings={ratings}
                 view={view}
