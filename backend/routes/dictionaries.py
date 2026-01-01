@@ -142,8 +142,10 @@ async def create_timezone(timezone_data: Dict[str, Any] = Body(...), admin: dict
     }
     
     await db.custom_timezones.insert_one(timezone_dict)
-    timezone_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
-    return timezone_dict
+    
+    # Fetch clean data without _id
+    created_timezone = await db.custom_timezones.find_one({"id": timezone_dict["id"]}, {"_id": 0})
+    return created_timezone
 
 @router.delete("/timezones/{timezone_id}")
 async def delete_timezone(timezone_id: str, admin: dict = Depends(require_admin)):
