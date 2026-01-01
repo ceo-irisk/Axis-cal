@@ -53,6 +53,16 @@ const TEMPLATE_EVENT_COLORS = {
 
 // Generate dynamic styles for custom event types
 const getEventDynamicStyle = (event, eventTypes) => {
+  // Special styling for "Занято" events
+  if (event.is_busy) {
+    return {
+      background: '#6b7280',
+      color: '#ffffff',
+      border: 'none',
+      opacity: 0.7
+    };
+  }
+  
   const type = event.event_type || 'meeting';
   
   // Find the event type config
@@ -86,6 +96,9 @@ const getEventDynamicStyle = (event, eventTypes) => {
 
 // Get event color class based on status and type (for predefined types)
 const getEventColorClass = (event) => {
+  // "Занято" events use dynamic styles only
+  if (event.is_busy) return '';
+  
   const type = event.event_type || 'meeting';
   
   // Only return CSS class if it's a predefined type
