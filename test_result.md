@@ -202,8 +202,20 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
-  stuck_tasks: []
+  current_focus:
+    - "Backend Refactoring - Users Routes"
+    - "Backend Refactoring - Events Routes"
+    - "Backend Refactoring - Calendars Routes"
+    - "Backend Refactoring - Subscriptions Routes"
+    - "Backend Refactoring - Templates Routes"
+    - "Backend Refactoring - Dictionaries Routes"
+  stuck_tasks:
+    - "Backend Refactoring - Users Routes"
+    - "Backend Refactoring - Events Routes"
+    - "Backend Refactoring - Calendars Routes"
+    - "Backend Refactoring - Subscriptions Routes"
+    - "Backend Refactoring - Templates Routes"
+    - "Backend Refactoring - Dictionaries Routes"
   test_all: false
   test_priority: "high_first"
 
