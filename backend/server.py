@@ -135,6 +135,7 @@ class EventBase(BaseModel):
     recurrence_type: RecurrenceType = RecurrenceType.NONE
     recurrence_end_date: Optional[datetime] = None
     recurrence_parent_id: Optional[str] = None  # For generated instances
+    recurrence_custom_days: Optional[List[str]] = None  # For custom_days recurrence: ['monday', 'wednesday', 'friday']
 
 class EventCreate(EventBase):
     pass
