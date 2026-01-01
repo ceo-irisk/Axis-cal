@@ -715,16 +715,43 @@ export const Sidebar = ({
                           className="w-full input-glass text-sm"
                           autoFocus
                         />
-                        <div className="flex gap-1 flex-wrap">
-                          {CALENDAR_COLORS.map(c => (
-                            <button 
-                              key={c} 
-                              onClick={() => setNewCalColor(c)} 
-                              className={`w-6 h-6 rounded-full ${newCalColor === c ? 'ring-2 ring-offset-2 ring-offset-background ring-foreground' : ''}`} 
-                              style={{ backgroundColor: c }} 
-                            />
-                          ))}
+                        
+                        {/* Icon selector */}
+                        <div>
+                          <Label className="text-xs text-muted-foreground mb-2 block">Иконка</Label>
+                          <div className="grid grid-cols-5 gap-1">
+                            {Object.entries(CALENDAR_ICONS).map(([key, IconComp]) => (
+                              <button
+                                key={key}
+                                type="button"
+                                onClick={() => setNewCalIcon(key)}
+                                className={`p-2 rounded hover:bg-background transition-colors ${
+                                  newCalIcon === key ? 'bg-[#085C53] text-white' : 'bg-accent'
+                                }`}
+                                title={key}
+                              >
+                                <IconComp className="w-4 h-4 mx-auto" />
+                              </button>
+                            ))}
+                          </div>
                         </div>
+                        
+                        {/* Color selector */}
+                        <div>
+                          <Label className="text-xs text-muted-foreground mb-2 block">Цвет</Label>
+                          <div className="flex gap-1 flex-wrap">
+                            {CALENDAR_COLORS.map(c => (
+                              <button 
+                                key={c}
+                                type="button"
+                                onClick={() => setNewCalColor(c)} 
+                                className={`w-6 h-6 rounded-full ${newCalColor === c ? 'ring-2 ring-offset-2 ring-offset-background ring-foreground' : ''}`} 
+                                style={{ backgroundColor: c }} 
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        
                         <div className="flex gap-2">
                           <button onClick={() => setShowAddForm(false)} className="flex-1 btn-secondary text-xs py-1.5">Отмена</button>
                           <button onClick={handleAddCalendar} className="flex-1 btn-primary text-xs py-1.5">Создать</button>
