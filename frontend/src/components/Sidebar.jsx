@@ -671,26 +671,39 @@ export const Sidebar = ({
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Мои календари</p>
                   <div className="space-y-1">
-                    <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-accent/50 group">
-                      <div className="w-3 h-3 rounded-full bg-[#085C53]" />
-                      <span className="text-sm flex-1">Основной</span>
-                      <Eye className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100" />
-                    </div>
-                    
-                    {myCalendars.map(cal => (
-                      <div key={cal.id} className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-accent/50 group">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cal.color }} />
-                        <span className={`text-sm flex-1 ${hiddenCalendars.has(cal.id) ? 'line-through text-muted-foreground' : ''}`}>
-                          {cal.name}
-                        </span>
-                        <button onClick={() => toggleCalendarVisibility(cal.id)} className="opacity-0 group-hover:opacity-100">
-                          {hiddenCalendars.has(cal.id) ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4 text-muted-foreground" />}
-                        </button>
-                        <button onClick={() => handleDeleteCalendar(cal.id)} className="opacity-0 group-hover:opacity-100">
-                          <Trash2 className="w-4 h-4 text-red-400" />
-                        </button>
-                      </div>
-                    ))}
+                    {myCalendars.map(cal => {
+                      const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
+                      const isDefault = cal.is_default;
+                      
+                      return (
+                        <div key={cal.id} className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-accent/50 group">
+                          <IconComponent className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                          <span className={`text-sm flex-1 ${hiddenCalendars.has(cal.id) ? 'line-through text-muted-foreground' : ''}`}>
+                            {cal.name}
+                            {isDefault && <span className="text-xs text-muted-foreground ml-1">({cal.is_public ? 'по умолчанию' : 'приватный'})</span>}
+                          </span>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                            <button onClick={() => toggleCalendarVisibility(cal.id)} className="p-1 rounded hover:bg-background">
+                              {hiddenCalendars.has(cal.id) ? <EyeOff className="w-3.5 h-3.5 text-muted-foreground" /> : <Eye className="w-3.5 h-3.5 text-muted-foreground" />}
+                            </button>
+                            {!isDefault && cal.is_public && (
+                              <button 
+                                onClick={() => { setSelectedCalendarForPermissions(cal); setShowPermissionsModal(true); }}
+                                className="p-1 rounded hover:bg-background"
+                                title="Управление доступом"
+                              >
+                                <Users className="w-3.5 h-3.5 text-[#085C53]" />
+                              </button>
+                            )}
+                            {!isDefault && (
+                              <button onClick={() => handleDeleteCalendar(cal.id)} className="p-1 rounded hover:bg-red-500/20">
+                                <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                     
                     {showAddForm ? (
                       <div className="p-3 rounded-lg bg-accent/50 space-y-3 mt-2">
