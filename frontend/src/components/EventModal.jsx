@@ -146,6 +146,9 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
   const dateStr = format(startDate, 'yyyy-MM-dd');
   const startHour = defaultHour ?? 9;
   
+  // Find "Открытый" calendar or use first available
+  const defaultCalendar = calendars.find(c => c.name === 'Открытый') || calendars[0];
+  
   return {
     title: '',
     description: '',
@@ -158,7 +161,7 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
     location: '',
     attendees: [],
     custom_fields: {},
-    calendar_id: calendars[0]?.id || '',
+    calendar_id: defaultCalendar?.id || '',
     is_all_day: false,
     is_blocked: false,
     is_completed: false,
