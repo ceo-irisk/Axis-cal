@@ -37,8 +37,10 @@ async def create_event_type(type_data: Dict[str, Any] = Body(...), admin: dict =
     }
     
     await db.event_types.insert_one(type_dict)
-    type_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
-    return type_dict
+    
+    # Fetch clean data without _id
+    created_type = await db.event_types.find_one({"id": type_dict["id"]}, {"_id": 0})
+    return created_type
 
 @router.put("/event-types/reorder")
 async def reorder_event_types(reorder_data: EventTypeReorderRequest, admin: dict = Depends(require_admin)):
@@ -97,8 +99,10 @@ async def create_event_status(status_data: Dict[str, Any] = Body(...), admin: di
     }
     
     await db.event_statuses.insert_one(status_dict)
-    status_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
-    return status_dict
+    
+    # Fetch clean data without _id
+    created_status = await db.event_statuses.find_one({"id": status_dict["id"]}, {"_id": 0})
+    return created_status
 
 @router.put("/event-statuses/{status_id}")
 async def update_event_status(

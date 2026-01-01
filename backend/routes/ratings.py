@@ -43,8 +43,10 @@ async def create_or_update_rating(
     }
     
     await db.day_ratings.insert_one(rating_dict)
-    rating_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
-    return rating_dict
+    
+    # Fetch clean data without _id
+    created_rating = await db.day_ratings.find_one({"id": rating_dict["id"]}, {"_id": 0})
+    return created_rating
 
 @router.get("")
 async def get_ratings(
@@ -93,8 +95,10 @@ async def create_survey_question(question_data: Dict[str, Any] = Body(...), admi
     }
     
     await db.survey_questions.insert_one(question_dict)
-    question_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
-    return question_dict
+    
+    # Fetch clean data without _id
+    created_question = await db.survey_questions.find_one({"id": question_dict["id"]}, {"_id": 0})
+    return created_question
 
 @survey_router.put("/questions/{question_id}")
 async def update_survey_question(
@@ -146,8 +150,10 @@ async def create_survey_response(
     }
     
     await db.survey_responses.insert_one(response_dict)
-    response_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
-    return response_dict
+    
+    # Fetch clean data without _id
+    created_response = await db.survey_responses.find_one({"id": response_dict["id"]}, {"_id": 0})
+    return created_response
 
 @survey_router.get("/responses")
 async def get_survey_responses(
