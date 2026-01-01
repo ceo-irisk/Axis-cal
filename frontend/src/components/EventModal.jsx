@@ -420,6 +420,47 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], on
             </div>
           </div>
 
+          {/* Recurring event settings */}
+          <div className="p-4 rounded-xl bg-accent/30 space-y-3">
+            <div className="flex items-center gap-2">
+              <Repeat className="w-4 h-4 text-muted-foreground" />
+              <Label className="text-sm font-medium">Повторение</Label>
+            </div>
+            <Select 
+              value={formData.recurrence_type} 
+              onValueChange={(v) => setFormData({ ...formData, recurrence_type: v })}
+            >
+              <SelectTrigger data-testid="recurrence-type-select">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper" sideOffset={4}>
+                {RECURRENCE_OPTIONS.map(opt => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            {formData.recurrence_type !== 'none' && (
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1.5 block">
+                  Повторять до (необязательно)
+                </Label>
+                <Input 
+                  type="date" 
+                  value={formData.recurrence_end_date} 
+                  onChange={(e) => setFormData({ ...formData, recurrence_end_date: e.target.value })}
+                  placeholder="Без ограничений"
+                  data-testid="recurrence-end-date"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Оставьте пустым для бесконечного повторения
+                </p>
+              </div>
+            )}
+          </div>
+
           {/* Location */}
           <div>
             <Label className="text-xs text-muted-foreground flex items-center gap-1 mb-1.5">
