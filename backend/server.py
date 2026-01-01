@@ -596,6 +596,38 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
     
+    # Check if there's already a template applied to this day
+    existing_applied = await db.applied_templates.find_one({
+        "user_id": user["id"],
+        "date": target_date
+    })
+    
+    if existing_applied:
+        # Delete events from old template
+        old_template_id = existing_applied.get("template_id")
+        await db.events.delete_many({
+            "created_by": user["id"],
+            "template_id": old_template_id,
+            "start_time": {"$gte": f"{target_date}T00:00:00", "$lte": f"{target_date}T23:59:59"}
+        })
+        
+        # Update applied template record
+        await db.applied_templates.update_one(
+            {"id": existing_applied["id"]},
+            {"$set": {"template_id": template_id, "updated_at": datetime.now(timezone.utc).isoformat()}}
+        )
+    else:
+        # Create new applied template record
+        applied_dict = {
+            "id": str(uuid.uuid4()),
+            "user_id": user["id"],
+            "template_id": template_id,
+            "date": target_date,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.applied_templates.insert_one(applied_dict)
+    
     created_events = []
     base_date = datetime.fromisoformat(target_date)
     # Ensure base_date has timezone
@@ -606,11 +638,7 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
         start_offset = timedelta(hours=event_template.get("start_hour", 9), minutes=event_template.get("start_minute", 0))
         end_offset = timedelta(hours=event_template.get("end_hour", 10), minutes=event_template.get("end_minute", 0))
         
-        if template["template_type"] == "week":
-            day_offset = event_template.get("day_of_week", 0)
-            event_date = base_date + timedelta(days=day_offset)
-        else:
-            event_date = base_date
+        event_date = base_date
         
         # Calculate start and end times with timezone
         start_time = event_date.replace(hour=0, minute=0, second=0, microsecond=0) + start_offset
