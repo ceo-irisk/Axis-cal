@@ -135,11 +135,9 @@ const UsersPanel = () => {
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       user.role === 'admin' 
                         ? 'bg-[#085C53]/20 text-[#074a44] dark:text-teal-400' 
-                        : user.role === 'assistant'
-                        ? 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-400'
-                        : 'bg-accent text-muted-foreground'
+                        : 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
                     }`}>
-                      {user.role === 'admin' ? 'Администратор' : user.role === 'assistant' ? 'Помощник' : 'Пользователь'}
+                      {user.role === 'admin' ? 'Администратор' : 'Пользователь'}
                     </span>
                   </td>
                   <td className="p-4">
@@ -248,7 +246,6 @@ const UserForm = ({ initialData, onSave, onCancel }) => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="user">Пользователь</SelectItem>
-            <SelectItem value="assistant">Помощник</SelectItem>
             <SelectItem value="admin">Администратор</SelectItem>
           </SelectContent>
         </Select>
