@@ -343,6 +343,7 @@ export default function CalendarPage() {
           defaultDate={selectedDate}
           defaultHour={defaultEventTime}
           calendars={calendars}
+          eventTypes={eventTypes}
           onSave={handleSaveEvent}
           onDelete={handleDeleteEvent}
           onClose={() => setShowEventModal(false)}
