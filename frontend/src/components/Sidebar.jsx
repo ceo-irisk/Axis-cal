@@ -152,10 +152,11 @@ export const Sidebar = ({
         setCustomTimezones(timezonesRes.data || []);
         setIcsSubscriptions(icsRes.data || []);
         onCustomTimezonesChange?.(timezonesRes.data || []);
+        onEventTypesChange?.(typesRes.data || []);
       } catch (e) { console.error(e); }
     };
     loadData();
-  }, [onCalendarsChange, onCustomTimezonesChange]);
+  }, [onCalendarsChange, onCustomTimezonesChange, onEventTypesChange]);
 
   const fetchCalendars = async () => {
     try {
