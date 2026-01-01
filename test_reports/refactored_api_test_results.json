@@ -1,0 +1,117 @@
+{
+  "timestamp": "2026-01-01T21:18:09.185850",
+  "total_tests": 18,
+  "passed_tests": 13,
+  "failed_tests": 5,
+  "success_rate": 72.22222222222221,
+  "test_results": [
+    {
+      "test": "Auth - Admin login (admin@example.com)",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Auth - GET /auth/me",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Auth - User login (user@company.com)",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Auth - Invalid login rejection",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Users - GET /users (admin only)",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Users - POST /users",
+      "success": false,
+      "details": "Failed: {'detail': [{'type': 'enum', 'loc': ['body', 'role'], 'msg': \"Input should be 'admin' or 'user'\", 'input': 'assistant', 'ctx': {'expected': \"'admin' or 'user'\"}, 'url': 'https://errors.pydantic.dev/2.12/v/enum'}]}",
+      "response_data": null
+    },
+    {
+      "test": "Events - POST /events",
+      "success": false,
+      "details": "Failed: {'status_code': 520, 'text': 'Internal Server Error'}",
+      "response_data": null
+    },
+    {
+      "test": "Calendars - GET /calendars (own + subscribed)",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Calendars - POST /calendars",
+      "success": false,
+      "details": "Failed: {'status_code': 520, 'text': 'Internal Server Error'}",
+      "response_data": null
+    },
+    {
+      "test": "Subscriptions - GET /subscriptions",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Templates - GET /templates",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Templates - POST /templates",
+      "success": false,
+      "details": "Failed: {'status_code': 520, 'text': 'Internal Server Error'}",
+      "response_data": null
+    },
+    {
+      "test": "Dictionaries - GET /dictionaries/event-types",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Dictionaries - POST /dictionaries/event-types",
+      "success": false,
+      "details": "Failed: {'status_code': 520, 'text': 'Internal Server Error'}",
+      "response_data": null
+    },
+    {
+      "test": "Dictionaries - GET /dictionaries/event-statuses",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Dictionaries - GET /dictionaries/timezones",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Recurring Events - GET /recurring-events (generate instances)",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Permissions - Events filtered by permissions",
+      "success": true,
+      "details": "",
+      "response_data": null
+    }
+  ]
+}
