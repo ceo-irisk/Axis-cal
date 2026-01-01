@@ -20,8 +20,19 @@ const RECURRENCE_OPTIONS = [
   { value: 'daily', label: 'Каждый день' },
   { value: 'workdays', label: 'Каждый рабочий день (Пн-Пт)' },
   { value: 'weekly', label: 'Каждую неделю' },
+  { value: 'custom_days', label: 'Определенные дни' },
   { value: 'monthly', label: 'Каждый месяц' },
   { value: 'yearly', label: 'Каждый год' },
+];
+
+const WEEKDAYS = [
+  { value: 'monday', label: 'Пн', fullLabel: 'Понедельник' },
+  { value: 'tuesday', label: 'Вт', fullLabel: 'Вторник' },
+  { value: 'wednesday', label: 'Ср', fullLabel: 'Среда' },
+  { value: 'thursday', label: 'Чт', fullLabel: 'Четверг' },
+  { value: 'friday', label: 'Пт', fullLabel: 'Пятница' },
+  { value: 'saturday', label: 'Сб', fullLabel: 'Суббота' },
+  { value: 'sunday', label: 'Вс', fullLabel: 'Воскресенье' },
 ];
 
 // Time picker component
