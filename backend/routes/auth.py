@@ -1,31 +1,24 @@
 from fastapi import APIRouter, HTTPException, Depends
-from motor.motor_asyncio import AsyncIOMotorClient
-from models.user import User, UserCreate, UserResponse
-from services.auth import hash_password, create_access_token, verify_password
+from pydantic import BaseModel, EmailStr
+from models.user import UserResponse
+from services.auth import create_access_token, verify_password
+from dependencies import get_current_user
 import os
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-# This will be injected from main server
 db = None
 
 def init_db(database):
     global db
     db = database
 
-class LoginRequest:
-    def __init__(self, email: str, password: str):
-        self.email = email
-        self.password = password
-
-from pydantic import BaseModel, EmailStr
-
-class LoginReq(BaseModel):
+class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
 @router.post("/login")
-async def login(credentials: LoginReq):
+async def login(credentials: LoginRequest):
     user = await db.users.find_one({"email": credentials.email})
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -55,6 +48,5 @@ async def login(credentials: LoginReq):
     }
 
 @router.get("/me", response_model=UserResponse)
-async def get_current_user_info(user: dict = Depends(lambda: {})):
-    # This will be properly implemented with dependency injection
-    pass
+async def get_me(user: dict = Depends(get_current_user)):
+    return UserResponse(**user)
