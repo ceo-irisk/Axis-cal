@@ -89,6 +89,51 @@ backend:
         agent: "testing"
         comment: "✅ PASSED: Event status dictionary API works correctly. GET /api/dictionaries/event-statuses returns default statuses (confirmed, tentative, cancelled) with proper labels."
 
+  - task: "Recurring Events API"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test recurring events API (/api/recurring-events) and event creation with recurrence_type field"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: Recurring events API works correctly. GET /api/recurring-events generates instances properly for daily, workdays, weekly, monthly, and yearly recurrence types. Event creation with recurrence_type and recurrence_end_date fields works. Generated 8 instances for daily recurring event over 2-week period as expected."
+
+  - task: "ICS Subscriptions CRUD API"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test ICS subscriptions CRUD operations (/api/ics-subscriptions)"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: ICS subscriptions CRUD API works correctly. GET /api/ics-subscriptions lists subscriptions, POST creates with URL validation, PUT updates name/color, DELETE removes subscription. URL validation properly rejects invalid ICS files."
+
+  - task: "ICS Events Fetch API"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Need to test ICS events fetching (/api/ics-subscriptions/all-events)"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: ICS events fetch API works correctly. GET /api/ics-subscriptions/all-events fetches events from all active subscriptions. Individual subscription events endpoint also works properly with date filtering."
+
 frontend:
   - task: "Event Selection (Single Click)"
     implemented: true
