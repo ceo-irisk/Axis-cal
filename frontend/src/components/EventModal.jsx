@@ -159,11 +159,6 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
     recurrence_end_date: '',
   };
 };
-    is_completed: false,
-    is_urgent: false,
-    is_video_call: false,
-  };
-};
 
 export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], onSave, onDelete, onClose }) => {
   const [customFields, setCustomFields] = useState([]);
@@ -195,12 +190,20 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], on
     const isTemplate = formData.status === 'template';
     const actualStatus = isTemplate ? 'confirmed' : formData.status;
     
+    // Prepare recurrence end date
+    let recurrenceEndDate = null;
+    if (formData.recurrence_type !== 'none' && formData.recurrence_end_date) {
+      recurrenceEndDate = new Date(`${formData.recurrence_end_date}T23:59:59`).toISOString();
+    }
+    
     onSave({
       ...formData,
       start_time: new Date(startDateTime).toISOString(),
       end_time: new Date(endDateTime).toISOString(),
       status: actualStatus,
       is_template_event: isTemplate,
+      recurrence_type: formData.recurrence_type,
+      recurrence_end_date: recurrenceEndDate,
     });
   };
 
