@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Optional
 from datetime import datetime, timezone
-from models.user import User, UserCreate, UserResponse, UserRole
+from models.user import User, UserCreate, UserResponse, UserRole, UserBase
 from services.auth import hash_password
+from dependencies import require_admin, get_current_user
 import uuid
 import logging
 
@@ -16,7 +17,7 @@ def init_db(database):
     db = database
 
 @router.post("", response_model=UserResponse)
-async def create_user(user_data: UserCreate, admin: dict = Depends(lambda: {})):
+async def create_user(user_data: UserCreate, admin: dict = Depends(require_admin)):
     existing = await db.users.find_one({"email": user_data.email})
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
