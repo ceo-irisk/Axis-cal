@@ -119,8 +119,12 @@ const EventIcons = ({ event }) => {
 };
 
 // Template selector dropdown
-const TemplateSelector = ({ day, templates, onApplyTemplate }) => {
+const TemplateSelector = ({ day, templates, appliedTemplates, onApplyTemplate, onRemoveTemplate }) => {
   const [open, setOpen] = useState(false);
+  
+  const dateStr = format(day, 'yyyy-MM-dd');
+  const appliedTemplate = appliedTemplates?.find(at => at.date === dateStr);
+  const hasTemplate = !!appliedTemplate;
   
   const handleSelect = (template) => {
     if (template && onApplyTemplate) {
@@ -129,19 +133,42 @@ const TemplateSelector = ({ day, templates, onApplyTemplate }) => {
     setOpen(false);
   };
   
+  const handleRemove = (e) => {
+    e.stopPropagation();
+    if (onRemoveTemplate && confirm('Удалить шаблон с этого дня?')) {
+      onRemoveTemplate(day);
+    }
+    setOpen(false);
+  };
+  
   return (
     <div className="relative">
       <button 
         onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
-        className="p-1 text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded opacity-0 group-hover:opacity-100 transition-all"
-        title="Выбрать шаблон"
+        className={`p-1 rounded transition-all ${
+          hasTemplate 
+            ? 'text-[#085C53] hover:bg-accent/50' 
+            : 'text-muted-foreground hover:text-foreground hover:bg-accent/50 opacity-0 group-hover:opacity-100'
+        }`}
+        title={hasTemplate ? 'Шаблон применен' : 'Выбрать шаблон'}
       >
-        <ChevronDown className="w-3.5 h-3.5" />
+        <ChevronDown className={`w-3.5 h-3.5 ${hasTemplate ? 'fill-[#085C53]' : ''}`} />
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-lg shadow-lg z-20 py-1 min-w-[140px]">
+            {hasTemplate && (
+              <>
+                <button 
+                  className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent text-red-500 flex items-center gap-2" 
+                  onClick={handleRemove}
+                >
+                  <span>✕</span> Убрать шаблон
+                </button>
+                <div className="border-t border-border my-1" />
+              </>
+            )}
             {templates && templates.length > 0 ? (
               templates.map(template => (
                 <button 
@@ -155,14 +182,6 @@ const TemplateSelector = ({ day, templates, onApplyTemplate }) => {
             ) : (
               <div className="px-3 py-1.5 text-xs text-muted-foreground">Нет шаблонов</div>
             )}
-            <div className="border-t border-border mt-1 pt-1">
-              <button 
-                className="w-full px-3 py-1.5 text-xs text-left hover:bg-accent text-muted-foreground" 
-                onClick={() => setOpen(false)}
-              >
-                Нет шаблона
-              </button>
-            </div>
           </div>
         </>
       )}
