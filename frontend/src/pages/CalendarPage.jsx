@@ -288,6 +288,8 @@ export default function CalendarPage() {
         mainView={mainView}
         onCustomTimezonesChange={setCustomTimezones}
         onEventTypesChange={setEventTypes}
+        viewingUserId={viewingUserId}
+        onViewingUserChange={setViewingUserId}
       />
       
       <main className="main-content-full flex-1" data-testid="calendar-main">
