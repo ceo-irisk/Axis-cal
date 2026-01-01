@@ -970,16 +970,6 @@ class EventTypeReorderRequest(BaseModel):
 @api_router.get("/dictionaries/event-types")
 async def get_event_types(user: dict = Depends(get_current_user)):
     types = await db.event_types.find({}, {"_id": 0}).sort("order", 1).to_list(50)
-    if not types:
-        # Return default types if none exist
-        return [
-            {"id": "default-meeting", "name": "meeting", "label": "Встреча", "color": "#8b5cf6", "order": 0, "is_active": True},
-            {"id": "default-call", "name": "call", "label": "Звонок", "color": "#06b6d4", "order": 1, "is_active": True},
-            {"id": "default-personal", "name": "personal", "label": "Личное", "color": "#f59e0b", "order": 2, "is_active": True},
-            {"id": "default-urgent", "name": "urgent", "label": "Срочно", "color": "#ef4444", "order": 3, "is_active": True},
-            {"id": "default-travel", "name": "travel", "label": "Поездка", "color": "#10b981", "order": 4, "is_active": True},
-            {"id": "default-deep_work", "name": "deep_work", "label": "Глубокая работа", "color": "#6366f1", "order": 5, "is_active": True},
-        ]
     return types
 
 @api_router.post("/dictionaries/event-types")
