@@ -375,11 +375,12 @@ export const Sidebar = ({
   const handleAddCalendar = async () => {
     if (!newCalName.trim()) return;
     try {
-      await addCalendar(newCalName, 'custom', newCalColor);
+      await addCalendar(newCalName.trim(), newCalColor, newCalIcon);
       setNewCalName('');
+      setNewCalColor(CALENDAR_COLORS[0]);
+      setNewCalIcon('calendar');
       setShowAddForm(false);
       fetchCalendars();
-      toast.success('Календарь создан');
     } catch (e) { toast.error('Ошибка создания'); }
   };
 
