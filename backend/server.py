@@ -1320,9 +1320,8 @@ async def get_events_with_recurring(
     user: dict = Depends(get_current_user)
 ):
     """Get events including generated recurring instances"""
+    # Fetch ALL events in date range (same as regular /events endpoint)
     query = {}
-    
-    # Fetch base events
     if start_date:
         query["start_time"] = {"$gte": start_date}
     if end_date:
@@ -1334,43 +1333,31 @@ async def get_events_with_recurring(
     events = await db.events.find(query, {"_id": 0}).to_list(1000)
     
     # Also fetch recurring events that might have started before start_date
+    recurring_query = {"recurrence_type": {"$nin": ["none", None, ""]}}
     if start_date:
-        recurring_query = {
-            "recurrence_type": {"$ne": "none"},
-            "start_time": {"$lt": start_date}
-        }
-        recurring_events = await db.events.find(recurring_query, {"_id": 0}).to_list(100)
-    else:
-        recurring_events = []
+        recurring_query["start_time"] = {"$lt": start_date}
+    recurring_events = await db.events.find(recurring_query, {"_id": 0}).to_list(100)
     
-    # Generate recurring instances
-    result_events = []
+    # Parse date range for recurring generation
+    start_dt = datetime.fromisoformat(start_date).replace(tzinfo=timezone.utc) if start_date else datetime.now(timezone.utc) - timedelta(days=30)
+    end_dt = datetime.fromisoformat(end_date).replace(tzinfo=timezone.utc) if end_date else datetime.now(timezone.utc) + timedelta(days=30)
+    
+    # Start with all regular events
+    result_events = list(events)
     processed_parent_ids = set()
     
-    # Parse date range
-    start_dt = datetime.fromisoformat(start_date) if start_date else datetime.now(timezone.utc) - timedelta(days=30)
-    end_dt = datetime.fromisoformat(end_date) if end_date else datetime.now(timezone.utc) + timedelta(days=30)
+    # Add recurring instances for recurring events
+    all_recurring = [e for e in events if e.get("recurrence_type") and e.get("recurrence_type") not in ["none", None, ""]]
+    all_recurring.extend(recurring_events)
     
-    for event in events + recurring_events:
+    for event in all_recurring:
         event_id = event.get("id")
-        recurrence_type = event.get("recurrence_type", "none")
+        if event_id in processed_parent_ids:
+            continue
         
-        # Add the original event (if within range)
-        event_start_str = event.get("start_time", "")
-        if event_start_str:
-            try:
-                event_start_dt = datetime.fromisoformat(event_start_str.replace("Z", "+00:00"))
-                if event_start_dt >= start_dt and event_start_dt <= end_dt:
-                    if event_id not in processed_parent_ids:
-                        result_events.append(event)
-            except (ValueError, TypeError):
-                pass
-        
-        # Generate recurring instances
-        if recurrence_type != "none" and event_id not in processed_parent_ids:
-            instances = generate_recurring_instances(event, start_dt, end_dt)
-            result_events.extend(instances)
-            processed_parent_ids.add(event_id)
+        instances = generate_recurring_instances(event, start_dt, end_dt)
+        result_events.extend(instances)
+        processed_parent_ids.add(event_id)
     
     return result_events
 
