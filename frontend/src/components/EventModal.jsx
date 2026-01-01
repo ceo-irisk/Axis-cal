@@ -462,6 +462,44 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
               </SelectContent>
             </Select>
             
+            {/* Custom days selector */}
+            {formData.recurrence_type === 'custom_days' && (
+              <div>
+                <Label className="text-xs text-muted-foreground mb-2 block">
+                  Выберите дни недели
+                </Label>
+                <div className="flex gap-1.5">
+                  {WEEKDAYS.map(day => {
+                    const isSelected = formData.recurrence_custom_days?.includes(day.value);
+                    return (
+                      <button
+                        key={day.value}
+                        type="button"
+                        onClick={() => {
+                          const currentDays = formData.recurrence_custom_days || [];
+                          const newDays = isSelected
+                            ? currentDays.filter(d => d !== day.value)
+                            : [...currentDays, day.value];
+                          setFormData({ ...formData, recurrence_custom_days: newDays });
+                        }}
+                        className={`flex-1 py-2 px-1 rounded-lg text-sm font-medium transition-all ${
+                          isSelected
+                            ? 'bg-[#085C53] text-white border-2 border-[#085C53]'
+                            : 'bg-accent text-muted-foreground border-2 border-border hover:border-[#085C53]/50'
+                        }`}
+                        title={day.fullLabel}
+                      >
+                        {day.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Выберите один или несколько дней для повторения
+                </p>
+              </div>
+            )}
+            
             {formData.recurrence_type !== 'none' && (
               <div>
                 <Label className="text-xs text-muted-foreground mb-1.5 block">
