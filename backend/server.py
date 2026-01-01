@@ -1313,7 +1313,7 @@ def generate_recurring_instances(event: dict, start_date: datetime, end_date: da
     
     return instances
 
-@api_router.get("/events/recurring")
+@api_router.get("/recurring-events")
 async def get_events_with_recurring(
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
