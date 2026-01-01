@@ -103,6 +103,13 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
     const startDateTime = event.start_time ? new Date(event.start_time) : new Date();
     const endDateTime = event.end_time ? new Date(event.end_time) : new Date();
     
+    // Parse recurrence end date if present
+    let recurrence_end = '';
+    if (event.recurrence_end_date) {
+      const recEndDate = new Date(event.recurrence_end_date);
+      recurrence_end = format(recEndDate, 'yyyy-MM-dd');
+    }
+    
     return {
       title: event.title || '',
       description: event.description || '',
@@ -121,6 +128,8 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
       is_completed: event.is_completed || false,
       is_urgent: event.is_urgent || false,
       is_video_call: event.is_video_call || false,
+      recurrence_type: event.recurrence_type || 'none',
+      recurrence_end_date: recurrence_end,
     };
   }
   
@@ -143,6 +152,13 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
     calendar_id: calendars[0]?.id || '',
     is_all_day: false,
     is_blocked: false,
+    is_completed: false,
+    is_urgent: false,
+    is_video_call: false,
+    recurrence_type: 'none',
+    recurrence_end_date: '',
+  };
+};
     is_completed: false,
     is_urgent: false,
     is_video_call: false,
