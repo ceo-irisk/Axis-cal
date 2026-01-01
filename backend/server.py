@@ -419,6 +419,41 @@ async def create_user(user_data: UserCreate, admin: dict = Depends(require_admin
     user_dict["is_active"] = True
     
     await db.users.insert_one(user_dict)
+    
+    # Create default calendars for the new user
+    default_calendars = [
+        {
+            "id": str(uuid.uuid4()),
+            "user_id": user_dict["id"],
+            "name": "Открытый",
+            "provider": "custom",
+            "color": "#085C53",
+            "icon": "book-open",
+            "is_default": True,
+            "is_public": True,
+            "is_active": True,
+            "sync_enabled": False,
+            "credentials": {},
+            "created_at": datetime.now(timezone.utc).isoformat()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "user_id": user_dict["id"],
+            "name": "Закрытый",
+            "provider": "custom",
+            "color": "#6b7280",
+            "icon": "lock",
+            "is_default": True,
+            "is_public": False,
+            "is_active": True,
+            "sync_enabled": False,
+            "credentials": {},
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+    ]
+    await db.calendars.insert_many(default_calendars)
+    logger.info(f"Created default calendars for user {user_dict['email']}")
+    
     return UserResponse(**{k: v for k, v in user_dict.items() if k != "password"})
 
 @api_router.get("/users", response_model=List[UserResponse])
