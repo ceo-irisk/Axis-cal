@@ -158,11 +158,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Event Creation API with Status Field"
-    - "Event Update API with Status Field"
-    - "Authentication API with Review Credentials"
-    - "Event Deletion API"
-    - "Event Flags Dictionary API"
+    - "Recurring Events API"
+    - "ICS Subscriptions API"
+    - "Combined Events with Recurring Instances"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -172,3 +170,5 @@ agent_communication:
     message: "Starting backend API testing for Axis Calendar features. Focus on new status field implementation and dictionary changes."
   - agent: "testing"
     message: "✅ BACKEND TESTING COMPLETE: All backend APIs are working correctly. Event creation/update with status field, authentication with review credentials, event deletion, and event flags functionality all pass tests. Ready for frontend integration testing."
+  - agent: "main"
+    message: "Added recurring events and ICS subscriptions functionality. Need to test: 1) Recurring events API (/api/recurring-events) generates instances correctly 2) ICS subscriptions CRUD (/api/ics-subscriptions) 3) Event creation with recurrence_type field"
