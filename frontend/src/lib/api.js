@@ -138,15 +138,24 @@ export const updateEventFields = (fields) => api.put('/event-fields', fields);
 
 // Calendars
 export const getCalendars = () => api.get('/calendars');
-export const addCalendar = (name, provider, color, pattern) => {
+export const addCalendar = (name, color, icon = 'calendar') => {
   const params = new URLSearchParams();
   params.append('name', name);
-  params.append('provider', provider);
   params.append('color', color);
-  if (pattern) params.append('pattern', pattern);
+  params.append('icon', icon);
   return api.post(`/calendars?${params.toString()}`);
 };
 export const deleteCalendar = (id) => api.delete(`/calendars/${id}`);
+
+// Calendar Permissions
+export const getCalendarPermissions = (calendarId) => api.get(`/calendars/${calendarId}/permissions`);
+export const grantCalendarPermission = (calendarId, userEmail, permissionLevel) => {
+  const params = new URLSearchParams();
+  params.append('user_email', userEmail);
+  params.append('permission_level', permissionLevel);
+  return api.post(`/calendars/${calendarId}/permissions?${params.toString()}`);
+};
+export const revokeCalendarPermission = (calendarId, userId) => api.delete(`/calendars/${calendarId}/permissions/${userId}`);
 
 // Analytics
 export const getOverloadedDays = (startDate, endDate) => 
