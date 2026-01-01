@@ -459,12 +459,24 @@ async def create_event(event_data: EventCreate, user: dict = Depends(get_current
     event_dict["created_by"] = user["id"]
     event_dict["created_at"] = datetime.now(timezone.utc).isoformat()
     event_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
-    event_dict["start_time"] = event_dict["start_time"].isoformat()
-    event_dict["end_time"] = event_dict["end_time"].isoformat()
+    
+    # Ensure datetime fields have timezone info
+    start_time = event_dict["start_time"]
+    if start_time.tzinfo is None:
+        start_time = start_time.replace(tzinfo=timezone.utc)
+    event_dict["start_time"] = start_time.isoformat()
+    
+    end_time = event_dict["end_time"]
+    if end_time.tzinfo is None:
+        end_time = end_time.replace(tzinfo=timezone.utc)
+    event_dict["end_time"] = end_time.isoformat()
     
     # Handle recurrence_end_date
     if event_dict.get("recurrence_end_date"):
-        event_dict["recurrence_end_date"] = event_dict["recurrence_end_date"].isoformat()
+        rec_end = event_dict["recurrence_end_date"]
+        if rec_end.tzinfo is None:
+            rec_end = rec_end.replace(tzinfo=timezone.utc)
+        event_dict["recurrence_end_date"] = rec_end.isoformat()
     
     # Set pattern for tentative events
     if event_dict["status"] == EventStatus.TENTATIVE:
