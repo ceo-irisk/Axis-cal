@@ -45,8 +45,7 @@ logger = logging.getLogger(__name__)
 
 class UserRole(str, Enum):
     ADMIN = "admin"
-    MANAGER = "manager"
-    ASSISTANT = "assistant"
+    USER = "user"
 
 class EventStatus(str, Enum):
     CONFIRMED = "confirmed"
