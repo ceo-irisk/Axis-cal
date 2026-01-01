@@ -1339,8 +1339,19 @@ async def get_events_with_recurring(
     recurring_events = await db.events.find(recurring_query, {"_id": 0}).to_list(100)
     
     # Parse date range for recurring generation
-    start_dt = datetime.fromisoformat(start_date).replace(tzinfo=timezone.utc) if start_date else datetime.now(timezone.utc) - timedelta(days=30)
-    end_dt = datetime.fromisoformat(end_date).replace(tzinfo=timezone.utc) if end_date else datetime.now(timezone.utc) + timedelta(days=30)
+    if start_date:
+        start_dt = datetime.fromisoformat(start_date)
+        if start_dt.tzinfo is None:
+            start_dt = start_dt.replace(tzinfo=timezone.utc)
+    else:
+        start_dt = datetime.now(timezone.utc) - timedelta(days=30)
+    
+    if end_date:
+        end_dt = datetime.fromisoformat(end_date)
+        if end_dt.tzinfo is None:
+            end_dt = end_dt.replace(tzinfo=timezone.utc)
+    else:
+        end_dt = datetime.now(timezone.utc) + timedelta(days=30)
     
     # Start with all regular events
     result_events = list(events)
