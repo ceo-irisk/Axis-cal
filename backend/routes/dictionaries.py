@@ -37,6 +37,7 @@ async def create_event_type(type_data: Dict[str, Any] = Body(...), admin: dict =
     }
     
     await db.event_types.insert_one(type_dict)
+    type_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
     return type_dict
 
 @router.put("/event-types/reorder")
@@ -96,6 +97,7 @@ async def create_event_status(status_data: Dict[str, Any] = Body(...), admin: di
     }
     
     await db.event_statuses.insert_one(status_dict)
+    status_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
     return status_dict
 
 @router.put("/event-statuses/{status_id}")
