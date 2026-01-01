@@ -112,6 +112,12 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
       recurrence_end = format(recEndDate, 'yyyy-MM-dd');
     }
     
+    // Parse custom days if present
+    let custom_days = [];
+    if (event.recurrence_custom_days && Array.isArray(event.recurrence_custom_days)) {
+      custom_days = event.recurrence_custom_days;
+    }
+    
     return {
       title: event.title || '',
       description: event.description || '',
@@ -132,6 +138,7 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
       is_video_call: event.is_video_call || false,
       recurrence_type: event.recurrence_type || 'none',
       recurrence_end_date: recurrence_end,
+      recurrence_custom_days: custom_days,
     };
   }
   
