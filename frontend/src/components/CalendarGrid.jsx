@@ -753,6 +753,7 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
           <div className="space-y-1">
             {allDayEvents.map(event => {
               const eventColorClass = getEventColorClass(event);
+              const dynamicStyle = getEventDynamicStyle(event, eventTypes);
               const isSelected = selectedEventId === event.id;
               return (
                 <div 
@@ -760,6 +761,7 @@ const DayView = ({ date, events, templates, onEventClick, onCellDoubleClick, onE
                   onClick={() => onEventSelect?.(event.id)}
                   onDoubleClick={() => onEventClick(event)}
                   className={`px-3 py-1.5 rounded text-sm cursor-pointer hover:opacity-80 ${eventColorClass} ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
+                  style={dynamicStyle || {}}
                 >
                   <div className="flex items-center justify-between">
                     <span>{event.title}</span>
