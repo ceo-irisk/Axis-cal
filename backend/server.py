@@ -106,8 +106,10 @@ class RecurrenceType(str, Enum):
     NONE = "none"
     DAILY = "daily"
     WORKDAYS = "workdays"  # Mon-Fri
+    WEEKLY = "weekly"
     MONTHLY = "monthly"
     YEARLY = "yearly"
+    CUSTOM_DAYS = "custom_days"  # Custom weekdays
 
 class EventBase(BaseModel):
     title: str
