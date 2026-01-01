@@ -9,15 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Switch } from '../components/ui/switch';
 import { getEventFields } from '../lib/api';
 
-const EVENT_TYPES = [
-  { value: 'meeting', label: 'Встреча', color: '#085C53' },
-  { value: 'call', label: 'Звонок', color: '#06b6d4' },
-  { value: 'personal', label: 'Личное', color: '#f59e0b' },
-  { value: 'urgent', label: 'Срочно', color: '#ef4444' },
-  { value: 'travel', label: 'Поездка', color: '#10b981' },
-  { value: 'deep_work', label: 'Глубокая работа', color: '#6366f1' },
-];
-
 const STATUS_OPTIONS = [
   { value: 'confirmed', label: 'Подтверждено', description: 'Обычное событие' },
   { value: 'tentative', label: 'Не согласовано', description: 'Пунктирная рамка' },
