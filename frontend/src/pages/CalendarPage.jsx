@@ -50,7 +50,6 @@ export default function CalendarPage() {
   const handleDeleteEventById = useCallback(async (eventId) => {
     try {
       await deleteEvent(eventId);
-      toast.success('Событие удалено');
       setShowEventModal(false);
       setSelectedEventId(null);
       // Remove event from local state immediately
@@ -202,7 +201,6 @@ export default function CalendarPage() {
   const handleEventUpdate = async (eventData) => {
     try {
       await updateEvent(eventData.id, eventData);
-      toast.success('Событие перемещено');
       fetchData();
     } catch (error) {
       console.error('Error updating event:', error);
@@ -214,7 +212,6 @@ export default function CalendarPage() {
     try {
       const dateStr = format(selectedDate, 'yyyy-MM-dd');
       await createRating(rating, dateStr, notes);
-      toast.success('Оценка сохранена');
       setRatings(prev => ({ ...prev, [dateStr]: { rating, notes, date: dateStr } }));
     } catch (error) {
       console.error('Error rating day:', error);
@@ -226,7 +223,6 @@ export default function CalendarPage() {
     try {
       const dateStr = format(targetDate, 'yyyy-MM-dd');
       await applyTemplate(templateId, dateStr);
-      toast.success('Шаблон применён');
       fetchData();
     } catch (error) {
       console.error('Error applying template:', error);
@@ -238,7 +234,6 @@ export default function CalendarPage() {
     try {
       const dateStr = format(targetDate, 'yyyy-MM-dd');
       await removeTemplateFromDay(dateStr);
-      toast.success('Шаблон удален с дня');
       fetchData();
     } catch (error) {
       console.error('Error removing template:', error);
@@ -369,7 +364,7 @@ export default function CalendarPage() {
       )}
 
       {showSurveyModal && (
-        <SurveyModal date={selectedDate} onClose={() => setShowSurveyModal(false)} onComplete={() => { setShowSurveyModal(false); toast.success('Опрос завершён'); }} />
+        <SurveyModal date={selectedDate} onClose={() => setShowSurveyModal(false)} onComplete={() => { setShowSurveyModal(false); }} />
       )}
     </div>
   );
