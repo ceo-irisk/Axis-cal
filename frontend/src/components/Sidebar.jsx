@@ -1319,58 +1319,6 @@ export const Sidebar = ({
                       <p className="text-xs text-muted-foreground mt-1">Роль: {user?.role === 'admin' ? 'Администратор' : 'Пользователь'}</p>
                     </div>
                     
-                    {/* Quick User Switch (for testing) */}
-                    {isAdmin?.() && (
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 px-3 py-2">
-                          <Users className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm font-medium text-muted-foreground">Быстрая смена пользователя</span>
-                        </div>
-                        <div className="space-y-1">
-                          {allUsers.filter(u => u.id !== user?.id).map(u => (
-                            <button
-                              key={u.id}
-                              onClick={async () => {
-                                try {
-                                  const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/login`, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                      email: u.email,
-                                      password: u.email === 'admin@example.com' ? 'admin123' : 
-                                               u.email === 'admin@company.com' ? 'Admin123!' :
-                                               u.email === 'user@company.com' ? 'user123' : 'password123'
-                                    })
-                                  });
-                                  
-                                  if (response.ok) {
-                                    const data = await response.json();
-                                    switchUser(data.user, data.access_token);
-                                  } else {
-                                    toast.error('Не удалось переключиться на пользователя');
-                                  }
-                                } catch (error) {
-                                  console.error('Switch user error:', error);
-                                  toast.error('Ошибка при смене пользователя');
-                                }
-                              }}
-                              className="flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm hover:bg-accent/50 transition-colors"
-                            >
-                              <div className="flex flex-col items-start">
-                                <span className="font-medium">{u.name}</span>
-                                <span className="text-xs text-muted-foreground">{u.email}</span>
-                              </div>
-                              <span className={`text-xs px-2 py-0.5 rounded ${
-                                u.role === 'admin' ? 'bg-blue-500/20 text-blue-500' : 'bg-gray-500/20 text-gray-500'
-                              }`}>
-                                {u.role === 'admin' ? 'Админ' : 'Юзер'}
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    
                     <button 
                       onClick={toggleTheme} 
                       className="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50"
