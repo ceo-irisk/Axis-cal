@@ -308,6 +308,16 @@ export default function CalendarPage() {
                 </div>
                 
                 <div className="flex items-center gap-2">
+                  {/* User switcher - показывать чей календарь смотрим */}
+                  {viewingUserId && (
+                    <button 
+                      onClick={() => setViewingUserId(null)}
+                      className="px-3 py-1.5 text-sm bg-accent hover:bg-accent/80 rounded-lg flex items-center gap-2"
+                    >
+                      <span>← Мой календарь</span>
+                    </button>
+                  )}
+                  
                   {/* View switcher */}
                   <div className="flex bg-accent rounded-lg p-1 mr-2">
                     {['month', 'week', 'day'].map(v => (
