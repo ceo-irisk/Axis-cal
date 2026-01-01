@@ -224,6 +224,7 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
       is_template_event: isTemplate,
       recurrence_type: formData.recurrence_type,
       recurrence_end_date: recurrenceEndDate,
+      recurrence_custom_days: formData.recurrence_type === 'custom_days' ? formData.recurrence_custom_days : null,
     });
   };
 
