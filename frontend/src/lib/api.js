@@ -44,6 +44,21 @@ export const updateUser = (id, data) => api.put(`/users/${id}`, data);
 export const deleteUser = (id) => api.delete(`/users/${id}`);
 export const toggleUserActive = (id) => api.patch(`/users/${id}/toggle-active`);
 
+// User Subscriptions
+export const getSubscriptions = () => api.get('/subscriptions');
+export const createSubscription = (targetUserId) => {
+  const params = new URLSearchParams();
+  params.append('target_user_id', targetUserId);
+  return api.post(`/subscriptions?${params.toString()}`);
+};
+export const deleteSubscription = (targetUserId) => api.delete(`/subscriptions/${targetUserId}`);
+export const getUserEvents = (userId, startDate, endDate) => {
+  const params = new URLSearchParams();
+  if (startDate) params.append('start_date', startDate);
+  if (endDate) params.append('end_date', endDate);
+  return api.get(`/users/${userId}/events?${params.toString()}`);
+};
+
 // Events
 export const getEvents = (startDate, endDate) => {
   const params = new URLSearchParams();
