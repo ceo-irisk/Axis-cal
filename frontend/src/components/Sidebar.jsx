@@ -460,7 +460,7 @@ export const Sidebar = ({
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{user?.name}</p>
                   <p className="text-xs text-muted-foreground truncate">
-                    {user?.role === 'admin' ? 'Админ' : user?.role === 'manager' ? 'Руководитель' : 'Помощник'}
+                    {user?.role === 'admin' ? 'Админ' : 'Пользователь'}
                   </p>
                 </div>
               </div>
