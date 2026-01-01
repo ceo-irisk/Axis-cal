@@ -7,7 +7,8 @@ import {
   getEventStatuses, createEventStatus, updateEventStatus, deleteEventStatus,
   getTemplates, createTemplate, updateTemplate, deleteTemplate, applyTemplate,
   getCustomTimezones, createCustomTimezone, deleteCustomTimezone,
-  getICSSubscriptions, createICSSubscription, deleteICSSubscription
+  getICSSubscriptions, createICSSubscription, deleteICSSubscription,
+  getSubscriptions, createSubscription, deleteSubscription, getUsers
 } from '../lib/api';
 import { 
   Sun, Moon, LogOut, Plus, Trash2, Eye, EyeOff, ChevronLeft, ChevronRight, ChevronUp, ChevronDown,
