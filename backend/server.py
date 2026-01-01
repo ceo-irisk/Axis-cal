@@ -1251,9 +1251,19 @@ def generate_recurring_instances(event: dict, start_date: datetime, end_date: da
     event_end = datetime.fromisoformat(event["end_time"].replace("Z", "+00:00"))
     duration = event_end - event_start
     
+    # Ensure all datetimes have timezone info
+    if start_date.tzinfo is None:
+        start_date = start_date.replace(tzinfo=timezone.utc)
+    if end_date.tzinfo is None:
+        end_date = end_date.replace(tzinfo=timezone.utc)
+    if event_start.tzinfo is None:
+        event_start = event_start.replace(tzinfo=timezone.utc)
+    
     recurrence_end = None
     if event.get("recurrence_end_date"):
         recurrence_end = datetime.fromisoformat(event["recurrence_end_date"].replace("Z", "+00:00"))
+        if recurrence_end.tzinfo is None:
+            recurrence_end = recurrence_end.replace(tzinfo=timezone.utc)
     
     current_date = event_start
     instance_count = 0
