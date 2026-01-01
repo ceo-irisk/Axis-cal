@@ -4,7 +4,8 @@ import {
   getEvents, createEvent, updateEvent, deleteEvent, 
   getRatings, createRating, checkDayRules, getOverloadedDays, getCalendars,
   getTemplates, applyTemplate, getUsers, createUser, updateUser, deleteUser,
-  getEventsWithRecurring, getAllICSEvents, getEventTypes, getAppliedTemplates, removeTemplateFromDay
+  getEventsWithRecurring, getAllICSEvents, getEventTypes, getAppliedTemplates, removeTemplateFromDay,
+  getUserEvents
 } from '../lib/api';
 import { getLocalTimezoneName } from '../lib/timezones';
 import Sidebar from '../components/Sidebar';
@@ -46,6 +47,9 @@ export default function CalendarPage() {
   const [defaultEventTime, setDefaultEventTime] = useState(null);
   const [selectedTimezone, setSelectedTimezone] = useState(() => getLocalTimezoneName());
   const [customTimezones, setCustomTimezones] = useState([]);
+  
+  // User switching for viewing others' calendars
+  const [viewingUserId, setViewingUserId] = useState(null); // null = viewing own calendar
 
   const handleDeleteEventById = useCallback(async (eventId) => {
     try {
