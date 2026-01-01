@@ -269,8 +269,8 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent position="popper" sideOffset={4}>
-                  {EVENT_TYPES.map(type => (
-                    <SelectItem key={type.value} value={type.value}>
+                  {availableEventTypes.map(type => (
+                    <SelectItem key={type.name} value={type.name}>
                       <div className="flex items-center gap-2">
                         <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: type.color }} />
                         {type.label}
