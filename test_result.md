@@ -350,3 +350,5 @@ agent_communication:
       - working: true
         agent: "testing"
         comment: "✅ PASSED: Events are properly filtered by permissions. Closed calendar events should show as 'Занято' to non-owners."
+  - agent: "testing"
+    message: "🔴 CRITICAL REGRESSION BUGS FOUND IN REFACTORED BACKEND: All POST endpoints that create new resources are failing with 520 errors due to MongoDB ObjectId serialization issue. After calling insert_one(dict), MongoDB adds an '_id' field with ObjectId to the dict, which is not JSON serializable. This affects: POST /events, POST /calendars, POST /users, POST /templates, POST /subscriptions, POST /dictionaries/event-types, and all other creation endpoints. FIX REQUIRED: Remove '_id' field from dict before returning OR query the document again with {'_id': 0} projection. Additionally, default calendars (Открытый, Закрытый) are NOT being created for new users despite code being present in routes/users.py."
