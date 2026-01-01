@@ -504,7 +504,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                 </button>
                 {/* Template selector - absolute positioned in corner */}
                 <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <TemplateSelector day={day} templates={templates} onApplyTemplate={onApplyTemplate} />
+                  <TemplateSelector day={day} templates={templates} appliedTemplates={appliedTemplates} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} />
                 </div>
               </div>
               
@@ -761,7 +761,7 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
             <h2 className="text-lg font-semibold">{format(date, 'EEEE, d MMMM', { locale: ru })}</h2>
             <p className="text-sm text-muted-foreground">{dayEvents.length + allDayEvents.length} событий</p>
           </div>
-          <TemplateSelector day={date} templates={templates} onApplyTemplate={onApplyTemplate} />
+          <TemplateSelector day={date} templates={templates} appliedTemplates={appliedTemplates} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} />
         </div>
       </div>
 
