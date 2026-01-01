@@ -114,7 +114,7 @@ class EventBase(BaseModel):
     description: Optional[str] = None
     start_time: datetime
     end_time: datetime
-    event_type: EventType = EventType.MEETING
+    event_type: str = "meeting"
     status: EventStatus = EventStatus.CONFIRMED
     color: Optional[str] = None
     pattern: Optional[str] = None  # for tentative events
