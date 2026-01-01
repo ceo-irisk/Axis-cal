@@ -1113,6 +1113,99 @@ async def delete_calendar(calendar_id: str, user: dict = Depends(get_current_use
         raise HTTPException(status_code=404, detail="Calendar not found")
     return {"message": "Calendar deleted"}
 
+
+# ==================== CALENDAR PERMISSIONS ====================
+
+@api_router.get("/calendars/{calendar_id}/permissions")
+async def get_calendar_permissions(calendar_id: str, user: dict = Depends(get_current_user)):
+    """Get all permissions for a calendar (owner only)"""
+    calendar = await db.calendars.find_one({"id": calendar_id, "user_id": user["id"]})
+    if not calendar:
+        raise HTTPException(status_code=403, detail="Not calendar owner")
+    
+    permissions = await db.calendar_permissions.find({"calendar_id": calendar_id}, {"_id": 0}).to_list(100)
+    
+    # Enrich with user info
+    for perm in permissions:
+        user_info = await db.users.find_one({"id": perm["user_id"]}, {"_id": 0, "password": 0})
+        if user_info:
+            perm["user_name"] = user_info.get("name")
+            perm["user_email"] = user_info.get("email")
+    
+    return permissions
+
+@api_router.post("/calendars/{calendar_id}/permissions")
+async def grant_calendar_permission(
+    calendar_id: str, 
+    user_email: str, 
+    permission_level: str,
+    owner: dict = Depends(get_current_user)
+):
+    """Grant access to a calendar"""
+    # Verify owner
+    calendar = await db.calendars.find_one({"id": calendar_id, "user_id": owner["id"]})
+    if not calendar:
+        raise HTTPException(status_code=403, detail="Not calendar owner")
+    
+    if calendar.get("is_default") and not calendar.get("is_public"):
+        raise HTTPException(status_code=400, detail="Cannot share private calendar")
+    
+    # Validate permission level
+    if permission_level not in ["read", "edit", "full"]:
+        raise HTTPException(status_code=400, detail="Invalid permission level")
+    
+    # Find target user
+    target_user = await db.users.find_one({"email": user_email})
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if target_user["id"] == owner["id"]:
+        raise HTTPException(status_code=400, detail="Cannot grant permission to yourself")
+    
+    # Check if permission already exists
+    existing = await db.calendar_permissions.find_one({
+        "calendar_id": calendar_id,
+        "user_id": target_user["id"]
+    })
+    
+    if existing:
+        # Update permission level
+        await db.calendar_permissions.update_one(
+            {"id": existing["id"]},
+            {"$set": {"permission_level": permission_level}}
+        )
+        return {**existing, "permission_level": permission_level}
+    else:
+        # Create new permission
+        perm_dict = {
+            "id": str(uuid.uuid4()),
+            "calendar_id": calendar_id,
+            "user_id": target_user["id"],
+            "permission_level": permission_level,
+            "granted_by": owner["id"],
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.calendar_permissions.insert_one(perm_dict)
+        return {k: v for k, v in perm_dict.items() if k != "_id"}
+
+@api_router.delete("/calendars/{calendar_id}/permissions/{permission_user_id}")
+async def revoke_calendar_permission(calendar_id: str, permission_user_id: str, owner: dict = Depends(get_current_user)):
+    """Revoke access to a calendar"""
+    # Verify owner
+    calendar = await db.calendars.find_one({"id": calendar_id, "user_id": owner["id"]})
+    if not calendar:
+        raise HTTPException(status_code=403, detail="Not calendar owner")
+    
+    result = await db.calendar_permissions.delete_one({
+        "calendar_id": calendar_id,
+        "user_id": permission_user_id
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Permission not found")
+    
+    return {"message": "Permission revoked"}
+
 # ==================== OVERLOADED DAYS ====================
 
 @api_router.get("/analytics/overloaded-days")
