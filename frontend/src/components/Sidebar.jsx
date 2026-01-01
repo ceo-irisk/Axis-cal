@@ -209,6 +209,7 @@ export const Sidebar = ({
       setCalendars(res.data || []);
       onCalendarsChange?.(res.data || []);
     } catch (e) { console.error(e); }
+  };
 
   // Subscriptions handlers
   const handleAddSubscription = async () => {
@@ -233,8 +234,6 @@ export const Sidebar = ({
         onViewingUserChange?.(null);
       }
     } catch (e) { toast.error('Ошибка отписки'); }
-  };
-
   };
 
   const fetchDictionaries = async () => {
