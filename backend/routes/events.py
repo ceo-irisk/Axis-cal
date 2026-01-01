@@ -37,6 +37,7 @@ async def create_event(event_data: EventCreate, user: dict = Depends(get_current
         event_dict["end_time"] = event_dict["end_time"].isoformat()
     
     await db.events.insert_one(event_dict)
+    event_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
     return event_dict
 
 @router.get("")

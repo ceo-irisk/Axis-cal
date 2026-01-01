@@ -23,6 +23,7 @@ async def create_template(template_data: TemplateBase, user: dict = Depends(requ
     template_dict["created_at"] = datetime.now(timezone.utc).isoformat()
     
     await db.templates.insert_one(template_dict)
+    template_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
     return template_dict
 
 @router.get("")

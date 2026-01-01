@@ -56,6 +56,7 @@ async def create_calendar(calendar_data: dict = Body(...), user: dict = Depends(
     calendar_dict["created_at"] = datetime.now(timezone.utc).isoformat()
     
     await db.calendars.insert_one(calendar_dict)
+    calendar_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
     return calendar_dict
 
 @router.delete("/{calendar_id}")
@@ -129,6 +130,7 @@ async def create_calendar_permission(
     }
     
     await db.calendar_permissions.insert_one(permission_dict)
+    permission_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
     return permission_dict
 
 @router.delete("/{calendar_id}/permissions/{permission_user_id}")
@@ -203,6 +205,7 @@ async def create_subscription(subscription_data: dict = Body(...), user: dict = 
     }
     
     await db.user_subscriptions.insert_one(subscription_dict)
+    subscription_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
     return subscription_dict
 
 @subscriptions_router.delete("/{target_user_id}")
