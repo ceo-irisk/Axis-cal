@@ -170,7 +170,7 @@ const TemplateSelector = ({ day, templates, onApplyTemplate }) => {
   );
 };
 
-export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, templates, overloadedDays, ratings, view, onDateClick, onCellDoubleClick, onEventClick, onEventUpdate, onApplyTemplate, onEventDelete, selectedEventId, onEventSelect, loading, selectedTimezone, onTimezoneChange, customTimezones = [] }) => {
+export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, templates, overloadedDays, ratings, view, onDateClick, onCellDoubleClick, onEventClick, onEventUpdate, onApplyTemplate, onEventDelete, selectedEventId, onEventSelect, loading, selectedTimezone, onTimezoneChange, customTimezones = [], eventTypes = [] }) => {
   // Calculate timezone shift
   const localOffset = getLocalTimezoneOffset();
   const allTimezones = [...TIMEZONES, ...customTimezones];
