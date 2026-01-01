@@ -64,7 +64,9 @@ async def create_user(user_data: UserCreate, admin: dict = Depends(require_admin
     await db.calendars.insert_many(default_calendars)
     logger.info(f"Created default calendars for user {user_dict['email']}")
     
-    return UserResponse(**{k: v for k, v in user_dict.items() if k != "password"})
+    # Fetch clean user data without _id and password
+    created_user = await db.users.find_one({"id": user_dict["id"]}, {"_id": 0, "password": 0})
+    return UserResponse(**created_user)
 
 @router.get("", response_model=List[UserResponse])
 async def get_users(user: dict = Depends(get_current_user)):
