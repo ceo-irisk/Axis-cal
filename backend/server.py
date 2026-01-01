@@ -323,6 +323,20 @@ async def startup_event():
         await db.users.insert_one(admin_user)
         logger.info(f"Created default admin: {admin_email}")
     
+    # Create default event types if none exist
+    event_types_count = await db.event_types.count_documents({})
+    if event_types_count == 0:
+        default_event_types = [
+            {"id": "default-meeting", "name": "meeting", "label": "Встреча", "color": "#8b5cf6", "order": 0, "is_active": True},
+            {"id": "default-call", "name": "call", "label": "Звонок", "color": "#06b6d4", "order": 1, "is_active": True},
+            {"id": "default-personal", "name": "personal", "label": "Личное", "color": "#f59e0b", "order": 2, "is_active": True},
+            {"id": "default-urgent", "name": "urgent", "label": "Срочно", "color": "#ef4444", "order": 3, "is_active": True},
+            {"id": "default-travel", "name": "travel", "label": "Поездка", "color": "#10b981", "order": 4, "is_active": True},
+            {"id": "default-deep_work", "name": "deep_work", "label": "Глубокая работа", "color": "#6366f1", "order": 5, "is_active": True},
+        ]
+        await db.event_types.insert_many(default_event_types)
+        logger.info("Created default event types")
+    
     # Create default survey questions if none exist
     questions_count = await db.survey_questions.count_documents({})
     if questions_count == 0:
