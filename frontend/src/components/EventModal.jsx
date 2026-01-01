@@ -160,7 +160,7 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
   };
 };
 
-export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], onSave, onDelete, onClose }) => {
+export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], eventTypes = [], onSave, onDelete, onClose }) => {
   const [customFields, setCustomFields] = useState([]);
   
   const initialData = useMemo(
@@ -179,6 +179,16 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], on
   useEffect(() => {
     getEventFields().then(res => setCustomFields(res.data?.fields || [])).catch(console.error);
   }, []);
+  
+  // Use provided eventTypes or fallback to hardcoded defaults
+  const availableEventTypes = eventTypes.length > 0 ? eventTypes : [
+    { name: 'meeting', label: 'Встреча', color: '#8b5cf6' },
+    { name: 'call', label: 'Звонок', color: '#06b6d4' },
+    { name: 'personal', label: 'Личное', color: '#f59e0b' },
+    { name: 'urgent', label: 'Срочно', color: '#ef4444' },
+    { name: 'travel', label: 'Поездка', color: '#10b981' },
+    { name: 'deep_work', label: 'Глубокая работа', color: '#6366f1' },
+  ];
 
   const handleSubmit = (e) => {
     e.preventDefault();
