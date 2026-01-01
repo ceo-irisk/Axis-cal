@@ -38,6 +38,7 @@ async def create_rule(rule_data: Dict[str, Any] = Body(...), admin: dict = Depen
     }
     
     await db.day_rules.insert_one(rule_dict)
+    rule_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
     return rule_dict
 
 @router.put("/{rule_id}")

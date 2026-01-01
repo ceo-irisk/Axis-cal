@@ -29,6 +29,7 @@ async def create_user(user_data: UserCreate, admin: dict = Depends(require_admin
     user_dict["is_active"] = True
     
     await db.users.insert_one(user_dict)
+    user_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
     
     # Create default calendars for the new user
     default_calendars = [
