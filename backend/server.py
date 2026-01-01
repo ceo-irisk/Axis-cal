@@ -99,6 +99,14 @@ class CustomField(BaseModel):
     required: bool = False
     options: Optional[List[str]] = None
 
+# Recurrence types
+class RecurrenceType(str, Enum):
+    NONE = "none"
+    DAILY = "daily"
+    WORKDAYS = "workdays"  # Mon-Fri
+    MONTHLY = "monthly"
+    YEARLY = "yearly"
+
 class EventBase(BaseModel):
     title: str
     description: Optional[str] = None
@@ -121,6 +129,10 @@ class EventBase(BaseModel):
     is_completed: bool = False
     is_urgent: bool = False
     is_video_call: bool = False
+    # Recurrence fields
+    recurrence_type: RecurrenceType = RecurrenceType.NONE
+    recurrence_end_date: Optional[datetime] = None
+    recurrence_parent_id: Optional[str] = None  # For generated instances
 
 class EventCreate(EventBase):
     pass
