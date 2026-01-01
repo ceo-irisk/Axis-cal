@@ -492,7 +492,7 @@ export const Sidebar = ({
           {/* Header - User info + Add Event button */}
           <div className="p-4 border-b border-border">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 flex-1 min-w-0 relative">
+              <div className="flex items-center gap-3 flex-1 min-w-0 relative user-switcher-container">
                 <button onClick={handleLogout} className="p-1 rounded-lg hover:bg-accent flex-shrink-0" title="Выйти" data-testid="logout-button">
                   <LogOut className="w-4 h-4 text-muted-foreground" />
                 </button>
