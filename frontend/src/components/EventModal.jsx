@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { format, addHours } from 'date-fns';
-import { X, Trash2, Clock, MapPin, Users, FileText, Square, CheckCircle2, Zap, Video, CalendarDays, ChevronUp, ChevronDown, Repeat } from 'lucide-react';
+import { X, Trash2, Clock, MapPin, Users, FileText, Square, CheckCircle2, Zap, Video, CalendarDays, ChevronUp, ChevronDown, Repeat, Calendar, BookOpen, Lock, Briefcase, Home, Target, Plane, Heart, Coffee, Dumbbell, GraduationCap, ShoppingCart, Mail, Phone, Settings } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -8,6 +8,25 @@ import { Textarea } from '../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Switch } from '../components/ui/switch';
 import { getEventFields } from '../lib/api';
+
+// Available calendar icons (same as in Sidebar)
+const CALENDAR_ICONS = {
+  'calendar': Calendar,
+  'book-open': BookOpen,
+  'lock': Lock,
+  'briefcase': Briefcase,
+  'home': Home,
+  'target': Target,
+  'plane': Plane,
+  'heart': Heart,
+  'coffee': Coffee,
+  'dumbbell': Dumbbell,
+  'graduation-cap': GraduationCap,
+  'shopping-cart': ShoppingCart,
+  'mail': Mail,
+  'phone': Phone,
+  'settings': Settings,
+};
 
 const STATUS_OPTIONS = [
   { value: 'confirmed', label: 'Подтверждено', description: 'Обычное событие' },
