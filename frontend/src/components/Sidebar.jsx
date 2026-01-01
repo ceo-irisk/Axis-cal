@@ -12,7 +12,9 @@ import {
 import { 
   Sun, Moon, LogOut, Plus, Trash2, Eye, EyeOff, ChevronLeft, ChevronRight, ChevronUp, ChevronDown,
   Calendar, LayoutGrid, Settings, Star, AlertTriangle, Clock, MapPin, FileText,
-  Users, Layout as LayoutIcon, Square, CheckCircle2, Zap, Video, Book, Edit2, Play, ArrowLeft, Palette, GripVertical, Globe, Link, ExternalLink
+  Users, Layout as LayoutIcon, Square, CheckCircle2, Zap, Video, Book, Edit2, Play, ArrowLeft, Palette, GripVertical, Globe, Link, ExternalLink,
+  // Calendar icons
+  CalendarDays, BookOpen, Lock, Briefcase, Home, Target, Plane, Heart, Coffee, Dumbbell, GraduationCap, ShoppingCart, Mail, Phone, Settings2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
