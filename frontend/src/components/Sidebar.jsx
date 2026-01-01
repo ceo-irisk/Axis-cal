@@ -200,6 +200,27 @@ export const Sidebar = ({
     } catch (e) { toast.error('Ошибка удаления'); }
   };
 
+  // ICS Subscriptions handlers
+  const handleSaveICSSubscription = async (data) => {
+    try {
+      await createICSSubscription(data);
+      toast.success('Календарь подключён');
+      setShowICSModal(false);
+      fetchDictionaries();
+    } catch (e) { 
+      toast.error(e.response?.data?.detail || 'Ошибка подключения календаря'); 
+    }
+  };
+
+  const handleDeleteICSSubscription = async (id) => {
+    if (!confirm('Отключить внешний календарь?')) return;
+    try {
+      await deleteICSSubscription(id);
+      toast.success('Календарь отключён');
+      fetchDictionaries();
+    } catch (e) { toast.error('Ошибка удаления'); }
+  };
+
   // Event Types handlers
   const handleSaveEventType = async (data) => {
     try {
