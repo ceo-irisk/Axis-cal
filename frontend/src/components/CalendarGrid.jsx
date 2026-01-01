@@ -1,7 +1,7 @@
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, isToday, parseISO, addMinutes, setHours, setMinutes } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { ChevronDown, Square, CheckCircle2, Zap, Video, Globe } from 'lucide-react';
+import { ChevronDown, Square, CheckCircle2, Zap, Video, Globe, Repeat } from 'lucide-react';
 import { TIMEZONES, getLocalTimezoneOffset, formatShiftedTime } from '../lib/timezones';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
