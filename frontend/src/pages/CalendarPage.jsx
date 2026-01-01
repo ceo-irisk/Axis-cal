@@ -68,9 +68,8 @@ export default function CalendarPage() {
         e.preventDefault();
         const eventToDelete = events.find(ev => ev.id === selectedEventId);
         if (eventToDelete) {
-          if (confirm(`Удалить событие "${eventToDelete.title}"?`)) {
-            handleDeleteEventById(selectedEventId);
-          }
+          // Delete without confirmation
+          handleDeleteEventById(selectedEventId);
         }
       }
       // Escape to deselect
