@@ -303,8 +303,9 @@ async def require_admin(user: dict = Depends(get_current_user)) -> dict:
     return user
 
 async def require_manager_or_admin(user: dict = Depends(get_current_user)) -> dict:
-    if user.get("role") not in [UserRole.ADMIN, UserRole.MANAGER]:
-        raise HTTPException(status_code=403, detail="Manager or Admin access required")
+    """Require admin role (manager role removed)"""
+    if user.get("role") != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Admin access required")
     return user
 
 # ==================== STARTUP ====================
