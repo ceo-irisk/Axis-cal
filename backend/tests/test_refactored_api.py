@@ -148,7 +148,7 @@ class RefactoredAPITester:
             "email": f"test.user.{timestamp}@company.com",
             "name": "Тестовый Пользователь",
             "password": "TestPass123!",
-            "role": "assistant",
+            "role": "user",
             "timezone": "Europe/Moscow"
         }
         
