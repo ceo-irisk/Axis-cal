@@ -1337,6 +1337,28 @@ async def get_user_events(
     return events
 
 @api_router.post("/calendars/{calendar_id}/share")
+async def share_calendar(
+    calendar_id: str,
+    user_email: str = Body(...),
+    permission_level: str = Body(...),
+    owner: dict = Depends(get_current_user)
+):
+    """Share calendar with another user"""
+    # Verify owner
+    calendar = await db.calendars.find_one({"id": calendar_id, "user_id": owner["id"]})
+    if not calendar:
+        raise HTTPException(status_code=403, detail="Not calendar owner")
+    
+    if calendar.get("is_default") and not calendar.get("is_public"):
+        raise HTTPException(status_code=400, detail="Cannot share private calendar")
+    
+    # Validate permission level
+    if permission_level not in ["read", "edit", "full"]:
+        raise HTTPException(status_code=400, detail="Invalid permission level")
+    
+    # Find target user
+    target_user = await db.users.find_one({"email": user_email})
+    if not target_user:
         raise HTTPException(status_code=404, detail="User not found")
     
     if target_user["id"] == owner["id"]:
@@ -1367,6 +1389,7 @@ async def get_user_events(
         }
         await db.calendar_permissions.insert_one(perm_dict)
         return {k: v for k, v in perm_dict.items() if k != "_id"}
+
 
 @api_router.delete("/calendars/{calendar_id}/permissions/{permission_user_id}")
 async def revoke_calendar_permission(calendar_id: str, permission_user_id: str, owner: dict = Depends(get_current_user)):
