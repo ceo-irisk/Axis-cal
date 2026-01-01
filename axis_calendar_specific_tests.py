@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 
 class AxisCalendarSpecificTester:
-    def __init__(self, base_url: str = "https://repeat-calendar.preview.emergentagent.com"):
+    def __init__(self, base_url: str = "https://smartplan-8.preview.emergentagent.com"):
         self.base_url = base_url
         self.token = None
         self.user_id = None
