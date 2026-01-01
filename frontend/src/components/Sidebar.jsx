@@ -1413,7 +1413,6 @@ const TemplateForm = ({ initialData, eventTypes, onSave, onCancel }) => {
           <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="day">День</SelectItem>
-            <SelectItem value="week">Неделя</SelectItem>
           </SelectContent>
         </Select>
       </div>
