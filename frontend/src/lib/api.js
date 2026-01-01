@@ -61,6 +61,13 @@ export const createTemplate = (data) => api.post('/templates', data);
 export const updateTemplate = (id, data) => api.put(`/templates/${id}`, data);
 export const deleteTemplate = (id) => api.delete(`/templates/${id}`);
 export const applyTemplate = (id, targetDate) => api.post(`/templates/${id}/apply?target_date=${targetDate}`);
+export const getAppliedTemplates = (startDate, endDate) => {
+  const params = new URLSearchParams();
+  if (startDate) params.append('start_date', startDate);
+  if (endDate) params.append('end_date', endDate);
+  return api.get(`/templates/applied?${params.toString()}`);
+};
+export const removeTemplateFromDay = (date) => api.delete(`/templates/applied/${date}`);
 
 // Ratings
 export const getRatings = (startDate, endDate) => {
