@@ -151,6 +151,9 @@ export const Sidebar = ({
   const [showAddSubscription, setShowAddSubscription] = useState(false);
   const [selectedUserForSub, setSelectedUserForSub] = useState('');
   
+  // User switcher dropdown state
+  const [showUserSwitcher, setShowUserSwitcher] = useState(false);
+  
   // Dictionaries state
   const [eventTypes, setEventTypes] = useState([]);
   const [eventStatuses, setEventStatuses] = useState([]);
@@ -489,23 +492,89 @@ export const Sidebar = ({
           {/* Header - User info + Add Event button */}
           <div className="p-4 border-b border-border">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <button onClick={handleLogout} className="p-1 rounded-lg hover:bg-accent" title="Выйти" data-testid="logout-button">
+              <div className="flex items-center gap-3 flex-1 min-w-0 relative">
+                <button onClick={handleLogout} className="p-1 rounded-lg hover:bg-accent flex-shrink-0" title="Выйти" data-testid="logout-button">
                   <LogOut className="w-4 h-4 text-muted-foreground" />
                 </button>
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#085C53] to-[#074a44] flex items-center justify-center text-xs font-medium text-white">
-                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{user?.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {user?.role === 'admin' ? 'Админ' : 'Пользователь'}
-                  </p>
-                </div>
+                
+                {/* User Info - Clickable for dropdown */}
+                <button 
+                  onClick={() => setShowUserSwitcher(!showUserSwitcher)}
+                  className="flex items-center gap-3 flex-1 min-w-0 hover:bg-accent/50 rounded-lg p-2 transition-colors"
+                  title="Быстрая смена пользователя"
+                >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#085C53] to-[#074a44] flex items-center justify-center text-xs font-medium text-white flex-shrink-0">
+                    {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  </div>
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className="text-sm font-medium truncate">{user?.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {user?.role === 'admin' ? 'Админ' : 'Пользователь'}
+                    </p>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform ${showUserSwitcher ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {/* User Switcher Dropdown */}
+                {showUserSwitcher && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+                    <div className="p-2">
+                      <div className="text-xs text-muted-foreground px-3 py-2 font-medium">
+                        Переключиться на:
+                      </div>
+                      {allUsers.filter(u => u.id !== user?.id).map(u => (
+                        <button
+                          key={u.id}
+                          onClick={async () => {
+                            setShowUserSwitcher(false);
+                            try {
+                              const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/login`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  email: u.email,
+                                  password: u.email === 'admin@example.com' ? 'admin123' : 
+                                           u.email === 'admin@company.com' ? 'Admin123!' :
+                                           u.email === 'user@company.com' ? 'user123' : 'password123'
+                                })
+                              });
+                              
+                              if (response.ok) {
+                                const data = await response.json();
+                                switchUser(data.user, data.access_token);
+                              } else {
+                                toast.error('Не удалось переключиться');
+                              }
+                            } catch (error) {
+                              console.error('Switch error:', error);
+                              toast.error('Ошибка при смене пользователя');
+                            }
+                          }}
+                          className="flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm hover:bg-accent transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#085C53] to-[#074a44] flex items-center justify-center text-xs font-medium text-white">
+                              {u.name?.charAt(0)?.toUpperCase() || 'U'}
+                            </div>
+                            <div className="text-left">
+                              <div className="font-medium">{u.name}</div>
+                              <div className="text-xs text-muted-foreground">{u.email}</div>
+                            </div>
+                          </div>
+                          <span className={`text-xs px-2 py-0.5 rounded ${
+                            u.role === 'admin' ? 'bg-blue-500/20 text-blue-500' : 'bg-gray-500/20 text-gray-500'
+                          }`}>
+                            {u.role === 'admin' ? 'Админ' : 'Юзер'}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
               <button 
                 onClick={onCreateEvent} 
-                className="w-8 h-8 rounded-lg bg-[#074a44] hover:bg-[#063d38] flex items-center justify-center text-white"
+                className="w-8 h-8 rounded-lg bg-[#074a44] hover:bg-[#063d38] flex items-center justify-center text-white flex-shrink-0"
                 title="Создать событие"
                 data-testid="create-event-button"
               >
