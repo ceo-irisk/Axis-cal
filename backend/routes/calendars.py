@@ -56,8 +56,10 @@ async def create_calendar(calendar_data: dict = Body(...), user: dict = Depends(
     calendar_dict["created_at"] = datetime.now(timezone.utc).isoformat()
     
     await db.calendars.insert_one(calendar_dict)
-    calendar_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
-    return calendar_dict
+    
+    # Fetch clean data without _id
+    created_calendar = await db.calendars.find_one({"id": calendar_dict["id"]}, {"_id": 0})
+    return created_calendar
 
 @router.delete("/{calendar_id}")
 async def delete_calendar(calendar_id: str, user: dict = Depends(get_current_user)):
@@ -130,8 +132,10 @@ async def create_calendar_permission(
     }
     
     await db.calendar_permissions.insert_one(permission_dict)
-    permission_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
-    return permission_dict
+    
+    # Fetch clean data without _id
+    created_permission = await db.calendar_permissions.find_one({"id": permission_dict["id"]}, {"_id": 0})
+    return created_permission
 
 @router.delete("/{calendar_id}/permissions/{permission_user_id}")
 async def delete_calendar_permission(
@@ -205,8 +209,10 @@ async def create_subscription(subscription_data: dict = Body(...), user: dict = 
     }
     
     await db.user_subscriptions.insert_one(subscription_dict)
-    subscription_dict.pop('_id', None)  # Remove MongoDB ObjectId for JSON serialization
-    return subscription_dict
+    
+    # Fetch clean data without _id
+    created_subscription = await db.user_subscriptions.find_one({"id": subscription_dict["id"]}, {"_id": 0})
+    return created_subscription
 
 @subscriptions_router.delete("/{target_user_id}")
 async def delete_subscription(target_user_id: str, user: dict = Depends(get_current_user)):
