@@ -1063,8 +1063,28 @@ async def update_event_fields(fields: List[dict], admin: dict = Depends(require_
 
 @api_router.get("/calendars")
 async def get_calendars(user: dict = Depends(get_current_user)):
-    calendars = await db.calendars.find({"user_id": user["id"]}, {"_id": 0, "credentials": 0}).to_list(20)
-    return calendars
+    # Get user's own calendars
+    own_calendars = await db.calendars.find({"user_id": user["id"]}, {"_id": 0, "credentials": 0}).to_list(100)
+    
+    # Get calendars shared with this user
+    permissions = await db.calendar_permissions.find({"user_id": user["id"]}, {"_id": 0}).to_list(100)
+    shared_calendar_ids = [p["calendar_id"] for p in permissions]
+    
+    shared_calendars = []
+    if shared_calendar_ids:
+        shared_calendars = await db.calendars.find(
+            {"id": {"$in": shared_calendar_ids}}, 
+            {"_id": 0, "credentials": 0}
+        ).to_list(100)
+        
+        # Add permission info to shared calendars
+        for cal in shared_calendars:
+            perm = next((p for p in permissions if p["calendar_id"] == cal["id"]), None)
+            if perm:
+                cal["permission_level"] = perm["permission_level"]
+                cal["is_shared"] = True
+    
+    return own_calendars + shared_calendars
 
 @api_router.post("/calendars")
 async def add_calendar(name: str, provider: str, color: str, pattern: Optional[str] = None, user: dict = Depends(get_current_user)):
