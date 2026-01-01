@@ -135,7 +135,7 @@ const TemplateSelector = ({ day, templates, appliedTemplates, onApplyTemplate, o
   
   const handleRemove = (e) => {
     e.stopPropagation();
-    if (onRemoveTemplate && confirm('Удалить шаблон с этого дня?')) {
+    if (onRemoveTemplate) {
       onRemoveTemplate(day);
     }
     setOpen(false);
