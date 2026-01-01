@@ -336,25 +336,23 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
           {/* Calendar */}
           <div>
             <Label className="text-xs text-muted-foreground mb-1.5 block">Календарь</Label>
-            <Select value={formData.calendar_id || 'default'} onValueChange={(v) => setFormData({ ...formData, calendar_id: v === 'default' ? '' : v })}>
+            <Select value={formData.calendar_id || ''} onValueChange={(v) => setFormData({ ...formData, calendar_id: v })}>
               <SelectTrigger data-testid="event-calendar-select">
                 <SelectValue placeholder="Выберите календарь" />
               </SelectTrigger>
               <SelectContent position="popper" sideOffset={4}>
-                <SelectItem value="default">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#085C53]" />
-                    Основной
-                  </div>
-                </SelectItem>
-                {calendars.map(cal => (
-                  <SelectItem key={cal.id} value={cal.id}>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cal.color }} />
-                      {cal.name}
-                    </div>
-                  </SelectItem>
-                ))}
+                {calendars.map(cal => {
+                  const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
+                  return (
+                    <SelectItem key={cal.id} value={cal.id}>
+                      <div className="flex items-center gap-2">
+                        <IconComponent className="w-3.5 h-3.5" />
+                        {cal.name}
+                        {cal.is_shared && <span className="text-xs text-muted-foreground">({cal.permission_level})</span>}
+                      </div>
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>
