@@ -556,15 +556,17 @@ export const Sidebar = ({
                         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Весь день</p>
                         {allDayEvents.map((event) => {
                           const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
+                          const eventColor = getEventTypeColor(event);
                           return (
                             <button 
                               key={event.id} 
                               onClick={() => onEventClick?.(event)} 
                               className={`w-full text-left p-3 rounded-xl transition-colors ${
                                 isUnconfirmed 
-                                  ? 'border-2 border-dashed border-[#085C53] bg-[#085C53]/5 hover:bg-[#085C53]/10'
-                                  : 'bg-accent/50 hover:bg-accent border-l-4 border-[#085C53]'
+                                  ? 'border-2 border-dashed bg-transparent hover:bg-accent/10'
+                                  : 'bg-accent/50 hover:bg-accent'
                               }`}
+                              style={isUnconfirmed ? { borderColor: eventColor } : { borderLeft: `4px solid ${eventColor}` }}
                               data-testid={`sidebar-event-${event.id}`}
                             >
                               <div className="flex items-center justify-between gap-2">
