@@ -197,4 +197,35 @@ export const createCustomTimezone = (name, label, offset) => {
 };
 export const deleteCustomTimezone = (id) => api.delete(`/dictionaries/timezones/${id}`);
 
+// ICS Subscriptions
+export const getICSSubscriptions = () => api.get('/ics-subscriptions');
+export const createICSSubscription = (data) => api.post('/ics-subscriptions', data);
+export const updateICSSubscription = (id, name, color) => {
+  const params = new URLSearchParams();
+  params.append('name', name);
+  params.append('color', color);
+  return api.put(`/ics-subscriptions/${id}?${params.toString()}`);
+};
+export const deleteICSSubscription = (id) => api.delete(`/ics-subscriptions/${id}`);
+export const getICSEvents = (subscriptionId, startDate, endDate) => {
+  const params = new URLSearchParams();
+  if (startDate) params.append('start_date', startDate);
+  if (endDate) params.append('end_date', endDate);
+  return api.get(`/ics-subscriptions/${subscriptionId}/events?${params.toString()}`);
+};
+export const getAllICSEvents = (startDate, endDate) => {
+  const params = new URLSearchParams();
+  if (startDate) params.append('start_date', startDate);
+  if (endDate) params.append('end_date', endDate);
+  return api.get(`/ics-subscriptions/all-events?${params.toString()}`);
+};
+
+// Recurring Events
+export const getEventsWithRecurring = (startDate, endDate) => {
+  const params = new URLSearchParams();
+  if (startDate) params.append('start_date', startDate);
+  if (endDate) params.append('end_date', endDate);
+  return api.get(`/events/recurring?${params.toString()}`);
+};
+
 export default api;
