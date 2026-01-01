@@ -32,6 +32,7 @@ export default function CalendarPage() {
   const [calendars, setCalendars] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [eventTypes, setEventTypes] = useState([]);
+  const [appliedTemplates, setAppliedTemplates] = useState([]);
   const [ratings, setRatings] = useState({});
   const [overloadedDays, setOverloadedDays] = useState([]);
   const [ruleViolations, setRuleViolations] = useState({});
