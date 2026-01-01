@@ -1182,6 +1182,19 @@ export const Sidebar = ({
           />
         </DialogContent>
       </Dialog>
+
+      {/* ICS Subscription Modal */}
+      <Dialog open={showICSModal} onOpenChange={setShowICSModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Подключить внешний календарь</DialogTitle>
+          </DialogHeader>
+          <ICSSubscriptionForm 
+            onSave={handleSaveICSSubscription}
+            onCancel={() => setShowICSModal(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
