@@ -1078,6 +1078,294 @@ async def delete_custom_timezone(timezone_id: str, admin: dict = Depends(require
         raise HTTPException(status_code=404, detail="Timezone not found")
     return {"message": "Timezone deleted"}
 
+# ==================== ICS SUBSCRIPTIONS ====================
+
+@api_router.get("/ics-subscriptions")
+async def get_ics_subscriptions(user: dict = Depends(get_current_user)):
+    """Get all ICS subscriptions for current user"""
+    subscriptions = await db.ics_subscriptions.find({"user_id": user["id"]}, {"_id": 0}).to_list(50)
+    return subscriptions
+
+@api_router.post("/ics-subscriptions")
+async def create_ics_subscription(subscription: ICSSubscriptionCreate, user: dict = Depends(get_current_user)):
+    """Create a new ICS subscription"""
+    # Validate URL by trying to fetch it
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(subscription.url)
+            response.raise_for_status()
+            # Try to parse as ICS
+            ICSCalendar(response.text)
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=400, detail=f"Не удалось загрузить календарь: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Невалидный ICS файл: {str(e)}")
+    
+    sub_dict = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "url": subscription.url,
+        "name": subscription.name,
+        "color": subscription.color,
+        "is_active": True,
+        "last_synced": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.ics_subscriptions.insert_one(sub_dict)
+    return {k: v for k, v in sub_dict.items() if k != "_id"}
+
+@api_router.put("/ics-subscriptions/{subscription_id}")
+async def update_ics_subscription(subscription_id: str, name: str, color: str, user: dict = Depends(get_current_user)):
+    """Update an ICS subscription"""
+    result = await db.ics_subscriptions.update_one(
+        {"id": subscription_id, "user_id": user["id"]},
+        {"$set": {"name": name, "color": color}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Subscription not found")
+    updated = await db.ics_subscriptions.find_one({"id": subscription_id}, {"_id": 0})
+    return updated
+
+@api_router.delete("/ics-subscriptions/{subscription_id}")
+async def delete_ics_subscription(subscription_id: str, user: dict = Depends(get_current_user)):
+    """Delete an ICS subscription"""
+    result = await db.ics_subscriptions.delete_one({"id": subscription_id, "user_id": user["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Subscription not found")
+    return {"message": "Subscription deleted"}
+
+@api_router.get("/ics-subscriptions/{subscription_id}/events")
+async def get_ics_events(subscription_id: str, start_date: Optional[str] = None, end_date: Optional[str] = None, user: dict = Depends(get_current_user)):
+    """Fetch and parse events from an ICS subscription"""
+    subscription = await db.ics_subscriptions.find_one({"id": subscription_id, "user_id": user["id"]}, {"_id": 0})
+    if not subscription:
+        raise HTTPException(status_code=404, detail="Subscription not found")
+    
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            response = await client.get(subscription["url"])
+            response.raise_for_status()
+            calendar = ICSCalendar(response.text)
+        
+        events = []
+        start_filter = datetime.fromisoformat(start_date) if start_date else None
+        end_filter = datetime.fromisoformat(end_date) if end_date else None
+        
+        for event in calendar.events:
+            # Filter by date range if provided
+            if start_filter and event.begin.datetime < start_filter.replace(tzinfo=event.begin.datetime.tzinfo):
+                continue
+            if end_filter and event.begin.datetime > end_filter.replace(tzinfo=event.begin.datetime.tzinfo):
+                continue
+            
+            events.append({
+                "id": f"ics-{subscription_id}-{event.uid or str(uuid.uuid4())}",
+                "title": event.name or "Без названия",
+                "description": event.description or "",
+                "start_time": event.begin.datetime.isoformat(),
+                "end_time": event.end.datetime.isoformat() if event.end else event.begin.shift(hours=1).datetime.isoformat(),
+                "location": event.location or "",
+                "is_external": True,
+                "external_calendar_id": subscription_id,
+                "external_calendar_name": subscription["name"],
+                "external_calendar_color": subscription["color"],
+                "event_type": "meeting",
+                "status": "confirmed"
+            })
+        
+        # Update last_synced
+        await db.ics_subscriptions.update_one(
+            {"id": subscription_id},
+            {"$set": {"last_synced": datetime.now(timezone.utc).isoformat()}}
+        )
+        
+        return events
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка загрузки календаря: {str(e)}")
+    except Exception as e:
+        logger.error(f"Error parsing ICS: {e}")
+        raise HTTPException(status_code=500, detail=f"Ошибка парсинга ICS: {str(e)}")
+
+@api_router.get("/ics-subscriptions/all-events")
+async def get_all_ics_events(start_date: Optional[str] = None, end_date: Optional[str] = None, user: dict = Depends(get_current_user)):
+    """Fetch events from all active ICS subscriptions"""
+    subscriptions = await db.ics_subscriptions.find({"user_id": user["id"], "is_active": True}, {"_id": 0}).to_list(50)
+    
+    all_events = []
+    for subscription in subscriptions:
+        try:
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                response = await client.get(subscription["url"])
+                response.raise_for_status()
+                calendar = ICSCalendar(response.text)
+            
+            start_filter = datetime.fromisoformat(start_date) if start_date else None
+            end_filter = datetime.fromisoformat(end_date) if end_date else None
+            
+            for event in calendar.events:
+                # Filter by date range if provided
+                if start_filter and event.begin.datetime < start_filter.replace(tzinfo=event.begin.datetime.tzinfo):
+                    continue
+                if end_filter and event.begin.datetime > end_filter.replace(tzinfo=event.begin.datetime.tzinfo):
+                    continue
+                
+                all_events.append({
+                    "id": f"ics-{subscription['id']}-{event.uid or str(uuid.uuid4())}",
+                    "title": event.name or "Без названия",
+                    "description": event.description or "",
+                    "start_time": event.begin.datetime.isoformat(),
+                    "end_time": event.end.datetime.isoformat() if event.end else event.begin.shift(hours=1).datetime.isoformat(),
+                    "location": event.location or "",
+                    "is_external": True,
+                    "external_calendar_id": subscription["id"],
+                    "external_calendar_name": subscription["name"],
+                    "external_calendar_color": subscription["color"],
+                    "event_type": "meeting",
+                    "status": "confirmed"
+                })
+        except Exception as e:
+            logger.warning(f"Failed to fetch ICS {subscription['id']}: {e}")
+            continue
+    
+    return all_events
+
+# ==================== RECURRING EVENTS ====================
+
+def generate_recurring_instances(event: dict, start_date: datetime, end_date: datetime) -> List[dict]:
+    """Generate instances of a recurring event within a date range"""
+    instances = []
+    recurrence_type = event.get("recurrence_type", "none")
+    
+    if recurrence_type == "none":
+        return instances
+    
+    event_start = datetime.fromisoformat(event["start_time"].replace("Z", "+00:00"))
+    event_end = datetime.fromisoformat(event["end_time"].replace("Z", "+00:00"))
+    duration = event_end - event_start
+    
+    recurrence_end = None
+    if event.get("recurrence_end_date"):
+        recurrence_end = datetime.fromisoformat(event["recurrence_end_date"].replace("Z", "+00:00"))
+    
+    current_date = event_start
+    instance_count = 0
+    max_instances = 365  # Safety limit
+    
+    while current_date <= end_date and instance_count < max_instances:
+        # Skip if before start_date or original event date
+        if current_date >= start_date and current_date > event_start:
+            # Check recurrence end date
+            if recurrence_end and current_date > recurrence_end:
+                break
+            
+            instance = {
+                **event,
+                "id": f"{event['id']}-{instance_count}",
+                "start_time": current_date.isoformat(),
+                "end_time": (current_date + duration).isoformat(),
+                "recurrence_parent_id": event["id"],
+                "is_recurring_instance": True
+            }
+            instances.append(instance)
+        
+        # Calculate next occurrence
+        if recurrence_type == "daily":
+            current_date = current_date + timedelta(days=1)
+        elif recurrence_type == "workdays":
+            current_date = current_date + timedelta(days=1)
+            # Skip weekends (Saturday=5, Sunday=6)
+            while current_date.weekday() >= 5:
+                current_date = current_date + timedelta(days=1)
+        elif recurrence_type == "weekly":
+            current_date = current_date + timedelta(weeks=1)
+        elif recurrence_type == "monthly":
+            # Add approximately one month
+            month = current_date.month
+            year = current_date.year
+            if month == 12:
+                month = 1
+                year += 1
+            else:
+                month += 1
+            try:
+                current_date = current_date.replace(year=year, month=month)
+            except ValueError:
+                # Handle months with fewer days
+                current_date = current_date.replace(year=year, month=month, day=28)
+        elif recurrence_type == "yearly":
+            try:
+                current_date = current_date.replace(year=current_date.year + 1)
+            except ValueError:
+                # Handle Feb 29 in non-leap years
+                current_date = current_date.replace(year=current_date.year + 1, day=28)
+        else:
+            break
+        
+        instance_count += 1
+    
+    return instances
+
+@api_router.get("/events/recurring")
+async def get_events_with_recurring(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    user: dict = Depends(get_current_user)
+):
+    """Get events including generated recurring instances"""
+    query = {}
+    
+    # Fetch base events
+    if start_date:
+        query["start_time"] = {"$gte": start_date}
+    if end_date:
+        if "start_time" in query:
+            query["start_time"]["$lte"] = end_date
+        else:
+            query["start_time"] = {"$lte": end_date}
+    
+    events = await db.events.find(query, {"_id": 0}).to_list(1000)
+    
+    # Also fetch recurring events that might have started before start_date
+    if start_date:
+        recurring_query = {
+            "recurrence_type": {"$ne": "none"},
+            "start_time": {"$lt": start_date}
+        }
+        recurring_events = await db.events.find(recurring_query, {"_id": 0}).to_list(100)
+    else:
+        recurring_events = []
+    
+    # Generate recurring instances
+    result_events = []
+    processed_parent_ids = set()
+    
+    # Parse date range
+    start_dt = datetime.fromisoformat(start_date) if start_date else datetime.now(timezone.utc) - timedelta(days=30)
+    end_dt = datetime.fromisoformat(end_date) if end_date else datetime.now(timezone.utc) + timedelta(days=30)
+    
+    for event in events + recurring_events:
+        event_id = event.get("id")
+        recurrence_type = event.get("recurrence_type", "none")
+        
+        # Add the original event (if within range)
+        event_start_str = event.get("start_time", "")
+        if event_start_str:
+            try:
+                event_start_dt = datetime.fromisoformat(event_start_str.replace("Z", "+00:00"))
+                if event_start_dt >= start_dt and event_start_dt <= end_dt:
+                    if event_id not in processed_parent_ids:
+                        result_events.append(event)
+            except:
+                pass
+        
+        # Generate recurring instances
+        if recurrence_type != "none" and event_id not in processed_parent_ids:
+            instances = generate_recurring_instances(event, start_dt, end_dt)
+            result_events.extend(instances)
+            processed_parent_ids.add(event_id)
+    
+    return result_events
+
 # ==================== HEALTH CHECK ====================
 
 @api_router.get("/")
