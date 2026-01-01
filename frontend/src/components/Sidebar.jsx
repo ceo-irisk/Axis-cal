@@ -180,6 +180,7 @@ export const Sidebar = ({
       setCustomTimezones(timezonesRes.data || []);
       setIcsSubscriptions(icsRes.data || []);
       onCustomTimezonesChange?.(timezonesRes.data || []);
+      onEventTypesChange?.(typesRes.data || []);
     } catch (e) { console.error(e); }
   };
 
