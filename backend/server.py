@@ -612,7 +612,11 @@ async def get_events(
             query["start_time"] = {"$lte": end_date}
     
     events = await db.events.find(query, {"_id": 0}).to_list(1000)
-    return events
+    
+    # Filter events based on calendar permissions
+    filtered_events = await filter_events_by_permissions(events, user["id"], db)
+    
+    return filtered_events
 
 @api_router.get("/events/{event_id}")
 async def get_event(event_id: str, user: dict = Depends(get_current_user)):
