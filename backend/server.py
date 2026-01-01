@@ -1223,6 +1223,108 @@ async def grant_calendar_permission(
     # Verify owner
     calendar = await db.calendars.find_one({"id": calendar_id, "user_id": owner["id"]})
     if not calendar:
+
+
+# ==================== USER SUBSCRIPTIONS ====================
+
+@api_router.get("/subscriptions")
+async def get_subscriptions(user: dict = Depends(get_current_user)):
+    """Get list of users current user is subscribed to"""
+    subscriptions = await db.user_subscriptions.find({"user_id": user["id"]}, {"_id": 0}).to_list(100)
+    
+    # Enrich with user info
+    for sub in subscriptions:
+        target_user = await db.users.find_one({"id": sub["target_user_id"]}, {"_id": 0, "password": 0})
+        if target_user:
+            sub["target_user_name"] = target_user.get("name")
+            sub["target_user_email"] = target_user.get("email")
+    
+    return subscriptions
+
+@api_router.post("/subscriptions")
+async def create_subscription(target_user_id: str, user: dict = Depends(get_current_user)):
+    """Subscribe to another user's calendar"""
+    if target_user_id == user["id"]:
+        raise HTTPException(status_code=400, detail="Cannot subscribe to yourself")
+    
+    # Check if target user exists
+    target = await db.users.find_one({"id": target_user_id})
+    if not target:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check if already subscribed
+    existing = await db.user_subscriptions.find_one({
+        "user_id": user["id"],
+        "target_user_id": target_user_id
+    })
+    
+    if existing:
+        return existing
+    
+    # Create subscription
+    sub_dict = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "target_user_id": target_user_id,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.user_subscriptions.insert_one(sub_dict)
+    return {k: v for k, v in sub_dict.items() if k != "_id"}
+
+@api_router.delete("/subscriptions/{target_user_id}")
+async def delete_subscription(target_user_id: str, user: dict = Depends(get_current_user)):
+    """Unsubscribe from a user"""
+    result = await db.user_subscriptions.delete_one({
+        "user_id": user["id"],
+        "target_user_id": target_user_id
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Subscription not found")
+    
+    return {"message": "Unsubscribed"}
+
+@api_router.get("/users/{user_id}/events")
+async def get_user_events(
+    user_id: str,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get events for a specific user (with permission filtering for current user)"""
+    # Build query
+    query = {"created_by": user_id}
+    
+    if start_date and end_date:
+        query["start_time"] = {"$gte": f"{start_date}T00:00:00", "$lte": f"{end_date}T23:59:59"}
+    
+    events = await db.events.find(query, {"_id": 0}).to_list(1000)
+    
+    # Generate recurring instances
+    if start_date and end_date:
+        start_dt = datetime.fromisoformat(start_date)
+        if start_dt.tzinfo is None:
+            start_dt = start_dt.replace(tzinfo=timezone.utc)
+        
+        end_dt = datetime.fromisoformat(end_date)
+        if end_dt.tzinfo is None:
+            end_dt = end_dt.replace(tzinfo=timezone.utc)
+        
+        all_events = list(events)
+        for event in events:
+            if event.get("recurrence_type") and event.get("recurrence_type") not in ["none", None, ""]:
+                instances = generate_recurring_instances(event, start_dt, end_dt)
+                all_events.extend(instances)
+        
+        events = all_events
+    
+    # Filter by permissions (if viewing another user)
+    if user_id != current_user["id"]:
+        filtered_events = await filter_events_by_permissions(events, current_user["id"], db)
+        return filtered_events
+    
+    return events
+
         raise HTTPException(status_code=403, detail="Not calendar owner")
     
     if calendar.get("is_default") and not calendar.get("is_public"):
