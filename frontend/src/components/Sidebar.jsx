@@ -779,30 +779,6 @@ export const Sidebar = ({
                 </div>
               </div>
             )}
-                    {externalCalendars.length === 0 ? (
-                      <p className="text-xs text-muted-foreground px-2 py-2">Нет подключённых календарей</p>
-                    ) : (
-                      externalCalendars.map(cal => (
-                        <div key={cal.id} className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-accent/50 group">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cal.color }} />
-                          <span className="text-sm flex-1">{cal.name}</span>
-                          <button onClick={() => toggleCalendarVisibility(cal.id)} className="opacity-0 group-hover:opacity-100">
-                            {hiddenCalendars.has(cal.id) ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4 text-muted-foreground" />}
-                          </button>
-                        </div>
-                      ))
-                    )}
-                    <button 
-                      onClick={() => setActiveTab(TABS.SETTINGS)}
-                      className="flex items-center gap-2 w-full px-2 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Подключить
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Dashboard Tab */}
             {activeTab === TABS.DASHBOARD && (
