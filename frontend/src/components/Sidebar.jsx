@@ -1716,4 +1716,14 @@ const TemplateEventForm = ({ initialData, eventTypes, templateType, onSave, onCa
   );
 };
 
+
+      {/* Calendar Permissions Modal */}
+      {showPermissionsModal && selectedCalendarForPermissions && (
+        <CalendarPermissionsModal
+          calendar={selectedCalendarForPermissions}
+          onClose={() => { setShowPermissionsModal(false); setSelectedCalendarForPermissions(null); }}
+          onUpdate={() => fetchCalendars()}
+        />
+      )}
+
 export default Sidebar;
