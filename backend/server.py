@@ -1740,7 +1740,10 @@ async def get_events_with_recurring(
         result_events.extend(instances)
         processed_parent_ids.add(event_id)
     
-    return result_events
+    # Filter by permissions
+    filtered_events = await filter_events_by_permissions(result_events, user["id"], db)
+    
+    return filtered_events
 
 # ==================== HEALTH CHECK ====================
 
