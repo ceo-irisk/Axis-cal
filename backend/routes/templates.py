@@ -188,12 +188,18 @@ async def get_applied_templates(
     
     events = await db.events.find(query, {"_id": 0}).to_list(1000)
     
-    # Group by date
-    applied_dates = {}
+    # Group by date and return array of {date, events} objects
+    applied_dates_dict = {}
     for event in events:
         event_date = event["start_time"][:10]  # Extract YYYY-MM-DD
-        if event_date not in applied_dates:
-            applied_dates[event_date] = []
-        applied_dates[event_date].append(event)
+        if event_date not in applied_dates_dict:
+            applied_dates_dict[event_date] = []
+        applied_dates_dict[event_date].append(event)
     
-    return {"applied_dates": list(applied_dates.keys()), "events_by_date": applied_dates}
+    # Convert to array format expected by frontend
+    result = [
+        {"date": date, "events": events_list}
+        for date, events_list in applied_dates_dict.items()
+    ]
+    
+    return result
