@@ -68,7 +68,8 @@ async def create_user(user_data: UserCreate, admin: dict = Depends(require_admin
     return UserResponse(**{k: v for k, v in user_dict.items() if k != "password"})
 
 @router.get("", response_model=List[UserResponse])
-async def get_users(admin: dict = Depends(require_admin)):
+async def get_users(user: dict = Depends(get_current_user)):
+    # Allow all authenticated users to see the list (for testing user switcher)
     users = await db.users.find({}, {"_id": 0, "password": 0}).to_list(100)
     return [UserResponse(**u) for u in users]
 
