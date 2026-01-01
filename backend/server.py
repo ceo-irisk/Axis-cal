@@ -1223,6 +1223,17 @@ async def grant_calendar_permission(
     # Verify owner
     calendar = await db.calendars.find_one({"id": calendar_id, "user_id": owner["id"]})
     if not calendar:
+        raise HTTPException(status_code=404, detail="Calendar not found")
+    
+    # Add permission
+    await db.calendar_permissions.insert_one({
+        "id": str(uuid.uuid4()),
+        "calendar_id": calendar_id,
+        "user_id": user_id,
+        "permission": permission,
+        "created_at": datetime.utcnow().isoformat()
+    })
+    return {"status": "ok"}
 
 
 # ==================== USER SUBSCRIPTIONS ====================
