@@ -142,6 +142,12 @@ export const Sidebar = ({
   const [hoveredStar, setHoveredStar] = useState(0);
   const [ratingNotes, setRatingNotes] = useState('');
   
+  // Subscriptions
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+  const [showAddSubscription, setShowAddSubscription] = useState(false);
+  const [selectedUserForSub, setSelectedUserForSub] = useState('');
+  
   // Dictionaries state
   const [eventTypes, setEventTypes] = useState([]);
   const [eventStatuses, setEventStatuses] = useState([]);
