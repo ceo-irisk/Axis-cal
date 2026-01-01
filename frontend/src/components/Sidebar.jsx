@@ -99,6 +99,12 @@ export const Sidebar = ({
   const { user, logout, isAdmin } = useAuth();
   const { theme, setTheme } = useTheme();
   
+  // Get event type color
+  const getEventTypeColor = (event) => {
+    const eventType = eventTypes.find(et => et.name === event.event_type);
+    return eventType?.color || '#085C53';
+  };
+  
   const [calendars, setCalendars] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newCalName, setNewCalName] = useState('');
