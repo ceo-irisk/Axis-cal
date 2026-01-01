@@ -233,6 +233,24 @@ class EventStatusConfig(BaseModel):
     order: int = 0
     is_active: bool = True
 
+# ==================== ICS SUBSCRIPTION MODEL ====================
+
+class ICSSubscription(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    url: str
+    name: str
+    color: str = "#6366f1"
+    is_active: bool = True
+    last_synced: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ICSSubscriptionCreate(BaseModel):
+    url: str
+    name: str
+    color: str = "#6366f1"
+
 # ==================== HELPERS ====================
 
 def hash_password(password: str) -> str:
