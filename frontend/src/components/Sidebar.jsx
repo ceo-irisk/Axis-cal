@@ -93,6 +93,7 @@ const TABS = {
 
 // Settings sub-tabs
 const SETTINGS_TABS = {
+  MY_CALENDARS: 'my_calendars',
   USERS: 'users',
   TEMPLATES: 'templates',
   EXTERNAL_CALENDARS: 'external_calendars',
