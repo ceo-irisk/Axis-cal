@@ -68,10 +68,15 @@ const getEventColorClass = (event) => {
 const EventIcons = ({ event }) => {
   const icons = [];
   
+  // Recurrence icon for all recurring events
+  if (event.recurrence_type && event.recurrence_type !== 'none') {
+    icons.push(<Repeat key="recurring" className="w-3 h-3 text-[#085C53]" />);
+  }
+  
   if (event.is_blocked) icons.push(<Square key="blocked" className="w-3 h-3 text-red-500 fill-red-500" />);
   if (event.is_completed) icons.push(<CheckCircle2 key="completed" className="w-3 h-3 text-green-500" />);
   if (event.is_urgent) icons.push(<Zap key="urgent" className="w-3 h-3 text-amber-500 fill-amber-500" />);
-  if (event.is_video_call || event.event_type === 'call') icons.push(<Video key="video" className="w-3 h-3 text-blue-500" />);
+  if (event.is_video_call) icons.push(<Video key="video" className="w-3 h-3 text-blue-500" />);
   
   if (icons.length === 0) return null;
   return <div className="flex items-center gap-0.5">{icons}</div>;
