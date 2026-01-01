@@ -1323,6 +1323,29 @@ def generate_recurring_instances(event: dict, start_date: datetime, end_date: da
             except ValueError:
                 # Handle Feb 29 in non-leap years
                 current_date = current_date.replace(year=current_date.year + 1, day=28)
+        elif recurrence_type == "custom_days":
+            # Custom weekdays recurrence
+            custom_days = event.get("recurrence_custom_days", [])
+            if not custom_days:
+                break
+            
+            # Map day names to weekday numbers (Monday=0, Sunday=6)
+            day_map = {
+                'monday': 0, 'tuesday': 1, 'wednesday': 2, 'thursday': 3,
+                'friday': 4, 'saturday': 5, 'sunday': 6
+            }
+            target_weekdays = [day_map.get(day.lower()) for day in custom_days if day.lower() in day_map]
+            
+            if not target_weekdays:
+                break
+            
+            # Find next occurrence on one of the selected weekdays
+            current_date = current_date + timedelta(days=1)
+            while current_date.weekday() not in target_weekdays:
+                current_date = current_date + timedelta(days=1)
+                # Safety check to avoid infinite loop
+                if current_date > end_date + timedelta(days=7):
+                    break
         else:
             break
         
