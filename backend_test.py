@@ -753,6 +753,10 @@ class ExecutiveCalendarAPITester:
         self.test_dictionary_functionality()
         self.test_axis_calendar_specific_features()
         
+        # Test new recurring events and ICS subscriptions
+        self.test_recurring_events()
+        self.test_ics_subscriptions()
+        
         self.test_analytics()
         
         # Cleanup
