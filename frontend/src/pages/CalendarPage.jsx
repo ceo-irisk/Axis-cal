@@ -94,12 +94,13 @@ export default function CalendarPage() {
       const startStr = format(start, 'yyyy-MM-dd');
       const endStr = format(end, 'yyyy-MM-dd');
 
-      const [eventsRes, icsEventsRes, ratingsRes, overloadedRes, templatesRes] = await Promise.all([
+      const [eventsRes, icsEventsRes, ratingsRes, overloadedRes, templatesRes, eventTypesRes] = await Promise.all([
         getEventsWithRecurring(startStr, endStr),
         getAllICSEvents(startStr, endStr).catch(() => ({ data: [] })),
         getRatings(startStr, endStr),
         getOverloadedDays(startStr, endStr),
-        getTemplates()
+        getTemplates(),
+        getEventTypes()
       ]);
 
       // Combine local events with ICS events
