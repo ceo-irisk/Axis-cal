@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-01-01T21:18:09.185850",
-  "total_tests": 18,
-  "passed_tests": 13,
-  "failed_tests": 5,
-  "success_rate": 72.22222222222221,
+  "timestamp": "2026-01-01T21:19:02.832882",
+  "total_tests": 24,
+  "passed_tests": 17,
+  "failed_tests": 7,
+  "success_rate": 70.83333333333334,
   "test_results": [
     {
       "test": "Auth - Admin login (admin@example.com)",
@@ -36,9 +36,33 @@
       "response_data": null
     },
     {
-      "test": "Users - POST /users",
+      "test": "Users - POST /users (create with default calendars)",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Users - Default calendars created",
+      "success": false,
+      "details": "Missing calendars. Found: []",
+      "response_data": null
+    },
+    {
+      "test": "Users - GET /users/{user_id}",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Users - PUT /users/{user_id}",
       "success": false,
       "details": "Failed: {'detail': [{'type': 'enum', 'loc': ['body', 'role'], 'msg': \"Input should be 'admin' or 'user'\", 'input': 'assistant', 'ctx': {'expected': \"'admin' or 'user'\"}, 'url': 'https://errors.pydantic.dev/2.12/v/enum'}]}",
+      "response_data": null
+    },
+    {
+      "test": "Users - PATCH /users/{user_id}/toggle-active",
+      "success": true,
+      "details": "",
       "response_data": null
     },
     {
@@ -63,6 +87,12 @@
       "test": "Subscriptions - GET /subscriptions",
       "success": true,
       "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Subscriptions - POST /subscriptions",
+      "success": false,
+      "details": "Failed: {'status_code': 520, 'text': 'Internal Server Error'}",
       "response_data": null
     },
     {
@@ -109,6 +139,12 @@
     },
     {
       "test": "Permissions - Events filtered by permissions",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test": "Cleanup - Delete test user",
       "success": true,
       "details": "",
       "response_data": null
