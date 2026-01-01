@@ -179,18 +179,22 @@ export const Sidebar = ({
       } catch (e) { console.error(e); }
       
       try {
-        const [typesRes, statusesRes, templatesRes, timezonesRes, icsRes] = await Promise.all([
+        const [typesRes, statusesRes, templatesRes, timezonesRes, icsRes, subsRes, usersRes] = await Promise.all([
           getEventTypes(),
           getEventStatuses(),
           getTemplates(),
           getCustomTimezones(),
-          getICSSubscriptions()
+          getICSSubscriptions(),
+          getSubscriptions(),
+          getUsers().catch(() => ({ data: [] }))
         ]);
         setEventTypes(typesRes.data || []);
         setEventStatuses(statusesRes.data || []);
         setTemplates(templatesRes.data || []);
         setCustomTimezones(timezonesRes.data || []);
         setIcsSubscriptions(icsRes.data || []);
+        setSubscriptions(subsRes.data || []);
+        setAllUsers(usersRes.data || []);
         onCustomTimezonesChange?.(timezonesRes.data || []);
         onEventTypesChange?.(typesRes.data || []);
       } catch (e) { console.error(e); }
