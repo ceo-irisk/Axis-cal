@@ -885,7 +885,7 @@ export const Sidebar = ({
                               </div>
                             </div>
                             <p className="text-xs text-muted-foreground">
-                              {template.events?.length || 0} событий • {template.template_type === 'week' ? 'Неделя' : 'День'}
+                              {template.events?.length || 0} событий
                             </p>
                           </div>
                         ))}
