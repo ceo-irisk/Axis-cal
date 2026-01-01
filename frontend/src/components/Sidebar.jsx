@@ -875,6 +875,12 @@ export const Sidebar = ({
               <div className="space-y-4">
                 {/* Settings Sub-tabs */}
                 <div className="flex flex-wrap gap-1 border-b border-border pb-2">
+                  <button 
+                      onClick={() => setSettingsTab(SETTINGS_TABS.MY_CALENDARS)} 
+                      className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.MY_CALENDARS ? 'bg-[#085C53] text-white' : 'text-muted-foreground hover:bg-accent'}`}
+                    >
+                      Мои календари
+                    </button>
                   {isAdmin?.() && (
                     <button 
                       onClick={() => setSettingsTab(SETTINGS_TABS.USERS)} 
@@ -899,7 +905,7 @@ export const Sidebar = ({
                     onClick={() => setSettingsTab(SETTINGS_TABS.EXTERNAL_CALENDARS)} 
                     className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.EXTERNAL_CALENDARS ? 'bg-[#085C53] text-white' : 'text-muted-foreground hover:bg-accent'}`}
                   >
-                    Календари
+                    ICS
                   </button>
                   <button 
                     onClick={() => setSettingsTab(SETTINGS_TABS.PROFILE)} 
@@ -908,6 +914,115 @@ export const Sidebar = ({
                     Профиль
                   </button>
                 </div>
+
+                {/* My Calendars Sub-tab */}
+                {settingsTab === SETTINGS_TABS.MY_CALENDARS && (
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-sm font-medium">Мои календари</h3>
+                        <button 
+                          onClick={() => setShowAddForm(true)}
+                          className="p-1.5 rounded-lg hover:bg-accent"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="space-y-1">
+                        {myCalendars.map(cal => {
+                          const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
+                          const isDefault = cal.is_default;
+                          
+                          return (
+                            <div key={cal.id} className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-accent/50 group">
+                              <IconComponent className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                              <span className={`text-sm flex-1 ${hiddenCalendars.has(cal.id) ? 'line-through text-muted-foreground' : ''}`}>
+                                {cal.name}
+                                {isDefault && <span className="text-xs text-muted-foreground ml-1">({cal.is_public ? 'по умолчанию' : 'приватный'})</span>}
+                              </span>
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                                {!isDefault && cal.is_public && (
+                                  <button 
+                                    onClick={() => { setSelectedCalendarForPermissions(cal); setShowPermissionsModal(true); }}
+                                    className="p-1 rounded hover:bg-background"
+                                    title="Управление доступом"
+                                  >
+                                    <Users className="w-3.5 h-3.5 text-[#085C53]" />
+                                  </button>
+                                )}
+                                {!isDefault && (
+                                  <button onClick={() => handleDeleteCalendar(cal.id)} className="p-1 rounded hover:bg-red-500/20">
+                                    <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    
+                    {/* Add calendar form */}
+                    {showAddForm && (
+                      <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Новый календарь</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div>
+                              <Label>Название</Label>
+                              <Input 
+                                value={newCalName}
+                                onChange={(e) => setNewCalName(e.target.value)}
+                                placeholder="Рабочий календарь"
+                                className="mt-1"
+                              />
+                            </div>
+                            
+                            <div>
+                              <Label className="text-xs text-muted-foreground mb-2 block">Иконка</Label>
+                              <div className="grid grid-cols-5 gap-1.5">
+                                {Object.entries(CALENDAR_ICONS).map(([key, IconComp]) => (
+                                  <button
+                                    key={key}
+                                    type="button"
+                                    onClick={() => setNewCalIcon(key)}
+                                    className={`p-2.5 rounded-lg hover:bg-background transition-colors ${
+                                      newCalIcon === key ? 'bg-[#085C53] text-white' : 'bg-accent'
+                                    }`}
+                                    title={key}
+                                  >
+                                    <IconComp className="w-5 h-5 mx-auto" />
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                            
+                            <div>
+                              <Label className="text-xs text-muted-foreground mb-2 block">Цвет</Label>
+                              <div className="flex gap-1.5 flex-wrap">
+                                {CALENDAR_COLORS.map(c => (
+                                  <button 
+                                    key={c}
+                                    type="button"
+                                    onClick={() => setNewCalColor(c)} 
+                                    className={`w-8 h-8 rounded-full ${newCalColor === c ? 'ring-2 ring-offset-2 ring-offset-background ring-foreground' : ''}`} 
+                                    style={{ backgroundColor: c }} 
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <DialogFooter>
+                            <Button variant="outline" onClick={() => setShowAddForm(false)}>Отмена</Button>
+                            <Button onClick={handleAddCalendar}>Создать</Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                  </div>
+                )}
 
                 {/* Users Sub-tab */}
                 {settingsTab === SETTINGS_TABS.USERS && isAdmin?.() && (
