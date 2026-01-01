@@ -235,6 +235,18 @@ export default function CalendarPage() {
     }
   };
 
+  const handleRemoveTemplate = async (targetDate) => {
+    try {
+      const dateStr = format(targetDate, 'yyyy-MM-dd');
+      await removeTemplateFromDay(dateStr);
+      toast.success('Шаблон удален с дня');
+      fetchData();
+    } catch (error) {
+      console.error('Error removing template:', error);
+      toast.error('Ошибка удаления шаблона');
+    }
+  };
+
   const selectedDateStr = format(selectedDate, 'yyyy-MM-dd');
   const selectedDateEvents = events.filter(e => e.start_time?.startsWith(selectedDateStr));
   const currentRating = ratings[selectedDateStr];
