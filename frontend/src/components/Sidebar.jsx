@@ -548,7 +548,7 @@ export const Sidebar = ({
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
                                   email: u.email,
-                                  password: 'admin123'
+                                  password: u.email === 'admin@company.com' ? 'admin123' : 'user123'
                                 })
                               });
                               
