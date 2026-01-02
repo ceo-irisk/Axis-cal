@@ -143,6 +143,7 @@ async def create_timezone(timezone_data: Dict[str, Any] = Body(...), admin: dict
         "id": str(uuid.uuid4()),
         "name": timezone_data.get("name", ""),
         "offset": timezone_data.get("offset", ""),
+        "is_system": False,  # Custom timezone
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     
@@ -151,6 +152,27 @@ async def create_timezone(timezone_data: Dict[str, Any] = Body(...), admin: dict
     # Fetch clean data without _id
     created_timezone = await db.custom_timezones.find_one({"id": timezone_dict["id"]}, {"_id": 0})
     return created_timezone
+
+@router.put("/timezones/{timezone_id}")
+async def update_timezone(
+    timezone_id: str,
+    timezone_data: Dict[str, Any] = Body(...),
+    admin: dict = Depends(require_admin)
+):
+    tz = await db.custom_timezones.find_one({"id": timezone_id})
+    if not tz:
+        raise HTTPException(status_code=404, detail="Timezone not found")
+    
+    update_data = {
+        "name": timezone_data.get("name"),
+        "offset": timezone_data.get("offset")
+    }
+    # Remove None values
+    update_data = {k: v for k, v in update_data.items() if v is not None}
+    
+    await db.custom_timezones.update_one({"id": timezone_id}, {"$set": update_data})
+    updated = await db.custom_timezones.find_one({"id": timezone_id}, {"_id": 0})
+    return updated
 
 @router.delete("/timezones/{timezone_id}")
 async def delete_timezone(timezone_id: str, admin: dict = Depends(require_admin)):
