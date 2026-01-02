@@ -7,8 +7,12 @@ export const getLocalTimezoneOffset = () => {
 
 // Get user's local timezone name (approximate)
 export const getLocalTimezoneName = () => {
-  const offset = getLocalTimezoneOffset();
-  return `GMT${offset >= 0 ? '+' : ''}${offset}`;
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch {
+    const offset = getLocalTimezoneOffset();
+    return `GMT${offset >= 0 ? '+' : ''}${offset}`;
+  }
 };
 
 // Format timezone offset as string

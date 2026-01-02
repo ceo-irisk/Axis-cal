@@ -994,15 +994,13 @@ export const Sidebar = ({
                                 {isDefault && <span className="text-xs text-muted-foreground ml-1">({cal.is_public ? 'по умолчанию' : 'приватный'})</span>}
                               </span>
                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
-                                {cal.is_public && (
-                                  <button 
-                                    onClick={() => { setSelectedCalendarForPermissions(cal); setShowPermissionsModal(true); }}
-                                    className="p-1 rounded hover:bg-background"
-                                    title="Управление доступом"
-                                  >
-                                    <Users className="w-3.5 h-3.5 text-[#085C53]" />
-                                  </button>
-                                )}
+                                <button 
+                                  onClick={() => { setSelectedCalendarForPermissions(cal); setShowPermissionsModal(true); }}
+                                  className="p-1 rounded hover:bg-background"
+                                  title="Управление доступом"
+                                >
+                                  <Users className="w-3.5 h-3.5 text-[#085C53]" />
+                                </button>
                                 {!isDefault && (
                                   <button onClick={() => handleDeleteCalendar(cal.id)} className="p-1 rounded hover:bg-red-500/20">
                                     <Trash2 className="w-3.5 h-3.5 text-red-500" />
