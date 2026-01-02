@@ -75,7 +75,7 @@ const getEventDynamicStyle = (event, eventTypes) => {
   if (EVENT_COLORS[type]) return null;
   
   // Generate dynamic styles for custom types
-  if (event.is_template_event) {
+  if (event.status === 'template') {
     return {
       border: `2px solid ${color}`,
       background: 'transparent'
@@ -104,7 +104,7 @@ const getEventColorClass = (event) => {
   // Only return CSS class if it's a predefined type
   if (!EVENT_COLORS[type]) return '';
   
-  if (event.is_template_event) {
+  if (event.status === 'template') {
     return TEMPLATE_EVENT_COLORS[type] || 'event-template-meeting';
   }
   if (event.status === 'tentative') {
