@@ -91,7 +91,9 @@ async def update_event(event_id: str, event_data: EventCreate, user: dict = Depe
                 "permission_level": {"$in": ["edit", "full"]}
             })
             if not permission:
-                raise HTTPException(status_code=403, detail="No permission to edit this event")
+                raise HTTPException(status_code=403, detail="Недостаточно прав")
+        else:
+            raise HTTPException(status_code=403, detail="Недостаточно прав")
     
     update_dict = event_data.model_dump()
     update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
@@ -122,8 +124,20 @@ async def delete_event(event_id: str, user: dict = Depends(get_current_user)):
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     
+    # Check if user is the creator
     if event["created_by"] != user["id"]:
-        raise HTTPException(status_code=403, detail="Cannot delete events created by other users")
+        # Check if user has full permissions to the calendar
+        calendar_id = event.get("calendar_id")
+        if calendar_id:
+            permission = await db.calendar_permissions.find_one({
+                "calendar_id": calendar_id,
+                "user_id": user["id"],
+                "permission_level": "full"
+            })
+            if not permission:
+                raise HTTPException(status_code=403, detail="Недостаточно прав")
+        else:
+            raise HTTPException(status_code=403, detail="Недостаточно прав")
     
     await db.events.delete_one({"id": event_id})
     return {"message": "Event deleted"}
