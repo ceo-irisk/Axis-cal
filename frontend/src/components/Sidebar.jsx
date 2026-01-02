@@ -782,79 +782,101 @@ export const Sidebar = ({
               </div>
             )}
 
-            {/* Calendars Tab - NOW SUBSCRIPTIONS */}
+            {/* Calendars Tab - Show all user calendars */}
             {activeTab === TABS.CALENDARS && (
               <div className="space-y-4">
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Подписки на пользователей</p>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Мои календари</p>
                   
-                  {subscriptions.length === 0 ? (
-                    <p className="text-xs text-muted-foreground text-center py-8">Нет подписок</p>
+                  {myCalendars.length === 0 ? (
+                    <p className="text-xs text-muted-foreground text-center py-8">Нет календарей</p>
                   ) : (
                     <div className="space-y-1">
-                      {subscriptions.map(sub => (
-                        <button
-                          key={sub.id}
-                          onClick={() => onViewingUserChange?.(sub.target_user_id)}
-                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
-                            viewingUserId === sub.target_user_id
-                              ? 'bg-[#085C53]/20 border border-[#085C53]'
-                              : 'hover:bg-accent/50'
-                          }`}
-                        >
-                          <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
-                            <Users className="w-4 h-4" />
+                      {myCalendars.map(cal => {
+                        const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
+                        const isHidden = hiddenCalendars.has(cal.id);
+                        
+                        return (
+                          <div key={cal.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors hover:bg-accent/50 group">
+                            <button
+                              onClick={() => toggleCalendarVisibility(cal.id)}
+                              className="flex-shrink-0"
+                            >
+                              {isHidden ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                            <IconComponent className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                            <span className={`text-sm flex-1 ${isHidden ? 'line-through text-muted-foreground' : ''}`}>
+                              {cal.name}
+                              {cal.is_default && <span className="text-xs text-muted-foreground ml-1">({cal.is_public ? 'открытый' : 'закрытый'})</span>}
+                            </span>
                           </div>
-                          <div className="flex-1 text-left min-w-0">
-                            <p className="font-medium text-sm truncate">{sub.target_user_name || 'Пользователь'}</p>
-                            <p className="text-xs text-muted-foreground truncate">{sub.target_user_email}</p>
-                          </div>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handleDeleteSubscription(sub.target_user_id); }}
-                            className="p-1.5 rounded hover:bg-red-500/20 opacity-0 hover:opacity-100 group-hover:opacity-100"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 text-red-500" />
-                          </button>
-                        </button>
-                      ))}
+                        );
+                      })}
                     </div>
-                  )}
-                  
-                  {/* Add subscription button */}
-                  {showAddSubscription ? (
-                    <div className="mt-3 p-3 rounded-lg bg-accent/50 space-y-3">
-                      <Select value={selectedUserForSub} onValueChange={setSelectedUserForSub}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Выберите пользователя" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {allUsers
-                            .filter(u => !subscriptions.find(s => s.target_user_id === u.id))
-                            .map(u => (
-                              <SelectItem key={u.id} value={u.id}>
-                                <div>
-                                  <p className="font-medium">{u.name}</p>
-                                  <p className="text-xs text-muted-foreground">{u.email}</p>
-                                </div>
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                      <div className="flex gap-2">
-                        <button onClick={() => setShowAddSubscription(false)} className="flex-1 btn-secondary text-xs py-1.5">Отмена</button>
-                        <button onClick={handleAddSubscription} className="flex-1 btn-primary text-xs py-1.5">Подписаться</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <button 
-                      onClick={() => setShowAddSubscription(true)}
-                      className="flex items-center gap-2 w-full px-3 py-2 mt-3 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Подписаться на пользователя
-                    </button>
                   )}
                 </div>
+                
+                {/* Shared calendars */}
+                {sharedCalendars.length > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Доступные мне</p>
+                    <div className="space-y-1">
+                      {sharedCalendars.map(cal => {
+                        const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
+                        const isHidden = hiddenCalendars.has(cal.id);
+                        
+                        return (
+                          <div key={cal.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors hover:bg-accent/50">
+                            <button
+                              onClick={() => toggleCalendarVisibility(cal.id)}
+                              className="flex-shrink-0"
+                            >
+                              {isHidden ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                            <IconComponent className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                            <span className={`text-sm flex-1 ${isHidden ? 'line-through text-muted-foreground' : ''}`}>
+                              {cal.name}
+                              {cal.owner && <span className="text-xs text-muted-foreground ml-1">({cal.owner.name})</span>}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+                
+                {/* External ICS calendars */}
+                {icsSubscriptions.length > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Внешние календари</p>
+                    <div className="space-y-1">
+                      {icsSubscriptions.map(sub => {
+                        const isHidden = hiddenCalendars.has(sub.id);
+                        
+                        return (
+                          <div key={sub.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors hover:bg-accent/50 group">
+                            <button
+                              onClick={() => toggleCalendarVisibility(sub.id)}
+                              className="flex-shrink-0"
+                            >
+                              {isHidden ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                            <Globe className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                            <span className={`text-sm flex-1 ${isHidden ? 'line-through text-muted-foreground' : ''}`}>
+                              {sub.name}
+                            </span>
+                            <button
+                              onClick={() => handleDeleteICSSubscription(sub.id)}
+                              className="p-1.5 rounded hover:bg-red-500/20 opacity-0 group-hover:opacity-100"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
