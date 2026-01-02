@@ -295,6 +295,7 @@ export default function CalendarPage() {
         onEventTypesChange={setEventTypes}
         viewingUserId={viewingUserId}
         onViewingUserChange={setViewingUserId}
+        onHiddenCalendarsChange={setHiddenCalendars}
       />
       
       <main className="main-content-full flex-1" data-testid="calendar-main">
@@ -349,7 +350,7 @@ export default function CalendarPage() {
               <CalendarGrid
                 currentDate={currentDate}
                 selectedDate={selectedDate}
-                events={events}
+                events={visibleEvents}
                 calendars={calendars}
                 templates={templates}
                 appliedTemplates={appliedTemplates}
