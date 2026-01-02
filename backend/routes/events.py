@@ -47,6 +47,7 @@ async def get_events(
     start_date: Optional[str] = Query(None),
     end_date: Optional[str] = Query(None),
     user_id: Optional[str] = Query(None),
+    expand_recurring: bool = Query(True),
     user: dict = Depends(get_current_user)
 ):
     query = {}
@@ -62,6 +63,30 @@ async def get_events(
         ]
     
     events = await db.events.find(query, {"_id": 0}).to_list(1000)
+    
+    # Expand recurring events if requested
+    if expand_recurring and start_date and end_date:
+        # Parse dates
+        start_dt = datetime.fromisoformat(start_date)
+        if start_dt.tzinfo is None:
+            start_dt = start_dt.replace(tzinfo=timezone.utc)
+        
+        end_dt = datetime.fromisoformat(end_date)
+        if end_dt.tzinfo is None:
+            end_dt = end_dt.replace(tzinfo=timezone.utc)
+        
+        # Find recurring events
+        recurring_events = [e for e in events if e.get("recurrence_type") and e.get("recurrence_type") not in ["none", None, ""]]
+        
+        # Generate instances
+        result_events = list(events)
+        for event in recurring_events:
+            instances = generate_recurring_instances(event, start_dt, end_dt)
+            result_events.extend(instances)
+        
+        # Filter events by permissions
+        filtered_events = await filter_events_by_permissions(result_events, user["id"], db)
+        return filtered_events
     
     # Filter events by permissions
     filtered_events = await filter_events_by_permissions(events, user["id"], db)
