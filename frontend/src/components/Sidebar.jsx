@@ -1212,60 +1212,6 @@ export const Sidebar = ({
                   </div>
                 )}
 
-                {/* External Calendars Sub-tab */}
-                {settingsTab === SETTINGS_TABS.EXTERNAL_CALENDARS && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-medium flex items-center gap-2">
-                        <Link className="w-4 h-4" />
-                        ICS-подписки
-                      </h3>
-                      <button 
-                        onClick={() => setShowICSModal(true)}
-                        className="p-1.5 rounded-lg hover:bg-accent"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
-                    </div>
-                    
-                    <p className="text-xs text-muted-foreground">
-                      Добавьте ссылку на .ics файл для отображения событий из внешних календарей (Apple, Google и др.)
-                    </p>
-                    
-                    {icsSubscriptions.length === 0 ? (
-                      <div className="text-center py-6">
-                        <ExternalLink className="w-10 h-10 mx-auto text-muted-foreground mb-2" />
-                        <p className="text-xs text-muted-foreground">Нет подключённых календарей</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {icsSubscriptions.map(sub => (
-                          <div key={sub.id} className="flex items-center gap-2 p-3 rounded-lg bg-accent/50 hover:bg-accent group">
-                            <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: sub.color }} />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate">{sub.name}</p>
-                              <p className="text-xs text-muted-foreground truncate">{sub.url}</p>
-                            </div>
-                            <button 
-                              onClick={() => handleDeleteICSSubscription(sub.id)} 
-                              className="p-1 rounded hover:bg-red-500/20 opacity-0 group-hover:opacity-100 flex-shrink-0"
-                            >
-                              <Trash2 className="w-4 h-4 text-red-500" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    <div className="pt-4 border-t border-border">
-                      <p className="text-xs text-muted-foreground mb-2">Как получить ссылку на ICS:</p>
-                      <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
-                        <li>Apple Calendar: Настройки → Публикация календаря</li>
-                        <li>Google Calendar: Настройки календаря → Интеграция → Секретный адрес iCal</li>
-                      </ul>
-                    </div>
-                  </div>
-                )}
 
                 {/* Profile Sub-tab */}
                 {settingsTab === SETTINGS_TABS.PROFILE && (
