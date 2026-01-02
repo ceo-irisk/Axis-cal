@@ -246,17 +246,22 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
                 {rating && <span className="text-xs text-amber-500">★{rating}</span>}
               </div>
               <div className="space-y-1">
-                {dayEvents.map((event) => (
-                  <div 
-                    key={event.id} 
-                    onClick={(e) => { e.stopPropagation(); onEventSelect?.(event.id); }} 
-                    onDoubleClick={(e) => { e.stopPropagation(); onEventClick(event); }}
-                    className={`px-2 py-0.5 rounded text-xs truncate cursor-pointer hover:opacity-80 ${EVENT_COLORS[event.event_type]} ${event.status === 'tentative' && 'event-tentative'} ${selectedEventId === event.id ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`} 
-                    data-testid={`event-${event.id}`}
-                  >
-                    {event.title}
-                  </div>
-                ))}
+                {dayEvents.map((event) => {
+                  const dynamicStyle = getEventDynamicStyle(event, eventTypes);
+                  const isSelected = selectedEventId === event.id;
+                  return (
+                    <div 
+                      key={event.id} 
+                      onClick={(e) => { e.stopPropagation(); onEventSelect?.(event.id); }} 
+                      onDoubleClick={(e) => { e.stopPropagation(); onEventClick(event); }}
+                      className={`px-2 py-0.5 rounded text-xs truncate cursor-pointer hover:opacity-80 ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
+                      style={dynamicStyle || {}}
+                      data-testid={`event-${event.id}`}
+                    >
+                      {event.title}
+                    </div>
+                  );
+                })}
                 {events.filter(e => e.start_time?.startsWith(format(day, 'yyyy-MM-dd'))).length > 3 && (
                   <p className="text-xs text-muted-foreground px-2">+{events.filter(e => e.start_time?.startsWith(format(day, 'yyyy-MM-dd'))).length - 3}</p>
                 )}
