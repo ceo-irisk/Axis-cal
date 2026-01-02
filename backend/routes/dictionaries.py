@@ -143,7 +143,6 @@ async def create_timezone(timezone_data: Dict[str, Any] = Body(...), admin: dict
         "id": str(uuid.uuid4()),
         "name": timezone_data.get("name", ""),
         "offset": timezone_data.get("offset", ""),
-        "is_system": False,  # Custom timezone
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     

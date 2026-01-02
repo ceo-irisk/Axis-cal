@@ -1247,36 +1247,31 @@ export const Sidebar = ({
                       
                       {/* All Timezones */}
                       <div className="space-y-1 max-h-64 overflow-y-auto">
-                        {customTimezones.map(tz => {
-                          const isSystem = tz.is_system;
-                          return (
-                            <div key={tz.id} className={`flex items-center gap-2 p-2 rounded-lg group ${isSystem ? 'bg-accent/30' : 'bg-accent/50 hover:bg-accent'}`}>
-                              <Globe className={`w-3.5 h-3.5 flex-shrink-0 ${isSystem ? 'text-muted-foreground' : 'text-[#085C53]'}`} />
-                              <span className="flex-1 text-sm">{tz.name}</span>
-                              <code className="text-xs text-muted-foreground">{tz.offset}</code>
-                              {isAdmin?.() && (
-                                <div className="flex gap-1 opacity-0 group-hover:opacity-100">
-                                  <button 
-                                    onClick={() => { setEditingTimezone(tz); setShowTimezoneModal(true); }}
-                                    className="p-1 rounded hover:bg-background"
-                                    title="Редактировать"
-                                  >
-                                    <Edit2 className="w-3 h-3" />
-                                  </button>
-                                  {!isSystem && (
-                                    <button 
-                                      onClick={() => handleDeleteTimezone(tz.id)} 
-                                      className="p-1 rounded hover:bg-red-500/20"
-                                      title="Удалить"
-                                    >
-                                      <Trash2 className="w-3 h-3 text-red-500" />
-                                    </button>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
+                        {customTimezones.map(tz => (
+                          <div key={tz.id} className="flex items-center gap-2 p-2 rounded-lg bg-accent/50 hover:bg-accent group">
+                            <Globe className="w-3.5 h-3.5 flex-shrink-0 text-[#085C53]" />
+                            <span className="flex-1 text-sm">{tz.name}</span>
+                            <code className="text-xs text-muted-foreground">{tz.offset}</code>
+                            {isAdmin?.() && (
+                              <div className="flex gap-1 opacity-0 group-hover:opacity-100">
+                                <button 
+                                  onClick={() => { setEditingTimezone(tz); setShowTimezoneModal(true); }}
+                                  className="p-1 rounded hover:bg-background"
+                                  title="Редактировать"
+                                >
+                                  <Edit2 className="w-3 h-3" />
+                                </button>
+                                <button 
+                                  onClick={() => handleDeleteTimezone(tz.id)} 
+                                  className="p-1 rounded hover:bg-red-500/20"
+                                  title="Удалить"
+                                >
+                                  <Trash2 className="w-3 h-3 text-red-500" />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
