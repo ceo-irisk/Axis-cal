@@ -151,6 +151,36 @@ async def startup_event():
         ]
         await db.day_rules.insert_many(default_rules)
         logger.info("Created default day rules")
+    
+    # Create default timezones if none exist
+    timezones_count = await db.custom_timezones.count_documents({})
+    if timezones_count == 0:
+        default_timezones = [
+            {"id": str(uuid.uuid4()), "name": "UTC", "offset": "0:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Лондон (GMT)", "offset": "+0:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Париж (GMT+1)", "offset": "+1:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Берлин (GMT+1)", "offset": "+1:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Киев (GMT+2)", "offset": "+2:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Москва (GMT+3)", "offset": "+3:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Самара (GMT+4)", "offset": "+4:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Екатеринбург (GMT+5)", "offset": "+5:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Омск (GMT+6)", "offset": "+6:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Красноярск (GMT+7)", "offset": "+7:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Иркутск (GMT+8)", "offset": "+8:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Якутск (GMT+9)", "offset": "+9:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Владивосток (GMT+10)", "offset": "+10:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Магадан (GMT+11)", "offset": "+11:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Камчатка (GMT+12)", "offset": "+12:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Дубай (GMT+4)", "offset": "+4:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Сингапур (GMT+8)", "offset": "+8:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Токио (GMT+9)", "offset": "+9:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Нью-Йорк (GMT-5)", "offset": "-5:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Чикаго (GMT-6)", "offset": "-6:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Денвер (GMT-7)", "offset": "-7:00", "is_system": True},
+            {"id": str(uuid.uuid4()), "name": "Лос-Анджелес (GMT-8)", "offset": "-8:00", "is_system": True},
+        ]
+        await db.custom_timezones.insert_many(default_timezones)
+        logger.info("Created default timezones")
 
 # Shutdown event
 @app.on_event("shutdown")
