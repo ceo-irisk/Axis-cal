@@ -758,7 +758,7 @@ export const Sidebar = ({
                                   <div 
                                     className={`w-2 h-2 rounded-full ${isUnconfirmed ? 'border' : ''}`} 
                                     style={{ 
-                                      backgroundColor: isUnconfirmed ? 'transparent' : eventColor,
+                                      backgroundColor: isUnconfirmed ? 'transparent' : (event.is_busy ? '#6b7280' : eventColor),
                                       borderColor: isUnconfirmed ? eventColor : 'transparent'
                                     }}
                                   />
