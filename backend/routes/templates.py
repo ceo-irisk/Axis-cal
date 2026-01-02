@@ -83,8 +83,8 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
         "created_by": user["id"],
         "status": "template",
         "start_time": {
-            "$gte": start_of_day.isoformat(),
-            "$lt": end_of_day.isoformat()
+            "$gte": start_of_day_str,
+            "$lt": end_of_day_str
         }
     }, {"_id": 0}).to_list(100)
     
