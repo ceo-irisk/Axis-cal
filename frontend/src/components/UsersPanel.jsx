@@ -265,6 +265,22 @@ const UserForm = ({ initialData, onSave, onCancel }) => {
           </SelectContent>
         </Select>
       </div>
+      
+      <div>
+        <Label>Часовой пояс</Label>
+        <Select value={timezone} onValueChange={setTimezone}>
+          <SelectTrigger className="mt-1">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {customTimezones.map(tz => (
+              <SelectItem key={tz.id} value={tz.name}>
+                {tz.name} ({tz.offset})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onCancel}>Отмена</Button>
