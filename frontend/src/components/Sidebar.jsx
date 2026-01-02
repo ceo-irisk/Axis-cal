@@ -1,12 +1,12 @@
 import { useAuth } from '../lib/auth';
 import { useTheme } from '../lib/theme';
 import { useState, useEffect } from 'react';
-import { 
+import {
   getCalendars, addCalendar, deleteCalendar,
   getEventTypes, createEventType, updateEventType, deleteEventType,
   getEventStatuses, createEventStatus, updateEventStatus, deleteEventStatus,
   getTemplates, createTemplate, updateTemplate, deleteTemplate, applyTemplate,
-  getCustomTimezones, createCustomTimezone, deleteCustomTimezone,
+  getCustomTimezones, createCustomTimezone, updateCustomTimezone, deleteCustomTimezone,
   getICSSubscriptions, createICSSubscription, deleteICSSubscription,
   getSubscriptions, createSubscription, deleteSubscription, getUsers
 } from '../lib/api';
