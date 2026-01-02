@@ -156,11 +156,19 @@ const TemplateSelector = ({ day, templates, appliedTemplates, onApplyTemplate, o
 };
 
 export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, templates, appliedTemplates = [], overloadedDays, ratings, view, onDateClick, onCellDoubleClick, onEventClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, onEventDelete, selectedEventId, onEventSelect, loading, selectedTimezone, onTimezoneChange, customTimezones = [], eventTypes = [] }) => {
-  // Calculate timezone shift
-  const localOffset = getLocalTimezoneOffset();
-  const allTimezones = [...TIMEZONES, ...customTimezones];
-  const selectedTz = allTimezones.find(tz => tz.value === selectedTimezone);
-  const timezoneShift = selectedTz ? selectedTz.offset - localOffset : 0;
+  // Parse offset string (format: "+3:00" or "-5:00")
+  const parseOffset = (offsetStr) => {
+    if (!offsetStr) return 0;
+    const match = offsetStr.match(/([+-])?(\d+):(\d+)/);
+    if (!match) return 0;
+    const sign = match[1] === '-' ? -1 : 1;
+    const hours = parseInt(match[2]);
+    const minutes = parseInt(match[3]);
+    return sign * (hours + minutes / 60);
+  };
+  
+  const selectedTz = customTimezones.find(tz => tz.name === selectedTimezone) || customTimezones[0];
+  const timezoneShift = selectedTz ? parseOffset(selectedTz.offset) : 0;
 
   if (view === 'day') return <DayView date={selectedDate} events={events} templates={templates} appliedTemplates={appliedTemplates} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} timezoneShift={timezoneShift} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} eventTypes={eventTypes} />;
   if (view === 'week') return <WeekView date={selectedDate} events={events} templates={templates} appliedTemplates={appliedTemplates} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} timezoneShift={timezoneShift} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} eventTypes={eventTypes} />;
