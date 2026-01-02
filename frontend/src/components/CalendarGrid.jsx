@@ -294,7 +294,7 @@ const TimezoneSelector = ({ selectedTimezone, onTimezoneChange, customTimezones 
   );
 };
 
-const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventId, onEventSelect, timezoneShift, selectedTimezone, onTimezoneChange, customTimezones, eventTypes }) => {
+const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventId, onEventSelect, currentTimezoneOffset, selectedTimezone, onTimezoneChange, customTimezones, eventTypes }) => {
   const weekStart = startOfWeek(date, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
@@ -317,8 +317,9 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
     try {
       const start = new Date(event.start_time);
       const end = new Date(event.end_time);
-      // Apply timezone shift for positioning
-      const shiftedStartHour = start.getHours() + start.getMinutes() / 60 + timezoneShift;
+      // Apply event's timezone shift for positioning
+      const shiftHours = event._timezoneShift || 0;
+      const shiftedStartHour = start.getHours() + start.getMinutes() / 60 + shiftHours;
       const duration = (end - start) / 3600000;
       const topOffset = shiftedStartHour * 60;
       return { 
@@ -579,7 +580,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                 {isTodayCol && (
                   <div 
                     className="absolute left-0 right-0 border-t-2 border-[#085C53] z-10 pointer-events-none" 
-                    style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60 + timezoneShift) * 60}px` }}
+                    style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60 + currentTimezoneOffset) * 60}px` }}
                   >
                     <div className="absolute -left-1 -top-1.5 w-3 h-3 rounded-full bg-[#085C53]" />
                   </div>
