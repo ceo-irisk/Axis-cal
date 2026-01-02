@@ -1294,6 +1294,7 @@ export const Sidebar = ({
                     </div>
                   </div>
                 )}
+                )}
 
                 {/* External Calendars Sub-tab */}
                 {settingsTab === SETTINGS_TABS.EXTERNAL_CALENDARS && (
