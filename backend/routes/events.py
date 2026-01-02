@@ -25,16 +25,8 @@ async def create_event(event_data: EventCreate, user: dict = Depends(get_current
     event_dict["created_at"] = datetime.now(timezone.utc).isoformat()
     event_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
     
-    # Ensure start_time and end_time are aware datetime in UTC
-    if isinstance(event_dict["start_time"], datetime):
-        if event_dict["start_time"].tzinfo is None:
-            event_dict["start_time"] = event_dict["start_time"].replace(tzinfo=timezone.utc)
-        event_dict["start_time"] = event_dict["start_time"].isoformat()
-    
-    if isinstance(event_dict["end_time"], datetime):
-        if event_dict["end_time"].tzinfo is None:
-            event_dict["end_time"] = event_dict["end_time"].replace(tzinfo=timezone.utc)
-        event_dict["end_time"] = event_dict["end_time"].isoformat()
+    # DON'T convert to UTC - keep as local time string
+    # Frontend sends "2026-01-02T14:00:00" and we save it as is
     
     await db.events.insert_one(event_dict)
     
@@ -128,20 +120,7 @@ async def update_event(event_id: str, event_data: EventCreate, user: dict = Depe
     update_dict = event_data.model_dump()
     update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
     
-    # Ensure datetime fields are properly formatted
-    if isinstance(update_dict["start_time"], datetime):
-        if update_dict["start_time"].tzinfo is None:
-            update_dict["start_time"] = update_dict["start_time"].replace(tzinfo=timezone.utc)
-        update_dict["start_time"] = update_dict["start_time"].isoformat()
-    
-    if isinstance(update_dict["end_time"], datetime):
-        if update_dict["end_time"].tzinfo is None:
-            update_dict["end_time"] = update_dict["end_time"].replace(tzinfo=timezone.utc)
-        update_dict["end_time"] = update_dict["end_time"].isoformat()
-    
-    # Update recurring instances if this is a parent recurring event
-    if event.get("recurrence_type") and event.get("recurrence_type") not in ["none", None, ""]:
-        update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    # DON'T convert datetime fields - keep as local time
     
     await db.events.update_one({"id": event_id}, {"$set": update_dict})
     
