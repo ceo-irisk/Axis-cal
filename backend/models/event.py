@@ -5,9 +5,9 @@ from enum import Enum
 import uuid
 
 class EventStatus(str, Enum):
-    CONFIRMED = "confirmed"
-    TENTATIVE = "tentative"
-    CANCELLED = "cancelled"
+    CONFIRMED = "confirmed"       # Согласовано
+    TENTATIVE = "tentative"       # Не согласовано
+    TEMPLATE = "template"         # Шаблон
 
 class RecurrenceType(str, Enum):
     NONE = "none"
@@ -26,26 +26,25 @@ class EventBase(BaseModel):
     event_type: str = "meeting"
     status: EventStatus = EventStatus.CONFIRMED
     color: Optional[str] = None
-    pattern: Optional[str] = None  # for tentative events
     location: Optional[str] = None
     attendees: List[str] = []
-    calendar_id: Optional[str] = None  # User's calendar
+    calendar_id: Optional[str] = None
     custom_fields: Dict[str, Any] = {}
     external_calendar_id: Optional[str] = None
     external_event_id: Optional[str] = None
-    # New fields for enhanced UI
+    
+    # Флаги (только необходимые)
     is_all_day: bool = False
-    is_unconfirmed: bool = False
-    is_template_event: bool = False
+    is_urgent: bool = False
     is_blocked: bool = False
     is_completed: bool = False
-    is_urgent: bool = False
     is_video_call: bool = False
+    
     # Recurrence fields
     recurrence_type: RecurrenceType = RecurrenceType.NONE
     recurrence_end_date: Optional[datetime] = None
-    recurrence_parent_id: Optional[str] = None  # For generated instances
-    recurrence_custom_days: Optional[List[str]] = None  # For custom_days recurrence: ['monday', 'wednesday', 'friday']
+    recurrence_parent_id: Optional[str] = None
+    recurrence_custom_days: Optional[List[str]] = None
 
 class EventCreate(EventBase):
     pass
