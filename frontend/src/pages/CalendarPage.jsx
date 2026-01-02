@@ -45,7 +45,7 @@ export default function CalendarPage() {
   const [showSurveyModal, setShowSurveyModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [defaultEventTime, setDefaultEventTime] = useState(null);
-  const [selectedTimezone, setSelectedTimezone] = useState(() => getLocalTimezoneName());
+  const [selectedTimezone, setSelectedTimezone] = useState(user?.timezone || 'Europe/Moscow');
   const [customTimezones, setCustomTimezones] = useState([]);
   
   // User switching for viewing others' calendars
