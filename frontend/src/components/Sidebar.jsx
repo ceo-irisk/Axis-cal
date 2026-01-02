@@ -1219,40 +1219,60 @@ export const Sidebar = ({
                     {/* Custom Timezones */}
                     <div className="border-t border-border pt-4">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-sm font-medium flex items-center gap-2">
-                          <Globe className="w-4 h-4" />
-                          Часовые пояса
-                        </h3>
-                        <button 
-                          onClick={() => setShowTimezoneModal(true)}
-                          className="p-1.5 rounded-lg hover:bg-accent"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <p className="text-xs text-muted-foreground mb-2">
-                        Добавьте свои часовые пояса для удобства
-                      </p>
-                      <div className="space-y-1">
-                        {customTimezones.map(tz => (
-                          <div key={tz.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/50 group">
-                            <Globe className="w-4 h-4 text-muted-foreground" />
-                            <span className="flex-1 text-sm">{tz.label}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {tz.offset >= 0 ? '+' : ''}{tz.offset}
-                            </span>
-                            <button 
-                              onClick={() => handleDeleteTimezone(tz.id)} 
-                              className="p-1 rounded hover:bg-red-500/20 opacity-0 group-hover:opacity-100"
-                            >
-                              <Trash2 className="w-3 h-3 text-red-500" />
-                            </button>
-                          </div>
-                        ))}
-                        {customTimezones.length === 0 && (
-                          <p className="text-xs text-muted-foreground text-center py-2">Нет кастомных часовых поясов</p>
+                        <h3 className="text-sm font-medium">Часовые пояса</h3>
+                        {isAdmin?.() && (
+                          <button 
+                            onClick={() => setShowTimezoneModal(true)}
+                            className="p-1.5 rounded-lg hover:bg-accent"
+                            title="Добавить кастомный часовой пояс"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
                         )}
                       </div>
+                      
+                      <p className="text-xs text-muted-foreground mb-3">
+                        Часовые пояса доступные в календаре
+                      </p>
+                      
+                      {/* Standard Timezones */}
+                      <div className="mb-3">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Стандартные</p>
+                        <div className="space-y-1 max-h-48 overflow-y-auto">
+                          {TIMEZONES.map(tz => (
+                            <div key={tz.value} className="flex items-center gap-2 p-2 rounded-lg bg-accent/30">
+                              <Globe className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                              <span className="flex-1 text-sm">{tz.label}</span>
+                              <code className="text-xs text-muted-foreground">{tz.offset >= 0 ? '+' : ''}{tz.offset}</code>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Custom Timezones */}
+                      {customTimezones.length > 0 && (
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Кастомные</p>
+                          <div className="space-y-1">
+                            {customTimezones.map(tz => (
+                              <div key={tz.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/50 group">
+                                <Globe className="w-3.5 h-3.5 text-[#085C53] flex-shrink-0" />
+                                <span className="flex-1 text-sm">{tz.name}</span>
+                                <code className="text-xs text-muted-foreground">{tz.offset}</code>
+                                {isAdmin?.() && (
+                                  <button 
+                                    onClick={() => handleDeleteTimezone(tz.id)} 
+                                    className="p-1 rounded hover:bg-red-500/20 opacity-0 group-hover:opacity-100"
+                                    title="Удалить"
+                                  >
+                                    <Trash2 className="w-3 h-3 text-red-500" />
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
