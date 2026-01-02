@@ -246,19 +246,18 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
 
 // Timezone selector component - compact version
 const TimezoneSelector = ({ selectedTimezone, onTimezoneChange, customTimezones = [] }) => {
-  const allTimezones = [...TIMEZONES, ...customTimezones];
-  const selectedTz = allTimezones.find(tz => tz.value === selectedTimezone);
+  const selectedTz = customTimezones.find(tz => tz.name === selectedTimezone);
   
   return (
     <Select value={selectedTimezone} onValueChange={onTimezoneChange}>
-      <SelectTrigger className="w-[130px] h-7 text-[10px] gap-1">
+      <SelectTrigger className="w-[180px] h-7 text-xs gap-1">
         <Globe className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-        <span className="truncate">{selectedTz?.label?.split(' ')[0] || 'UTC'}</span>
+        <span className="truncate">{selectedTz?.name || 'UTC (0:00)'}</span>
       </SelectTrigger>
       <SelectContent>
-        {allTimezones.map(tz => (
-          <SelectItem key={tz.value} value={tz.value} className="text-xs">
-            {tz.label}
+        {customTimezones.map(tz => (
+          <SelectItem key={tz.id} value={tz.name} className="text-xs">
+            {tz.name} ({tz.offset})
           </SelectItem>
         ))}
       </SelectContent>
