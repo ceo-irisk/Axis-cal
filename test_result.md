@@ -215,6 +215,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Calendar Hide/Show Functionality"
     - "Backend Refactoring - Users Routes"
     - "Backend Refactoring - Events Routes"
     - "Backend Refactoring - Calendars Routes"
