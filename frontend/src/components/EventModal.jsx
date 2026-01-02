@@ -217,9 +217,16 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Combine date and time
-    const startDateTime = `${formData.start_date}T${formData.start_time_val}`;
-    const endDateTime = `${formData.end_date}T${formData.end_time_val}`;
+    // Get current timezone offset in minutes
+    const timezoneOffset = new Date().getTimezoneOffset();
+    
+    // Combine date and time into local datetime string
+    const startDateTimeStr = `${formData.start_date}T${formData.start_time_val}`;
+    const endDateTimeStr = `${formData.end_date}T${formData.end_time_val}`;
+    
+    // Create Date objects (will be interpreted as local time)
+    const startLocal = new Date(startDateTimeStr);
+    const endLocal = new Date(endDateTimeStr);
     
     // Prepare recurrence end date
     let recurrenceEndDate = null;
@@ -229,8 +236,8 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
     
     onSave({
       ...formData,
-      start_time: new Date(startDateTime).toISOString(),
-      end_time: new Date(endDateTime).toISOString(),
+      start_time: startLocal.toISOString(),
+      end_time: endLocal.toISOString(),
       status: formData.status,
       recurrence_type: formData.recurrence_type,
       recurrence_end_date: recurrenceEndDate,
