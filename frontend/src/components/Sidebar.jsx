@@ -1444,14 +1444,15 @@ export const Sidebar = ({
       </Dialog>
 
       {/* Timezone Modal */}
-      <Dialog open={showTimezoneModal} onOpenChange={setShowTimezoneModal}>
+      <Dialog open={showTimezoneModal} onOpenChange={(open) => { setShowTimezoneModal(open); if (!open) setEditingTimezone(null); }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Новый часовой пояс</DialogTitle>
+            <DialogTitle>{editingTimezone ? 'Редактировать часовой пояс' : 'Новый часовой пояс'}</DialogTitle>
           </DialogHeader>
           <TimezoneForm 
+            timezone={editingTimezone}
             onSave={handleSaveTimezone}
-            onCancel={() => setShowTimezoneModal(false)}
+            onCancel={() => { setShowTimezoneModal(false); setEditingTimezone(null); }}
           />
         </DialogContent>
       </Dialog>
