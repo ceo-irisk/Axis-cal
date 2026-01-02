@@ -343,18 +343,19 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
                 <SelectContent position="popper" sideOffset={4}>
                   {calendars.map(cal => {
                     const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
-                  return (
-                    <SelectItem key={cal.id} value={cal.id}>
-                      <div className="flex items-center gap-2">
-                        <IconComponent className="w-3.5 h-3.5" />
-                        {cal.name}
-                        {cal.is_shared && <span className="text-xs text-muted-foreground">({cal.permission_level})</span>}
-                      </div>
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
+                    return (
+                      <SelectItem key={cal.id} value={cal.id}>
+                        <div className="flex items-center gap-2">
+                          <IconComponent className="w-3.5 h-3.5" />
+                          {cal.name}
+                          {cal.is_shared && <span className="text-xs text-muted-foreground">({cal.permission_level})</span>}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* All day toggle */}
