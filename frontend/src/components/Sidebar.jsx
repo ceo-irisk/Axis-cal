@@ -134,7 +134,6 @@ export const Sidebar = ({
   const [calendars, setCalendars] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newCalName, setNewCalName] = useState('');
-  const [newCalColor, setNewCalColor] = useState('#085C53');
   const [newCalIcon, setNewCalIcon] = useState('calendar');
   const [showPermissionsModal, setShowPermissionsModal] = useState(false);
   const [selectedCalendarForPermissions, setSelectedCalendarForPermissions] = useState(null);
@@ -426,9 +425,8 @@ export const Sidebar = ({
   const handleAddCalendar = async () => {
     if (!newCalName.trim()) return;
     try {
-      await addCalendar(newCalName.trim(), newCalColor, newCalIcon);
+      await addCalendar(newCalName.trim(), newCalIcon);
       setNewCalName('');
-      setNewCalColor(CALENDAR_COLORS[0]);
       setNewCalIcon('calendar');
       setShowAddForm(false);
       fetchCalendars();
@@ -1050,21 +1048,6 @@ export const Sidebar = ({
                                   >
                                     <IconComp className="w-5 h-5 mx-auto" />
                                   </button>
-                                ))}
-                              </div>
-                            </div>
-                            
-                            <div>
-                              <Label className="text-xs text-muted-foreground mb-2 block">Цвет</Label>
-                              <div className="flex gap-1.5 flex-wrap">
-                                {CALENDAR_COLORS.map(c => (
-                                  <button 
-                                    key={c}
-                                    type="button"
-                                    onClick={() => setNewCalColor(c)} 
-                                    className={`w-8 h-8 rounded-full ${newCalColor === c ? 'ring-2 ring-offset-2 ring-offset-background ring-foreground' : ''}`} 
-                                    style={{ backgroundColor: c }} 
-                                  />
                                 ))}
                               </div>
                             </div>
