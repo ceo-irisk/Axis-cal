@@ -1225,21 +1225,7 @@ export const Sidebar = ({
                       <p className="text-xs text-amber-500 mt-3 text-center">Редактирование флагов — скоро</p>
                     </div>
 
-                    {/* Custom Timezones */}
-                    <div className="border-t border-border pt-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-sm font-medium">Часовые пояса</h3>
-                        {isAdmin?.() && (
-                          <button 
-                            onClick={() => setShowTimezoneModal(true)}
-                            className="p-1.5 rounded-lg hover:bg-accent"
-                            title="Добавить кастомный часовой пояс"
-                          >
-                            <Plus className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                      
+                    {/* Timezones */}
                     <div className="border-t border-border pt-4">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-sm font-medium">Часовые пояса</h3>
