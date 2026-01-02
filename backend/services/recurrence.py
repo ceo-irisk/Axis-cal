@@ -9,23 +9,33 @@ def generate_recurring_instances(event: dict, start_date: datetime, end_date: da
     if recurrence_type == "none":
         return instances
     
-    event_start = datetime.fromisoformat(event["start_time"].replace("Z", "+00:00"))
-    event_end = datetime.fromisoformat(event["end_time"].replace("Z", "+00:00"))
+    # Parse event times as naive datetime (local time)
+    event_start_str = event["start_time"].replace("Z", "+00:00")
+    event_end_str = event["end_time"].replace("Z", "+00:00")
+    
+    # Remove timezone info if present to get naive datetime
+    if "+" in event_start_str or event_start_str.endswith("Z"):
+        event_start = datetime.fromisoformat(event_start_str).replace(tzinfo=None)
+        event_end = datetime.fromisoformat(event_end_str).replace(tzinfo=None)
+    else:
+        event_start = datetime.fromisoformat(event_start_str)
+        event_end = datetime.fromisoformat(event_end_str)
+    
     duration = event_end - event_start
     
-    # Ensure all datetimes have timezone info
-    if start_date.tzinfo is None:
-        start_date = start_date.replace(tzinfo=timezone.utc)
-    if end_date.tzinfo is None:
-        end_date = end_date.replace(tzinfo=timezone.utc)
-    if event_start.tzinfo is None:
-        event_start = event_start.replace(tzinfo=timezone.utc)
+    # Convert start_date and end_date to naive for comparison
+    if start_date.tzinfo is not None:
+        start_date = start_date.replace(tzinfo=None)
+    if end_date.tzinfo is not None:
+        end_date = end_date.replace(tzinfo=None)
     
     recurrence_end = None
     if event.get("recurrence_end_date"):
-        recurrence_end = datetime.fromisoformat(event["recurrence_end_date"].replace("Z", "+00:00"))
-        if recurrence_end.tzinfo is None:
-            recurrence_end = recurrence_end.replace(tzinfo=timezone.utc)
+        recurrence_end_str = event["recurrence_end_date"].replace("Z", "+00:00")
+        if "+" in recurrence_end_str or recurrence_end_str.endswith("Z"):
+            recurrence_end = datetime.fromisoformat(recurrence_end_str).replace(tzinfo=None)
+        else:
+            recurrence_end = datetime.fromisoformat(recurrence_end_str)
     
     current_date = event_start
     instance_count = 0
