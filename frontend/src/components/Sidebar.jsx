@@ -785,11 +785,21 @@ export const Sidebar = ({
             {/* Calendars Tab - Show all user calendars */}
             {activeTab === TABS.CALENDARS && (
               <div className="space-y-4">
+                {/* My calendars */}
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Мои календари</p>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Мои календари</p>
+                    <button
+                      onClick={() => setShowAddForm(true)}
+                      className="p-1 rounded-lg hover:bg-accent"
+                      title="Создать календарь"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
                   
                   {myCalendars.length === 0 ? (
-                    <p className="text-xs text-muted-foreground text-center py-8">Нет календарей</p>
+                    <p className="text-xs text-muted-foreground text-center py-4">Нет календарей</p>
                   ) : (
                     <div className="space-y-1">
                       {myCalendars.map(cal => {
@@ -797,7 +807,7 @@ export const Sidebar = ({
                         const isHidden = hiddenCalendars.has(cal.id);
                         
                         return (
-                          <div key={cal.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors hover:bg-accent/50 group">
+                          <div key={cal.id} className="flex items-center gap-2 px-2 py-2 rounded-lg transition-colors hover:bg-accent/50 group">
                             <button
                               onClick={() => toggleCalendarVisibility(cal.id)}
                               className="flex-shrink-0"
@@ -805,9 +815,47 @@ export const Sidebar = ({
                               {isHidden ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4" />}
                             </button>
                             <IconComponent className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                            <span className={`text-sm flex-1 ${isHidden ? 'line-through text-muted-foreground' : ''}`}>
+                            <span className={`text-sm flex-1 min-w-0 truncate ${isHidden ? 'line-through text-muted-foreground' : ''}`}>
                               {cal.name}
-                              {cal.is_default && <span className="text-xs text-muted-foreground ml-1">({cal.is_public ? 'открытый' : 'закрытый'})</span>}
+                              {cal.is_default && <span className="text-xs text-muted-foreground ml-1">({cal.is_public ? 'откр' : 'закр'})</span>}
+                            </span>
+                            <button
+                              onClick={() => { setSelectedCalendarForPermissions(cal); setShowPermissionsModal(true); }}
+                              className="p-1 rounded hover:bg-accent opacity-0 group-hover:opacity-100"
+                              title="Настроить доступы"
+                            >
+                              <Users className="w-3.5 h-3.5 text-[#085C53]" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+                
+                {/* Shared calendars - always show */}
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Доступные мне</p>
+                  {sharedCalendars.length === 0 ? (
+                    <p className="text-xs text-muted-foreground text-center py-4">Нет расшаренных календарей</p>
+                  ) : (
+                    <div className="space-y-1">
+                      {sharedCalendars.map(cal => {
+                        const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
+                        const isHidden = hiddenCalendars.has(cal.id);
+                        
+                        return (
+                          <div key={cal.id} className="flex items-center gap-2 px-2 py-2 rounded-lg transition-colors hover:bg-accent/50">
+                            <button
+                              onClick={() => toggleCalendarVisibility(cal.id)}
+                              className="flex-shrink-0"
+                            >
+                              {isHidden ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                            <IconComponent className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                            <span className={`text-sm flex-1 min-w-0 truncate ${isHidden ? 'line-through text-muted-foreground' : ''}`}>
+                              {cal.name}
+                              {cal.owner && <span className="text-xs text-muted-foreground ml-1">({cal.owner.name})</span>}
                             </span>
                           </div>
                         );
@@ -816,45 +864,18 @@ export const Sidebar = ({
                   )}
                 </div>
                 
-                {/* Shared calendars */}
-                {sharedCalendars.length > 0 && (
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Доступные мне</p>
-                    <div className="space-y-1">
-                      {sharedCalendars.map(cal => {
-                        const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
-                        const isHidden = hiddenCalendars.has(cal.id);
-                        
-                        return (
-                          <div key={cal.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors hover:bg-accent/50">
-                            <button
-                              onClick={() => toggleCalendarVisibility(cal.id)}
-                              className="flex-shrink-0"
-                            >
-                              {isHidden ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4" />}
-                            </button>
-                            <IconComponent className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                            <span className={`text-sm flex-1 ${isHidden ? 'line-through text-muted-foreground' : ''}`}>
-                              {cal.name}
-                              {cal.owner && <span className="text-xs text-muted-foreground ml-1">({cal.owner.name})</span>}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-                
-                {/* External ICS calendars */}
-                {icsSubscriptions.length > 0 && (
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Внешние календари</p>
+                {/* External ICS calendars - always show */}
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Внешние календари</p>
+                  {icsSubscriptions.length === 0 ? (
+                    <p className="text-xs text-muted-foreground text-center py-4">Нет внешних календарей</p>
+                  ) : (
                     <div className="space-y-1">
                       {icsSubscriptions.map(sub => {
                         const isHidden = hiddenCalendars.has(sub.id);
                         
                         return (
-                          <div key={sub.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors hover:bg-accent/50 group">
+                          <div key={sub.id} className="flex items-center gap-2 px-2 py-2 rounded-lg transition-colors hover:bg-accent/50 group">
                             <button
                               onClick={() => toggleCalendarVisibility(sub.id)}
                               className="flex-shrink-0"
@@ -862,12 +883,12 @@ export const Sidebar = ({
                               {isHidden ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4" />}
                             </button>
                             <Globe className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                            <span className={`text-sm flex-1 ${isHidden ? 'line-through text-muted-foreground' : ''}`}>
+                            <span className={`text-sm flex-1 min-w-0 truncate ${isHidden ? 'line-through text-muted-foreground' : ''}`}>
                               {sub.name}
                             </span>
                             <button
                               onClick={() => handleDeleteICSSubscription(sub.id)}
-                              className="p-1.5 rounded hover:bg-red-500/20 opacity-0 group-hover:opacity-100"
+                              className="p-1 rounded hover:bg-red-500/20 opacity-0 group-hover:opacity-100"
                             >
                               <Trash2 className="w-3.5 h-3.5 text-red-500" />
                             </button>
@@ -875,8 +896,8 @@ export const Sidebar = ({
                         );
                       })}
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             )}
 
