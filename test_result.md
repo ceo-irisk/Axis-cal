@@ -195,6 +195,18 @@ frontend:
         agent: "main"
         comment: "Frontend testing not performed by testing agent"
 
+  - task: "Calendar Hide/Show Functionality"
+    implemented: false
+    working: false
+    file: "frontend/src/components/Sidebar.jsx, frontend/src/pages/CalendarPage.jsx, frontend/src/components/CalendarGrid.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL BUG: Calendar hide/show feature crashes the app. Error: 'onHiddenCalendarsChange is not defined'. The Sidebar has toggleCalendarVisibility function (line 443) that calls onHiddenCalendarsChange?.(next), but this prop is not passed from CalendarPage. Root causes: 1) CalendarPage has no hiddenCalendars state 2) No onHiddenCalendarsChange handler passed to Sidebar 3) CalendarGrid has no logic to filter events by calendar visibility. When user clicks eye button in Calendars tab, app shows red error screen. REQUIRED FIXES: Add hiddenCalendars state to CalendarPage, create and pass onHiddenCalendarsChange handler to Sidebar, pass hiddenCalendars to CalendarGrid, implement event filtering in CalendarGrid to hide events from hidden calendars."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
