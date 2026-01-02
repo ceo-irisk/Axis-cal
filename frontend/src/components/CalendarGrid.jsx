@@ -664,8 +664,9 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
     try {
       const start = new Date(event.start_time);
       const end = new Date(event.end_time);
-      // Apply timezone shift for positioning
-      const shiftedStartHour = start.getHours() + start.getMinutes() / 60 + timezoneShift;
+      // Apply event's timezone shift for positioning
+      const shiftHours = event._timezoneShift || 0;
+      const shiftedStartHour = start.getHours() + start.getMinutes() / 60 + shiftHours;
       const duration = (end - start) / 3600000;
       const topOffset = shiftedStartHour * 60;
       return { top: `${topOffset}px`, height: `${Math.max(duration * 60, 30)}px` };
@@ -816,7 +817,7 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
           {isToday(date) && (
             <div 
               className="absolute left-0 right-0 border-t-2 border-[#085C53] z-10 pointer-events-none" 
-              style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60 + timezoneShift) * 60}px` }}
+              style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60 + currentTimezoneOffset) * 60}px` }}
             >
               <div className="absolute -left-1 -top-1.5 w-3 h-3 rounded-full bg-[#085C53]" />
             </div>
