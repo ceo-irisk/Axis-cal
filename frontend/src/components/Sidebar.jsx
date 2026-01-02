@@ -158,7 +158,6 @@ export const Sidebar = ({
   const [eventTypes, setEventTypes] = useState([]);
   const [eventStatuses, setEventStatuses] = useState([]);
   const [templates, setTemplates] = useState([]);
-  const [allTimezones, setAllTimezones] = useState([]);  // All timezones from DB
   
   // Edit modals
   const [showTypeModal, setShowTypeModal] = useState(false);
@@ -253,7 +252,6 @@ export const Sidebar = ({
       setEventTypes(typesRes.data || []);
       setEventStatuses(statusesRes.data || []);
       setTemplates(templatesRes.data || []);
-      setAllTimezones(timezonesRes.data || []);  // Store all timezones
       setCustomTimezones(timezonesRes.data || []);
       setIcsSubscriptions(icsRes.data || []);
       onCustomTimezonesChange?.(timezonesRes.data || []);
@@ -1242,16 +1240,30 @@ export const Sidebar = ({
                         )}
                       </div>
                       
+                    <div className="border-t border-border pt-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-sm font-medium">Часовые пояса</h3>
+                        {isAdmin?.() && (
+                          <button 
+                            onClick={() => { setEditingTimezone(null); setShowTimezoneModal(true); }}
+                            className="p-1.5 rounded-lg hover:bg-accent"
+                            title="Добавить часовой пояс"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                      
                       <p className="text-xs text-muted-foreground mb-3">
                         Часовые пояса доступные в календаре
                       </p>
                       
-                      {/* All Timezones from DB */}
+                      {/* All Timezones */}
                       <div className="space-y-1 max-h-64 overflow-y-auto">
-                        {allTimezones.map(tz => {
+                        {customTimezones.map(tz => {
                           const isSystem = tz.is_system;
                           return (
-                            <div key={tz.id} className={`flex items-center gap-2 p-2 rounded-lg group ${isSystem ? 'bg-accent/30' : 'hover:bg-accent/50'}`}>
+                            <div key={tz.id} className={`flex items-center gap-2 p-2 rounded-lg group ${isSystem ? 'bg-accent/30' : 'bg-accent/50 hover:bg-accent'}`}>
                               <Globe className={`w-3.5 h-3.5 flex-shrink-0 ${isSystem ? 'text-muted-foreground' : 'text-[#085C53]'}`} />
                               <span className="flex-1 text-sm">{tz.name}</span>
                               <code className="text-xs text-muted-foreground">{tz.offset}</code>
