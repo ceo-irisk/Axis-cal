@@ -21,36 +21,6 @@ const getLocalTime = (isoString, timezoneShift = 0) => {
   }
 };
 
-// Confirmed events - left border + fill
-const EVENT_COLORS = {
-  meeting: 'event-meeting',
-  call: 'event-call',
-  personal: 'event-personal',
-  urgent: 'event-urgent',
-  travel: 'event-travel',
-  deep_work: 'event-deep-work',
-};
-
-// Unconfirmed events - dashed border + fill
-const UNCONFIRMED_EVENT_COLORS = {
-  meeting: 'event-unconfirmed-meeting',
-  call: 'event-unconfirmed-call',
-  personal: 'event-unconfirmed-personal',
-  urgent: 'event-unconfirmed-urgent',
-  travel: 'event-unconfirmed-travel',
-  deep_work: 'event-unconfirmed-deep_work',
-};
-
-// Template events - solid border, no fill
-const TEMPLATE_EVENT_COLORS = {
-  meeting: 'event-template-meeting',
-  call: 'event-template-call',
-  personal: 'event-template-personal',
-  urgent: 'event-template-urgent',
-  travel: 'event-template-travel',
-  deep_work: 'event-template-deep-work',
-};
-
 // Get dynamic event styles based on status and type color
 const getEventDynamicStyle = (event, eventTypes = []) => {
   // "Занято" events - special styling
