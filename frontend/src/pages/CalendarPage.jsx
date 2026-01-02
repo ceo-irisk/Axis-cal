@@ -193,10 +193,8 @@ export default function CalendarPage() {
       const dataWithTimezone = { ...eventData, timezone: selectedTimezone };
       if (selectedEvent) {
         await updateEvent(selectedEvent.id, dataWithTimezone);
-        toast.success('Событие обновлено');
       } else {
         await createEvent(dataWithTimezone);
-        toast.success('Событие создано');
       }
       setShowEventModal(false);
       fetchData();

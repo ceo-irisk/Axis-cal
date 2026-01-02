@@ -188,14 +188,8 @@ export const createEventType = (name, label, color) => {
   params.append('color', color);
   return api.post(`/dictionaries/event-types?${params.toString()}`);
 };
-export const updateEventType = (id, name, label, color, order = 0, isActive = true) => {
-  const params = new URLSearchParams();
-  params.append('name', name);
-  params.append('label', label);
-  params.append('color', color);
-  params.append('order', order);
-  params.append('is_active', isActive);
-  return api.put(`/dictionaries/event-types/${id}?${params.toString()}`);
+export const updateEventType = (id, data) => {
+  return api.put(`/dictionaries/event-types/${id}`, data);
 };
 export const deleteEventType = (id) => api.delete(`/dictionaries/event-types/${id}`);
 export const reorderEventTypes = (typeIds) => api.put('/dictionaries/event-types/reorder', typeIds);

@@ -370,8 +370,8 @@ export const Sidebar = ({
     
     // Update order values
     try {
-      await updateEventType(newTypes[index].id, newTypes[index].name, newTypes[index].label, newTypes[index].color, index);
-      await updateEventType(newTypes[newIndex].id, newTypes[newIndex].name, newTypes[newIndex].label, newTypes[newIndex].color, newIndex);
+      await updateEventType(newTypes[index].id, { ...newTypes[index], order: index });
+      await updateEventType(newTypes[newIndex].id, { ...newTypes[newIndex], order: newIndex });
       fetchDictionaries();
     } catch (e) { toast.error('Ошибка изменения порядка'); }
   };
