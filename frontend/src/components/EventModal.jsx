@@ -331,13 +331,18 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
           {/* Calendar */}
           <div>
             <Label className="text-xs text-muted-foreground mb-1.5 block">Календарь</Label>
-            <Select value={formData.calendar_id || ''} onValueChange={(v) => setFormData({ ...formData, calendar_id: v })}>
-              <SelectTrigger data-testid="event-calendar-select">
-                <SelectValue placeholder="Выберите календарь" />
-              </SelectTrigger>
-              <SelectContent position="popper" sideOffset={4}>
-                {calendars.map(cal => {
-                  const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
+            {event?.is_ics_event ? (
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-accent/50">
+                <span className="text-sm text-muted-foreground">📅 {event.subscription_name || 'Внешний календарь'}</span>
+              </div>
+            ) : (
+              <Select value={formData.calendar_id || ''} onValueChange={(v) => setFormData({ ...formData, calendar_id: v })}>
+                <SelectTrigger data-testid="event-calendar-select">
+                  <SelectValue placeholder="Выберите календарь" />
+                </SelectTrigger>
+                <SelectContent position="popper" sideOffset={4}>
+                  {calendars.map(cal => {
+                    const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
                   return (
                     <SelectItem key={cal.id} value={cal.id}>
                       <div className="flex items-center gap-2">
