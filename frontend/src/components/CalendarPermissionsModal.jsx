@@ -105,8 +105,8 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
                 return (
                   <div key={perm.id} className="flex items-center justify-between p-3 rounded-lg bg-accent/50 hover:bg-accent">
                     <div className="flex-1">
-                      <p className="font-medium text-sm">{perm.user_name || 'Unknown'}</p>
-                      <p className="text-xs text-muted-foreground">{perm.user_email}</p>
+                      <p className="font-medium text-sm">{perm.user?.name || 'Unknown'}</p>
+                      <p className="text-xs text-muted-foreground">{perm.user?.email || perm.user_id}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-background text-xs">
