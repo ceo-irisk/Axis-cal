@@ -61,7 +61,8 @@ export default function CalendarPage() {
       setEvents(prev => prev.filter(e => e.id !== eventId));
     } catch (error) {
       console.error('Error deleting event:', error);
-      toast.error('Ошибка удаления события');
+      const errorMsg = error.response?.data?.detail || 'Ошибка удаления события';
+      toast.error(errorMsg === 'Недостаточно прав' ? 'Недостаточно прав' : errorMsg);
     }
   }, []);
 
@@ -200,7 +201,8 @@ export default function CalendarPage() {
       fetchData();
     } catch (error) {
       console.error('Error saving event:', error);
-      toast.error('Ошибка сохранения события');
+      const errorMsg = error.response?.data?.detail || 'Ошибка сохранения события';
+      toast.error(errorMsg === 'Недостаточно прав' ? 'Недостаточно прав' : errorMsg);
     }
   };
 
@@ -215,7 +217,8 @@ export default function CalendarPage() {
       fetchData();
     } catch (error) {
       console.error('Error updating event:', error);
-      toast.error('Ошибка перемещения события');
+      const errorMsg = error.response?.data?.detail || 'Ошибка перемещения события';
+      toast.error(errorMsg === 'Недостаточно прав' ? 'Недостаточно прав' : errorMsg);
     }
   };
 
