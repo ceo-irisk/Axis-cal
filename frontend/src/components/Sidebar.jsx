@@ -307,17 +307,18 @@ export const Sidebar = ({
   // Event Types handlers
   const handleSaveEventType = async (data) => {
     try {
-      if (editingType?.id && !editingType.id.startsWith('default-')) {
-        await updateEventType(editingType.id, data.name, data.label, data.color, data.order || 0);
-        toast.success('Тип события обновлён');
+      if (editingType?.id) {
+        await updateEventType(editingType.id, data);
       } else {
         await createEventType(data.name, data.label, data.color);
-        toast.success('Тип события создан');
       }
       setShowTypeModal(false);
       setEditingType(null);
       fetchDictionaries();
-    } catch (e) { toast.error('Ошибка сохранения'); }
+    } catch (e) { 
+      console.error('Error saving event type:', e);
+      toast.error('Ошибка сохранения'); 
+    }
   };
 
   const handleDeleteEventType = async (id) => {
