@@ -111,14 +111,7 @@ const TimePicker = ({ value, onChange, label }) => {
 
 const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
   if (event) {
-    // Map is_unconfirmed to status for backwards compatibility
     let status = event.status || 'confirmed';
-    if (event.is_unconfirmed && status === 'confirmed') {
-      status = 'tentative';
-    }
-    if (event.is_template_event) {
-      status = 'template';
-    }
     
     // Parse ISO dates and convert to local time
     const startDateTime = event.start_time ? new Date(event.start_time) : new Date();
@@ -228,10 +221,6 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
     const startDateTime = `${formData.start_date}T${formData.start_time_val}`;
     const endDateTime = `${formData.end_date}T${formData.end_time_val}`;
     
-    // Map status to is_template_event flag
-    const isTemplate = formData.status === 'template';
-    const actualStatus = isTemplate ? 'confirmed' : formData.status;
-    
     // Prepare recurrence end date
     let recurrenceEndDate = null;
     if (formData.recurrence_type !== 'none' && formData.recurrence_end_date) {
@@ -242,8 +231,7 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
       ...formData,
       start_time: new Date(startDateTime).toISOString(),
       end_time: new Date(endDateTime).toISOString(),
-      status: actualStatus,
-      is_template_event: isTemplate,
+      status: formData.status,
       recurrence_type: formData.recurrence_type,
       recurrence_end_date: recurrenceEndDate,
       recurrence_custom_days: formData.recurrence_type === 'custom_days' ? formData.recurrence_custom_days : null,
