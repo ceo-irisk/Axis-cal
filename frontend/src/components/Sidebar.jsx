@@ -158,6 +158,7 @@ export const Sidebar = ({
   const [eventTypes, setEventTypes] = useState([]);
   const [eventStatuses, setEventStatuses] = useState([]);
   const [templates, setTemplates] = useState([]);
+  const [allTimezones, setAllTimezones] = useState([]);  // All timezones from DB
   
   // Edit modals
   const [showTypeModal, setShowTypeModal] = useState(false);
@@ -169,6 +170,7 @@ export const Sidebar = ({
   const [editingType, setEditingType] = useState(null);
   const [editingStatus, setEditingStatus] = useState(null);
   const [editingTemplate, setEditingTemplate] = useState(null);
+  const [editingTimezone, setEditingTimezone] = useState(null);  // NEW
   const [selectedTemplateForApply, setSelectedTemplateForApply] = useState(null);
   const [applyDate, setApplyDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [customTimezones, setCustomTimezones] = useState([]);
