@@ -1246,44 +1246,39 @@ export const Sidebar = ({
                         Часовые пояса доступные в календаре
                       </p>
                       
-                      {/* Standard Timezones */}
-                      <div className="mb-3">
-                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Стандартные</p>
-                        <div className="space-y-1 max-h-48 overflow-y-auto">
-                          {TIMEZONES.map(tz => (
-                            <div key={tz.value} className="flex items-center gap-2 p-2 rounded-lg bg-accent/30">
-                              <Globe className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-                              <span className="flex-1 text-sm">{tz.label}</span>
-                              <code className="text-xs text-muted-foreground">{tz.offset >= 0 ? '+' : ''}{tz.offset}</code>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      {/* Custom Timezones */}
-                      {customTimezones.length > 0 && (
-                        <div>
-                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Кастомные</p>
-                          <div className="space-y-1">
-                            {customTimezones.map(tz => (
-                              <div key={tz.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/50 group">
-                                <Globe className="w-3.5 h-3.5 text-[#085C53] flex-shrink-0" />
-                                <span className="flex-1 text-sm">{tz.name}</span>
-                                <code className="text-xs text-muted-foreground">{tz.offset}</code>
-                                {isAdmin?.() && (
+                      {/* All Timezones from DB */}
+                      <div className="space-y-1 max-h-64 overflow-y-auto">
+                        {allTimezones.map(tz => {
+                          const isSystem = tz.is_system;
+                          return (
+                            <div key={tz.id} className={`flex items-center gap-2 p-2 rounded-lg group ${isSystem ? 'bg-accent/30' : 'hover:bg-accent/50'}`}>
+                              <Globe className={`w-3.5 h-3.5 flex-shrink-0 ${isSystem ? 'text-muted-foreground' : 'text-[#085C53]'}`} />
+                              <span className="flex-1 text-sm">{tz.name}</span>
+                              <code className="text-xs text-muted-foreground">{tz.offset}</code>
+                              {isAdmin?.() && (
+                                <div className="flex gap-1 opacity-0 group-hover:opacity-100">
                                   <button 
-                                    onClick={() => handleDeleteTimezone(tz.id)} 
-                                    className="p-1 rounded hover:bg-red-500/20 opacity-0 group-hover:opacity-100"
-                                    title="Удалить"
+                                    onClick={() => { setEditingTimezone(tz); setShowTimezoneModal(true); }}
+                                    className="p-1 rounded hover:bg-background"
+                                    title="Редактировать"
                                   >
-                                    <Trash2 className="w-3 h-3 text-red-500" />
+                                    <Edit2 className="w-3 h-3" />
                                   </button>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                                  {!isSystem && (
+                                    <button 
+                                      onClick={() => handleDeleteTimezone(tz.id)} 
+                                      className="p-1 rounded hover:bg-red-500/20"
+                                      title="Удалить"
+                                    >
+                                      <Trash2 className="w-3 h-3 text-red-500" />
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 )}
