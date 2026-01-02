@@ -4,7 +4,7 @@ import {
   getEvents, createEvent, updateEvent, deleteEvent, 
   getRatings, createRating, checkDayRules, getOverloadedDays, getCalendars,
   getTemplates, applyTemplate, getUsers, createUser, updateUser, deleteUser,
-  getEventsWithRecurring, getAllICSEvents, getEventTypes, getAppliedTemplates, removeTemplateFromDay,
+  getAllICSEvents, getEventTypes, getAppliedTemplates, removeTemplateFromDay,
   getUserEvents
 } from '../lib/api';
 import { getLocalTimezoneName } from '../lib/timezones';
@@ -45,8 +45,9 @@ export default function CalendarPage() {
   const [showSurveyModal, setShowSurveyModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [defaultEventTime, setDefaultEventTime] = useState(null);
-  const [selectedTimezone, setSelectedTimezone] = useState(() => getLocalTimezoneName());
+  const [selectedTimezone, setSelectedTimezone] = useState(user?.timezone || 'Europe/Moscow');
   const [customTimezones, setCustomTimezones] = useState([]);
+  const [hiddenCalendars, setHiddenCalendars] = useState(new Set());
   
   // User switching for viewing others' calendars
   const [viewingUserId, setViewingUserId] = useState(null); // null = viewing own calendar
@@ -60,7 +61,8 @@ export default function CalendarPage() {
       setEvents(prev => prev.filter(e => e.id !== eventId));
     } catch (error) {
       console.error('Error deleting event:', error);
-      toast.error('Ошибка удаления события');
+      const errorMsg = error.response?.data?.detail || 'Ошибка удаления события';
+      toast.error(errorMsg === 'Недостаточно прав' ? 'Недостаточно прав' : errorMsg);
     }
   }, []);
 
@@ -100,7 +102,7 @@ export default function CalendarPage() {
       // If viewing another user's calendar, load their events
       const eventsPromise = viewingUserId 
         ? getUserEvents(viewingUserId, startStr, endStr)
-        : getEventsWithRecurring(startStr, endStr);
+        : getEvents(startStr, endStr);
 
       const [eventsRes, icsEventsRes, ratingsRes, overloadedRes, templatesRes, eventTypesRes, appliedTemplatesRes] = await Promise.all([
         eventsPromise,
@@ -189,18 +191,18 @@ export default function CalendarPage() {
 
   const handleSaveEvent = async (eventData) => {
     try {
+      const dataWithTimezone = { ...eventData, timezone: selectedTimezone };
       if (selectedEvent) {
-        await updateEvent(selectedEvent.id, eventData);
-        toast.success('Событие обновлено');
+        await updateEvent(selectedEvent.id, dataWithTimezone);
       } else {
-        await createEvent(eventData);
-        toast.success('Событие создано');
+        await createEvent(dataWithTimezone);
       }
       setShowEventModal(false);
       fetchData();
     } catch (error) {
       console.error('Error saving event:', error);
-      toast.error('Ошибка сохранения события');
+      const errorMsg = error.response?.data?.detail || 'Ошибка сохранения события';
+      toast.error(errorMsg === 'Недостаточно прав' ? 'Недостаточно прав' : errorMsg);
     }
   };
 
@@ -215,7 +217,8 @@ export default function CalendarPage() {
       fetchData();
     } catch (error) {
       console.error('Error updating event:', error);
-      toast.error('Ошибка перемещения события');
+      const errorMsg = error.response?.data?.detail || 'Ошибка перемещения события';
+      toast.error(errorMsg === 'Недостаточно прав' ? 'Недостаточно прав' : errorMsg);
     }
   };
 
@@ -257,6 +260,13 @@ export default function CalendarPage() {
   const currentRating = ratings[selectedDateStr];
   const currentViolations = ruleViolations[selectedDateStr];
 
+  // Filter events by hidden calendars (including ICS subscriptions)
+  const visibleEvents = events.filter(e => {
+    if (e.calendar_id && hiddenCalendars.has(e.calendar_id)) return false;
+    if (e.ics_subscription_id && hiddenCalendars.has(e.ics_subscription_id)) return false;
+    return true;
+  });
+
   const getTitle = () => {
     if (mainView === MAIN_VIEW.USERS) return 'Пользователи';
     if (view === 'day') return format(selectedDate, 'd MMMM yyyy', { locale: ru });
@@ -290,6 +300,7 @@ export default function CalendarPage() {
         onEventTypesChange={setEventTypes}
         viewingUserId={viewingUserId}
         onViewingUserChange={setViewingUserId}
+        onHiddenCalendarsChange={setHiddenCalendars}
       />
       
       <main className="main-content-full flex-1" data-testid="calendar-main">
@@ -344,7 +355,7 @@ export default function CalendarPage() {
               <CalendarGrid
                 currentDate={currentDate}
                 selectedDate={selectedDate}
-                events={events}
+                events={visibleEvents}
                 calendars={calendars}
                 templates={templates}
                 appliedTemplates={appliedTemplates}

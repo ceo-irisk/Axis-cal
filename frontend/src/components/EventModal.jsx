@@ -217,20 +217,21 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Combine date and time
-    const startDateTime = `${formData.start_date}T${formData.start_time_val}`;
-    const endDateTime = `${formData.end_date}T${formData.end_time_val}`;
+    
+    // Combine date and time into ISO string WITHOUT timezone conversion
+    const startDateTimeStr = `${formData.start_date}T${formData.start_time_val}:00`;
+    const endDateTimeStr = `${formData.end_date}T${formData.end_time_val}:00`;
     
     // Prepare recurrence end date
     let recurrenceEndDate = null;
     if (formData.recurrence_type !== 'none' && formData.recurrence_end_date) {
-      recurrenceEndDate = new Date(`${formData.recurrence_end_date}T23:59:59`).toISOString();
+      recurrenceEndDate = `${formData.recurrence_end_date}T23:59:59`;
     }
     
     onSave({
       ...formData,
-      start_time: new Date(startDateTime).toISOString(),
-      end_time: new Date(endDateTime).toISOString(),
+      start_time: startDateTimeStr,
+      end_time: endDateTimeStr,
       status: formData.status,
       recurrence_type: formData.recurrence_type,
       recurrence_end_date: recurrenceEndDate,
@@ -324,25 +325,31 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
           {/* Calendar */}
           <div>
             <Label className="text-xs text-muted-foreground mb-1.5 block">Календарь</Label>
-            <Select value={formData.calendar_id || ''} onValueChange={(v) => setFormData({ ...formData, calendar_id: v })}>
-              <SelectTrigger data-testid="event-calendar-select">
-                <SelectValue placeholder="Выберите календарь" />
-              </SelectTrigger>
-              <SelectContent position="popper" sideOffset={4}>
-                {calendars.map(cal => {
-                  const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
-                  return (
-                    <SelectItem key={cal.id} value={cal.id}>
-                      <div className="flex items-center gap-2">
-                        <IconComponent className="w-3.5 h-3.5" />
-                        {cal.name}
-                        {cal.is_shared && <span className="text-xs text-muted-foreground">({cal.permission_level})</span>}
-                      </div>
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
+            {event?.is_ics_event ? (
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-accent/50">
+                <span className="text-sm text-muted-foreground">📅 {event.subscription_name || 'Внешний календарь'}</span>
+              </div>
+            ) : (
+              <Select value={formData.calendar_id || ''} onValueChange={(v) => setFormData({ ...formData, calendar_id: v })}>
+                <SelectTrigger data-testid="event-calendar-select">
+                  <SelectValue placeholder="Выберите календарь" />
+                </SelectTrigger>
+                <SelectContent position="popper" sideOffset={4}>
+                  {calendars.map(cal => {
+                    const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
+                    return (
+                      <SelectItem key={cal.id} value={cal.id}>
+                        <div className="flex items-center gap-2">
+                          <IconComponent className="w-3.5 h-3.5" />
+                          {cal.name}
+                          {cal.is_shared && <span className="text-xs text-muted-foreground">({cal.permission_level})</span>}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* All day toggle */}

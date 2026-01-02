@@ -195,6 +195,21 @@ frontend:
         agent: "main"
         comment: "Frontend testing not performed by testing agent"
 
+  - task: "Calendar Hide/Show Functionality"
+    implemented: true
+    working: true
+    file: "frontend/src/components/Sidebar.jsx, frontend/src/pages/CalendarPage.jsx, frontend/src/components/CalendarGrid.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL BUG: Calendar hide/show feature crashes the app. Error: 'onHiddenCalendarsChange is not defined'. The Sidebar has toggleCalendarVisibility function (line 443) that calls onHiddenCalendarsChange?.(next), but this prop is not passed from CalendarPage. Root causes: 1) CalendarPage has no hiddenCalendars state 2) No onHiddenCalendarsChange handler passed to Sidebar 3) CalendarGrid has no logic to filter events by calendar visibility. When user clicks eye button in Calendars tab, app shows red error screen. REQUIRED FIXES: Add hiddenCalendars state to CalendarPage, create and pass onHiddenCalendarsChange handler to Sidebar, pass hiddenCalendars to CalendarGrid, implement event filtering in CalendarGrid to hide events from hidden calendars."
+      - working: true
+        agent: "testing"
+        comment: "✅ BUG FIXED: Calendar hide/show functionality is now working correctly. Tested with admin@company.com login. All core features work: 1) Eye icon toggles to EyeOff when calendar is hidden 2) Calendar text gets line-through styling when hidden 3) Icon and text return to normal state when shown again 4) Events from hidden calendars are filtered from view. Minor issue: React warning 'Cannot update a component while rendering' appears when hiding calendar - this is non-critical and doesn't affect functionality. The warning is caused by calling onHiddenCalendarsChange inside setState callback in Sidebar.toggleCalendarVisibility (line 449). Recommendation: Move the parent state update outside the setState callback using useEffect to eliminate the warning."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
@@ -203,6 +218,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Calendar Hide/Show Functionality"
     - "Backend Refactoring - Users Routes"
     - "Backend Refactoring - Events Routes"
     - "Backend Refactoring - Calendars Routes"
@@ -228,6 +244,8 @@ agent_communication:
     message: "Added recurring events and ICS subscriptions functionality. Need to test: 1) Recurring events API (/api/recurring-events) generates instances correctly 2) ICS subscriptions CRUD (/api/ics-subscriptions) 3) Event creation with recurrence_type field"
   - agent: "testing"
     message: "✅ RECURRING EVENTS & ICS SUBSCRIPTIONS TESTING COMPLETE: All new APIs working correctly. Recurring events API generates instances properly for all recurrence types (daily, workdays, weekly, monthly, yearly). ICS subscriptions CRUD operations work with proper URL validation. Event creation with recurrence_type field functions correctly. Fixed timezone comparison issue in recurring instances generation. All 47 tests passed with 100% success rate."
+  - agent: "testing"
+    message: "🔴 CRITICAL BUG FOUND: Calendar hide/show functionality is BROKEN. When clicking the eye button to hide a calendar, the app crashes with 'ReferenceError: onHiddenCalendarsChange is not defined'. The Sidebar component calls onHiddenCalendarsChange?.(next) on line 448, but this prop is not passed from CalendarPage. Additionally, even if the error is fixed, the CalendarGrid component has no logic to filter events based on hidden calendars, so the feature would still not work. FIX REQUIRED: 1) Add hiddenCalendars state to CalendarPage 2) Pass onHiddenCalendarsChange handler to Sidebar 3) Pass hiddenCalendars to CalendarGrid 4) Implement event filtering in CalendarGrid based on calendar visibility."
   - task: "Backend Refactoring - Authentication Routes"
     implemented: true
     working: true
@@ -364,3 +382,5 @@ agent_communication:
         comment: "✅ PASSED: Events are properly filtered by permissions. Closed calendar events should show as 'Занято' to non-owners."
   - agent: "testing"
     message: "🔴 CRITICAL REGRESSION BUGS FOUND IN REFACTORED BACKEND: All POST endpoints that create new resources are failing with 520 errors due to MongoDB ObjectId serialization issue. After calling insert_one(dict), MongoDB adds an '_id' field with ObjectId to the dict, which is not JSON serializable. This affects: POST /events, POST /calendars, POST /users, POST /templates, POST /subscriptions, POST /dictionaries/event-types, and all other creation endpoints. FIX REQUIRED: Remove '_id' field from dict before returning OR query the document again with {'_id': 0} projection. Additionally, default calendars (Открытый, Закрытый) are NOT being created for new users despite code being present in routes/users.py."
+  - agent: "testing"
+    message: "✅ CALENDAR HIDE/SHOW BUG FIX VERIFIED: Retested the calendar hide/show functionality after main agent's fix. All core features are working correctly: Eye icon toggles properly, text styling (line-through) works, and events from hidden calendars are filtered from view. Minor React warning detected ('Cannot update a component while rendering') when hiding calendar - this is non-critical and doesn't affect functionality. The warning occurs in Sidebar.toggleCalendarVisibility where onHiddenCalendarsChange is called inside setState callback. Optional improvement: Use useEffect to call parent state update outside of setState to eliminate the warning."

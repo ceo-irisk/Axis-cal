@@ -25,16 +25,13 @@ async def create_event(event_data: EventCreate, user: dict = Depends(get_current
     event_dict["created_at"] = datetime.now(timezone.utc).isoformat()
     event_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
     
-    # Ensure start_time and end_time are aware datetime in UTC
-    if isinstance(event_dict["start_time"], datetime):
-        if event_dict["start_time"].tzinfo is None:
-            event_dict["start_time"] = event_dict["start_time"].replace(tzinfo=timezone.utc)
+    # Convert datetime objects to ISO strings (pydantic converts strings to datetime)
+    if isinstance(event_dict.get("start_time"), datetime):
         event_dict["start_time"] = event_dict["start_time"].isoformat()
-    
-    if isinstance(event_dict["end_time"], datetime):
-        if event_dict["end_time"].tzinfo is None:
-            event_dict["end_time"] = event_dict["end_time"].replace(tzinfo=timezone.utc)
+    if isinstance(event_dict.get("end_time"), datetime):
         event_dict["end_time"] = event_dict["end_time"].isoformat()
+    if isinstance(event_dict.get("recurrence_end_date"), datetime):
+        event_dict["recurrence_end_date"] = event_dict["recurrence_end_date"].isoformat()
     
     await db.events.insert_one(event_dict)
     
@@ -47,14 +44,11 @@ async def get_events(
     start_date: Optional[str] = Query(None),
     end_date: Optional[str] = Query(None),
     user_id: Optional[str] = Query(None),
+    expand_recurring: bool = Query(True),
     user: dict = Depends(get_current_user)
 ):
-    query = {}
-    
-    # If viewing another user's events, use that user_id, otherwise use current user
-    target_user_id = user_id if user_id else user["id"]
-    
     # Build query for date range
+    query = {}
     if start_date and end_date:
         query["$or"] = [
             {"start_time": {"$gte": start_date, "$lte": end_date}},
@@ -63,9 +57,42 @@ async def get_events(
     
     events = await db.events.find(query, {"_id": 0}).to_list(1000)
     
+    # Expand recurring events if requested
+    if expand_recurring and start_date and end_date:
+        # Get ALL recurring events (even outside date range - they might have instances inside)
+        all_recurring = await db.events.find(
+            {"recurrence_type": {"$nin": ["none", None, ""]}},
+            {"_id": 0}
+        ).to_list(1000)
+        
+        # Parse dates
+        start_dt = datetime.fromisoformat(start_date)
+        if start_dt.tzinfo is None:
+            start_dt = start_dt.replace(tzinfo=timezone.utc)
+        
+        end_dt = datetime.fromisoformat(end_date)
+        if end_dt.tzinfo is None:
+            end_dt = end_dt.replace(tzinfo=timezone.utc)
+        
+        # Generate instances for all recurring events
+        result_events = list(events)
+        processed_ids = set()
+        
+        for event in all_recurring:
+            event_id = event.get("id")
+            if event_id in processed_ids:
+                continue
+            
+            instances = generate_recurring_instances(event, start_dt, end_dt)
+            result_events.extend(instances)
+            processed_ids.add(event_id)
+        
+        # Filter events by permissions
+        filtered_events = await filter_events_by_permissions(result_events, user["id"], db)
+        return filtered_events
+    
     # Filter events by permissions
     filtered_events = await filter_events_by_permissions(events, user["id"], db)
-    
     return filtered_events
 
 @router.get("/{event_id}")
@@ -91,25 +118,20 @@ async def update_event(event_id: str, event_data: EventCreate, user: dict = Depe
                 "permission_level": {"$in": ["edit", "full"]}
             })
             if not permission:
-                raise HTTPException(status_code=403, detail="No permission to edit this event")
+                raise HTTPException(status_code=403, detail="Недостаточно прав")
+        else:
+            raise HTTPException(status_code=403, detail="Недостаточно прав")
     
     update_dict = event_data.model_dump()
     update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
     
-    # Ensure datetime fields are properly formatted
-    if isinstance(update_dict["start_time"], datetime):
-        if update_dict["start_time"].tzinfo is None:
-            update_dict["start_time"] = update_dict["start_time"].replace(tzinfo=timezone.utc)
+    # Convert datetime objects to ISO strings
+    if isinstance(update_dict.get("start_time"), datetime):
         update_dict["start_time"] = update_dict["start_time"].isoformat()
-    
-    if isinstance(update_dict["end_time"], datetime):
-        if update_dict["end_time"].tzinfo is None:
-            update_dict["end_time"] = update_dict["end_time"].replace(tzinfo=timezone.utc)
+    if isinstance(update_dict.get("end_time"), datetime):
         update_dict["end_time"] = update_dict["end_time"].isoformat()
-    
-    # Update recurring instances if this is a parent recurring event
-    if event.get("recurrence_type") and event.get("recurrence_type") not in ["none", None, ""]:
-        update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    if isinstance(update_dict.get("recurrence_end_date"), datetime):
+        update_dict["recurrence_end_date"] = update_dict["recurrence_end_date"].isoformat()
     
     await db.events.update_one({"id": event_id}, {"$set": update_dict})
     
@@ -122,8 +144,20 @@ async def delete_event(event_id: str, user: dict = Depends(get_current_user)):
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     
+    # Check if user is the creator
     if event["created_by"] != user["id"]:
-        raise HTTPException(status_code=403, detail="Cannot delete events created by other users")
+        # Check if user has full permissions to the calendar
+        calendar_id = event.get("calendar_id")
+        if calendar_id:
+            permission = await db.calendar_permissions.find_one({
+                "calendar_id": calendar_id,
+                "user_id": user["id"],
+                "permission_level": "full"
+            })
+            if not permission:
+                raise HTTPException(status_code=403, detail="Недостаточно прав")
+        else:
+            raise HTTPException(status_code=403, detail="Недостаточно прав")
     
     await db.events.delete_one({"id": event_id})
     return {"message": "Event deleted"}

@@ -167,12 +167,33 @@ export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, tem
     return sign * (hours + minutes / 60);
   };
   
+  // Calculate timezone shift for each event
+  const calculateEventShift = (event) => {
+    if (!event.timezone || !selectedTimezone) return 0;
+    
+    const eventTz = customTimezones.find(tz => tz.name === event.timezone);
+    const selectedTz = customTimezones.find(tz => tz.name === selectedTimezone);
+    
+    if (!eventTz || !selectedTz) return 0;
+    
+    const eventOffset = parseOffset(eventTz.offset);
+    const selectedOffset = parseOffset(selectedTz.offset);
+    
+    return selectedOffset - eventOffset;
+  };
+  
+  // Add shift to each event
+  const eventsWithShift = events.map(event => ({
+    ...event,
+    _timezoneShift: calculateEventShift(event)
+  }));
+  
   const selectedTz = customTimezones.find(tz => tz.name === selectedTimezone) || customTimezones[0];
-  const timezoneShift = selectedTz ? parseOffset(selectedTz.offset) : 0;
+  const currentTimezoneOffset = selectedTz ? parseOffset(selectedTz.offset) : 0;
 
-  if (view === 'day') return <DayView date={selectedDate} events={events} templates={templates} appliedTemplates={appliedTemplates} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} timezoneShift={timezoneShift} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} eventTypes={eventTypes} />;
-  if (view === 'week') return <WeekView date={selectedDate} events={events} templates={templates} appliedTemplates={appliedTemplates} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} timezoneShift={timezoneShift} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} eventTypes={eventTypes} />;
-  return <MonthView currentDate={currentDate} selectedDate={selectedDate} events={events} overloadedDays={overloadedDays} ratings={ratings} onDateClick={onDateClick} onCellDoubleClick={onCellDoubleClick} onEventClick={onEventClick} selectedEventId={selectedEventId} onEventSelect={onEventSelect} eventTypes={eventTypes} />;
+  if (view === 'day') return <DayView date={selectedDate} events={eventsWithShift} templates={templates} appliedTemplates={appliedTemplates} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} currentTimezoneOffset={currentTimezoneOffset} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} eventTypes={eventTypes} />;
+  if (view === 'week') return <WeekView date={selectedDate} events={eventsWithShift} templates={templates} appliedTemplates={appliedTemplates} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} currentTimezoneOffset={currentTimezoneOffset} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} eventTypes={eventTypes} />;
+  return <MonthView currentDate={currentDate} selectedDate={selectedDate} events={eventsWithShift} overloadedDays={overloadedDays} ratings={ratings} onDateClick={onDateClick} onCellDoubleClick={onCellDoubleClick} onEventClick={onEventClick} selectedEventId={selectedEventId} onEventSelect={onEventSelect} eventTypes={eventTypes} />;
 };
 
 const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings, onDateClick, onCellDoubleClick, onEventClick, selectedEventId, onEventSelect, eventTypes }) => {
@@ -260,7 +281,7 @@ const TimezoneSelector = ({ selectedTimezone, onTimezoneChange, customTimezones 
     <Select value={selectedTimezone} onValueChange={onTimezoneChange}>
       <SelectTrigger className="w-[180px] h-7 text-xs gap-1">
         <Globe className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-        <span className="truncate">{selectedTz?.name || 'UTC (0:00)'}</span>
+        <span className="truncate">{selectedTz?.name || selectedTimezone || 'Локальное время'}</span>
       </SelectTrigger>
       <SelectContent>
         {customTimezones.map(tz => (
@@ -273,7 +294,7 @@ const TimezoneSelector = ({ selectedTimezone, onTimezoneChange, customTimezones 
   );
 };
 
-const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventId, onEventSelect, timezoneShift, selectedTimezone, onTimezoneChange, customTimezones, eventTypes }) => {
+const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventId, onEventSelect, currentTimezoneOffset, selectedTimezone, onTimezoneChange, customTimezones, eventTypes }) => {
   const weekStart = startOfWeek(date, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
@@ -296,8 +317,9 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
     try {
       const start = new Date(event.start_time);
       const end = new Date(event.end_time);
-      // Apply timezone shift for positioning
-      const shiftedStartHour = start.getHours() + start.getMinutes() / 60 + timezoneShift;
+      // Apply event's timezone shift for positioning
+      const shiftHours = event._timezoneShift || 0;
+      const shiftedStartHour = start.getHours() + start.getMinutes() / 60 + shiftHours;
       const duration = (end - start) / 3600000;
       const topOffset = shiftedStartHour * 60;
       return { 
@@ -568,25 +590,25 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                 {dayEvents.map(event => {
                   const duration = getEventDuration(event);
                   const isLong = duration >= 1;
-                  const eventTime = getLocalTime(event.start_time, timezoneShift);
+                  const eventTime = getLocalTime(event.start_time, event._timezoneShift || 0);
                   const dynamicStyle = getEventDynamicStyle(event, eventTypes);
                   const overlapStyle = getOverlapStyle(event, dayEvents);
                   const isSelected = selectedEventId === event.id;
                   
                   // Format time with shift indicator
-                  const timeDisplay = timezoneShift !== 0 
-                    ? `${eventTime.formatted} (${eventTime.original}${timezoneShift > 0 ? '+' : ''}${timezoneShift})`
+                  const timeDisplay = event._timezoneShift && event._timezoneShift !== 0 
+                    ? `${eventTime.formatted} (${eventTime.original}${event._timezoneShift > 0 ? '+' : ''}${event._timezoneShift})`
                     : eventTime.formatted;
                   
                   return (
                     <div 
                       key={event.id} 
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, event)}
-                      onClick={(e) => { e.stopPropagation(); onEventSelect?.(event.id); }}
-                      onDoubleClick={(e) => { e.stopPropagation(); onEventClick(event); }}
+                      draggable={!event.is_busy}
+                      onDragStart={(e) => !event.is_busy && handleDragStart(e, event)}
+                      onClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventSelect?.(event.id); }}
+                      onDoubleClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventClick(event); }}
                       className={`
-                        absolute px-1 py-1 rounded-md text-xs cursor-pointer 
+                        absolute px-1 py-1 rounded-md text-xs ${event.is_busy ? 'cursor-default' : 'cursor-pointer'}
                         hover:opacity-90 transition-opacity overflow-hidden group
                         ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
                       `} 
@@ -604,11 +626,13 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                         </div>
                         <EventIcons event={event} />
                       </div>
-                      {/* Resize handle */}
-                      <div 
-                        className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize opacity-0 group-hover:opacity-100 bg-black/20 rounded-b"
-                        onMouseDown={(e) => handleResizeStart(e, event, day)}
-                      />
+                      {/* Resize handle - hide for busy events */}
+                      {!event.is_busy && (
+                        <div 
+                          className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize opacity-0 group-hover:opacity-100 bg-black/20 rounded-b"
+                          onMouseDown={(e) => handleResizeStart(e, event, day)}
+                        />
+                      )}
                     </div>
                   );
                 })}
@@ -631,7 +655,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
   );
 };
 
-const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventId, onEventSelect, timezoneShift, selectedTimezone, onTimezoneChange, customTimezones, eventTypes }) => {
+const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventId, onEventSelect, currentTimezoneOffset, selectedTimezone, onTimezoneChange, customTimezones, eventTypes }) => {
   const hours = Array.from({ length: 24 }, (_, i) => i); // Все 24 часа
   const dayEvents = events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd')) && !e.is_all_day);
   const allDayEvents = events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd')) && e.is_all_day);
@@ -642,8 +666,9 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
     try {
       const start = new Date(event.start_time);
       const end = new Date(event.end_time);
-      // Apply timezone shift for positioning
-      const shiftedStartHour = start.getHours() + start.getMinutes() / 60 + timezoneShift;
+      // Apply event's timezone shift for positioning
+      const shiftHours = event._timezoneShift || 0;
+      const shiftedStartHour = start.getHours() + start.getMinutes() / 60 + shiftHours;
       const duration = (end - start) / 3600000;
       const topOffset = shiftedStartHour * 60;
       return { top: `${topOffset}px`, height: `${Math.max(duration * 60, 30)}px` };
@@ -804,25 +829,24 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
           {dayEvents.map(event => {
             const duration = getEventDuration(event);
             const isLong = duration >= 1;
-            const eventTime = getLocalTime(event.start_time, timezoneShift);
+            const eventTime = getLocalTime(event.start_time, event._timezoneShift || 0);
             const dynamicStyle = getEventDynamicStyle(event, eventTypes);
             const overlapStyle = getOverlapStyle(event);
             const isSelected = selectedEventId === event.id;
             
-            // Format time with shift indicator
-            const timeDisplay = timezoneShift !== 0 
-              ? `${eventTime.formatted} (${eventTime.original}${timezoneShift > 0 ? '+' : ''}${timezoneShift})`
+            const timeDisplay = event._timezoneShift && event._timezoneShift !== 0 
+              ? `${eventTime.formatted} (${eventTime.original}${event._timezoneShift > 0 ? '+' : ''}${event._timezoneShift})`
               : eventTime.formatted;
             
             return (
               <div 
                 key={event.id}
-                draggable
-                onDragStart={(e) => handleDragStart(e, event)}
-                onClick={(e) => { e.stopPropagation(); onEventSelect?.(event.id); }}
-                onDoubleClick={(e) => { e.stopPropagation(); onEventClick(event); }}
+                draggable={!event.is_busy}
+                onDragStart={(e) => !event.is_busy && handleDragStart(e, event)}
+                onClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventSelect?.(event.id); }}
+                onDoubleClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventClick(event); }}
                 className={`
-                  absolute px-2 py-1.5 rounded-lg cursor-pointer 
+                  absolute px-2 py-1.5 rounded-lg ${event.is_busy ? 'cursor-default' : 'cursor-pointer'}
                   hover:opacity-90 transition-opacity group
                   ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
                 `}
@@ -838,8 +862,10 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
                   </div>
                   <EventIcons event={event} />
                 </div>
-                {/* Resize handle */}
-                <div className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize opacity-0 group-hover:opacity-100 bg-black/20 rounded-b" />
+                {/* Resize handle - hide for busy events */}
+                {!event.is_busy && (
+                  <div className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize opacity-0 group-hover:opacity-100 bg-black/20 rounded-b" />
+                )}
               </div>
             );
           })}

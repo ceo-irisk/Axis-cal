@@ -187,68 +187,17 @@ async def update_event_fields(fields_data: Dict[str, Any] = Body(...), admin: di
     updated = await db.event_field_config.find_one({}, {"_id": 0})
     return updated
 
-# Recurring Events
+# Recurring Events - DEPRECATED, use GET /events?expand_recurring=true instead
+# Keeping for backward compatibility
 @recurring_router.get("")
-async def get_recurring_events(
+async def get_recurring_events_deprecated(
     start_date: Optional[str] = Query(None),
     end_date: Optional[str] = Query(None),
     user: dict = Depends(get_current_user)
 ):
-    from services.recurrence import generate_recurring_instances
-    from services.permissions import filter_events_by_permissions
-    
-    # Get all events with recurrence
-    recurring_events = await db.events.find(
-        {"recurrence_type": {"$nin": ["none", None, ""]}},
-        {"_id": 0}
-    ).to_list(1000)
-    
-    # Get regular events in the date range
-    query = {}
-    if start_date and end_date:
-        query["$or"] = [
-            {"start_time": {"$gte": start_date, "$lte": end_date}},
-            {"end_time": {"$gte": start_date, "$lte": end_date}}
-        ]
-    
-    events = await db.events.find(query, {"_id": 0}).to_list(1000)
-    
-    # Parse dates
-    if start_date:
-        start_dt = datetime.fromisoformat(start_date)
-        if start_dt.tzinfo is None:
-            start_dt = start_dt.replace(tzinfo=timezone.utc)
-    else:
-        start_dt = datetime.now(timezone.utc) - timedelta(days=30)
-    
-    if end_date:
-        end_dt = datetime.fromisoformat(end_date)
-        if end_dt.tzinfo is None:
-            end_dt = end_dt.replace(tzinfo=timezone.utc)
-    else:
-        end_dt = datetime.now(timezone.utc) + timedelta(days=30)
-    
-    # Start with all regular events
-    result_events = list(events)
-    processed_parent_ids = set()
-    
-    # Add recurring instances
-    all_recurring = [e for e in events if e.get("recurrence_type") and e.get("recurrence_type") not in ["none", None, ""]]
-    all_recurring.extend(recurring_events)
-    
-    for event in all_recurring:
-        event_id = event.get("id")
-        if event_id in processed_parent_ids:
-            continue
-        
-        instances = generate_recurring_instances(event, start_dt, end_dt)
-        result_events.extend(instances)
-        processed_parent_ids.add(event_id)
-    
-    # Filter by permissions
-    filtered_events = await filter_events_by_permissions(result_events, user["id"], db)
-    
-    return filtered_events
+    """Deprecated: Use GET /events?expand_recurring=true instead"""
+    from routes.events import get_events as events_get
+    return await events_get(start_date, end_date, None, True, user)
 
 # User Events (for viewing other user's events)
 @user_events_router.get("/{user_id}/events")

@@ -28,6 +28,12 @@ async def create_ics_subscription(subscription_data: dict = Body(...), user: dic
     name = subscription_data.get("name")
     color = subscription_data.get("color", "#6366f1")
     
+    # Convert webcal:// to https://
+    if url.startswith("webcal://"):
+        url = "https://" + url[9:]
+    elif url.startswith("webcals://"):
+        url = "https://" + url[10:]
+    
     # Validate URL by trying to fetch it
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -112,11 +118,11 @@ async def get_ics_subscription_events(subscription_id: str, user: dict = Depends
                 "start_time": ics_event.begin.datetime.isoformat() if ics_event.begin else "",
                 "end_time": ics_event.end.datetime.isoformat() if ics_event.end else "",
                 "location": str(ics_event.location) if ics_event.location else "",
-                "event_type": "meeting",
-                "status": "confirmed",
+                "event_type": "external",
+                "status": "template",
                 "color": subscription.get("color", "#6366f1"),
                 "is_ics_event": True,
-                "subscription_id": subscription_id,
+                "ics_subscription_id": subscription_id,
                 "subscription_name": subscription.get("name", "ICS Calendar")
             }
             events.append(event_dict)
@@ -158,11 +164,11 @@ async def get_all_ics_events(user: dict = Depends(get_current_user)):
                     "start_time": ics_event.begin.datetime.isoformat() if ics_event.begin else "",
                     "end_time": ics_event.end.datetime.isoformat() if ics_event.end else "",
                     "location": str(ics_event.location) if ics_event.location else "",
-                    "event_type": "meeting",
-                    "status": "confirmed",
+                    "event_type": "external",
+                    "status": "template",
                     "color": subscription.get("color", "#6366f1"),
                     "is_ics_event": True,
-                    "subscription_id": subscription["id"],
+                    "ics_subscription_id": subscription["id"],
                     "subscription_name": subscription.get("name", "ICS Calendar")
                 }
                 all_events.append(event_dict)

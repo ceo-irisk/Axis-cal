@@ -28,7 +28,7 @@ async def create_user(user_data: UserCreate, admin: dict = Depends(require_admin
     user_dict["created_at"] = datetime.now(timezone.utc).isoformat()
     user_dict["is_active"] = True
     
-    await db.users.insert_one(user_dict)
+    result = await db.users.insert_one(user_dict)
     
     # Create default calendars for the new user
     default_calendars = [
@@ -37,7 +37,6 @@ async def create_user(user_data: UserCreate, admin: dict = Depends(require_admin
             "user_id": user_dict["id"],
             "name": "Открытый",
             "provider": "custom",
-            "color": "#085C53",
             "icon": "book-open",
             "is_default": True,
             "is_public": True,
@@ -51,7 +50,6 @@ async def create_user(user_data: UserCreate, admin: dict = Depends(require_admin
             "user_id": user_dict["id"],
             "name": "Закрытый",
             "provider": "custom",
-            "color": "#6b7280",
             "icon": "lock",
             "is_default": True,
             "is_public": False,

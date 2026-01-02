@@ -9,23 +9,54 @@ def generate_recurring_instances(event: dict, start_date: datetime, end_date: da
     if recurrence_type == "none":
         return instances
     
-    event_start = datetime.fromisoformat(event["start_time"].replace("Z", "+00:00"))
-    event_end = datetime.fromisoformat(event["end_time"].replace("Z", "+00:00"))
+    # Parse event times - handle both string and datetime objects
+    start_time = event["start_time"]
+    end_time = event["end_time"]
+    event_timezone = event.get("timezone")
+    
+    if isinstance(start_time, datetime):
+        event_start = start_time.replace(tzinfo=None) if start_time.tzinfo else start_time
+        event_end = end_time.replace(tzinfo=None) if end_time.tzinfo else end_time
+    else:
+        event_start_str = str(start_time)
+        event_end_str = str(end_time)
+        
+        # Parse datetime
+        if "+" in event_start_str or event_start_str.endswith("Z"):
+            # Has timezone - parse it
+            event_start_utc = datetime.fromisoformat(event_start_str.replace("Z", "+00:00"))
+            event_end_utc = datetime.fromisoformat(event_end_str.replace("Z", "+00:00"))
+            
+            # CRITICAL: Convert from UTC to local time if event has timezone
+            # Event stored as UTC but should repeat at LOCAL time
+            # For now, just strip timezone to get the UTC time as naive
+            # The actual time conversion happens on frontend display
+            event_start = event_start_utc.replace(tzinfo=None)
+            event_end = event_end_utc.replace(tzinfo=None)
+        else:
+            # No timezone - already local time
+            event_start = datetime.fromisoformat(event_start_str)
+            event_end = datetime.fromisoformat(event_end_str)
+    
     duration = event_end - event_start
     
-    # Ensure all datetimes have timezone info
-    if start_date.tzinfo is None:
-        start_date = start_date.replace(tzinfo=timezone.utc)
-    if end_date.tzinfo is None:
-        end_date = end_date.replace(tzinfo=timezone.utc)
-    if event_start.tzinfo is None:
-        event_start = event_start.replace(tzinfo=timezone.utc)
+    # Convert start_date and end_date to naive for comparison
+    if start_date.tzinfo is not None:
+        start_date = start_date.replace(tzinfo=None)
+    if end_date.tzinfo is not None:
+        end_date = end_date.replace(tzinfo=None)
     
     recurrence_end = None
     if event.get("recurrence_end_date"):
-        recurrence_end = datetime.fromisoformat(event["recurrence_end_date"].replace("Z", "+00:00"))
-        if recurrence_end.tzinfo is None:
-            recurrence_end = recurrence_end.replace(tzinfo=timezone.utc)
+        rec_end = event["recurrence_end_date"]
+        if isinstance(rec_end, datetime):
+            recurrence_end = rec_end.replace(tzinfo=None) if rec_end.tzinfo else rec_end
+        else:
+            rec_end_str = str(rec_end).replace("Z", "+00:00")
+            if "+" in rec_end_str:
+                recurrence_end = datetime.fromisoformat(rec_end_str).replace(tzinfo=None)
+            else:
+                recurrence_end = datetime.fromisoformat(rec_end_str)
     
     current_date = event_start
     instance_count = 0

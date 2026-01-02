@@ -32,6 +32,7 @@ class EventBase(BaseModel):
     custom_fields: Dict[str, Any] = {}
     external_calendar_id: Optional[str] = None
     external_event_id: Optional[str] = None
+    timezone: str = "Europe/Moscow"
     
     # Флаги (только необходимые)
     is_all_day: bool = False

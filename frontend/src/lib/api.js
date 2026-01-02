@@ -60,10 +60,11 @@ export const getUserEvents = (userId, startDate, endDate) => {
 };
 
 // Events
-export const getEvents = (startDate, endDate) => {
+export const getEvents = (startDate, endDate, expandRecurring = true) => {
   const params = new URLSearchParams();
   if (startDate) params.append('start_date', startDate);
   if (endDate) params.append('end_date', endDate);
+  params.append('expand_recurring', expandRecurring.toString());
   return api.get(`/events?${params.toString()}`);
 };
 export const createEvent = (data) => api.post('/events', data);
@@ -153,12 +154,15 @@ export const updateEventFields = (fields) => api.put('/event-fields', fields);
 
 // Calendars
 export const getCalendars = () => api.get('/calendars');
-export const addCalendar = (name, color, icon = 'calendar') => {
-  const params = new URLSearchParams();
-  params.append('name', name);
-  params.append('color', color);
-  params.append('icon', icon);
-  return api.post(`/calendars?${params.toString()}`);
+export const addCalendar = (name, icon = 'calendar') => {
+  return api.post('/calendars', { 
+    name, 
+    icon,
+    provider: 'custom',
+    is_public: false,
+    is_active: true,
+    sync_enabled: false
+  });
 };
 export const deleteCalendar = (id) => api.delete(`/calendars/${id}`);
 
@@ -185,14 +189,8 @@ export const createEventType = (name, label, color) => {
   params.append('color', color);
   return api.post(`/dictionaries/event-types?${params.toString()}`);
 };
-export const updateEventType = (id, name, label, color, order = 0, isActive = true) => {
-  const params = new URLSearchParams();
-  params.append('name', name);
-  params.append('label', label);
-  params.append('color', color);
-  params.append('order', order);
-  params.append('is_active', isActive);
-  return api.put(`/dictionaries/event-types/${id}?${params.toString()}`);
+export const updateEventType = (id, data) => {
+  return api.put(`/dictionaries/event-types/${id}`, data);
 };
 export const deleteEventType = (id) => api.delete(`/dictionaries/event-types/${id}`);
 export const reorderEventTypes = (typeIds) => api.put('/dictionaries/event-types/reorder', typeIds);

@@ -187,6 +187,21 @@ const UserForm = ({ initialData, onSave, onCancel }) => {
   const [email, setEmail] = useState(initialData?.email || '');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState(initialData?.role || 'user');
+  const [timezone, setTimezone] = useState(initialData?.timezone || 'Europe/Moscow');
+  const [customTimezones, setCustomTimezones] = useState([]);
+
+  useEffect(() => {
+    const fetchTimezones = async () => {
+      try {
+        const { getCustomTimezones } = await import('../lib/api');
+        const res = await getCustomTimezones();
+        setCustomTimezones(res.data || []);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchTimezones();
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -199,7 +214,7 @@ const UserForm = ({ initialData, onSave, onCancel }) => {
       return;
     }
     
-    const data = { name: name.trim(), email: email.trim(), role };
+    const data = { name: name.trim(), email: email.trim(), role, timezone };
     if (password) data.password = password;
     onSave(data);
   };
@@ -247,6 +262,22 @@ const UserForm = ({ initialData, onSave, onCancel }) => {
           <SelectContent>
             <SelectItem value="user">Пользователь</SelectItem>
             <SelectItem value="admin">Администратор</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div>
+        <Label>Часовой пояс</Label>
+        <Select value={timezone} onValueChange={setTimezone}>
+          <SelectTrigger className="mt-1">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {customTimezones.map(tz => (
+              <SelectItem key={tz.id} value={tz.name}>
+                {tz.name} ({tz.offset})
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

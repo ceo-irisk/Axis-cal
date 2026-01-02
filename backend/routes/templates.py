@@ -58,18 +58,14 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
     
-    # Parse target date
+    # Parse target date as naive datetime (user's local date)
     try:
-        target_dt = datetime.fromisoformat(target_date)
+        target_dt = datetime.strptime(target_date, "%Y-%m-%d")
     except:
         try:
-            target_dt = datetime.strptime(target_date, "%Y-%m-%d")
+            target_dt = datetime.fromisoformat(target_date.split('T')[0])
         except:
             raise HTTPException(status_code=400, detail="Invalid date format")
-    
-    # Ensure target_dt is aware (has timezone)
-    if target_dt.tzinfo is None:
-        target_dt = target_dt.replace(tzinfo=timezone.utc)
     
     # Get user's default "Открытый" calendar
     default_calendar = await db.calendars.find_one({
@@ -80,15 +76,15 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
     default_calendar_id = default_calendar["id"] if default_calendar else None
     
     # Check if there are already template events for this day
-    start_of_day = target_dt.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_of_day = start_of_day + timedelta(days=1)
+    start_of_day_str = target_dt.strftime("%Y-%m-%d") + "T00:00:00"
+    end_of_day_str = target_dt.strftime("%Y-%m-%d") + "T23:59:59"
     
     existing_template_events = await db.events.find({
         "created_by": user["id"],
         "status": "template",
         "start_time": {
-            "$gte": start_of_day.isoformat(),
-            "$lt": end_of_day.isoformat()
+            "$gte": start_of_day_str,
+            "$lt": end_of_day_str
         }
     }, {"_id": 0}).to_list(100)
     
@@ -108,14 +104,9 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
         start_hour, start_minute = map(int, start_time_str.split(":"))
         end_hour, end_minute = map(int, end_time_str.split(":"))
         
+        # Use target_dt date but with specified time
         event_start = target_dt.replace(hour=start_hour, minute=start_minute, second=0, microsecond=0)
         event_end = target_dt.replace(hour=end_hour, minute=end_minute, second=0, microsecond=0)
-        
-        # Ensure both are aware datetimes in UTC
-        if event_start.tzinfo is None:
-            event_start = event_start.replace(tzinfo=timezone.utc)
-        if event_end.tzinfo is None:
-            event_end = event_end.replace(tzinfo=timezone.utc)
         
         event_dict = {
             "id": str(uuid.uuid4()),
@@ -135,6 +126,7 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
             "is_completed": False,
             "is_video_call": False,
             "recurrence_type": "none",
+            "timezone": user.get("timezone", "Europe/Moscow"),
             "created_at": datetime.now(timezone.utc).isoformat(),
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
