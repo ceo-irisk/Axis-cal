@@ -50,12 +50,8 @@ async def get_events(
     expand_recurring: bool = Query(True),
     user: dict = Depends(get_current_user)
 ):
-    query = {}
-    
-    # If viewing another user's events, use that user_id, otherwise use current user
-    target_user_id = user_id if user_id else user["id"]
-    
     # Build query for date range
+    query = {}
     if start_date and end_date:
         query["$or"] = [
             {"start_time": {"$gte": start_date, "$lte": end_date}},
@@ -66,6 +62,12 @@ async def get_events(
     
     # Expand recurring events if requested
     if expand_recurring and start_date and end_date:
+        # Get ALL recurring events (even outside date range - they might have instances inside)
+        all_recurring = await db.events.find(
+            {"recurrence_type": {"$nin": ["none", None, ""]}},
+            {"_id": 0}
+        ).to_list(1000)
+        
         # Parse dates
         start_dt = datetime.fromisoformat(start_date)
         if start_dt.tzinfo is None:
@@ -75,14 +77,18 @@ async def get_events(
         if end_dt.tzinfo is None:
             end_dt = end_dt.replace(tzinfo=timezone.utc)
         
-        # Find recurring events
-        recurring_events = [e for e in events if e.get("recurrence_type") and e.get("recurrence_type") not in ["none", None, ""]]
-        
-        # Generate instances
+        # Generate instances for all recurring events
         result_events = list(events)
-        for event in recurring_events:
+        processed_ids = set()
+        
+        for event in all_recurring:
+            event_id = event.get("id")
+            if event_id in processed_ids:
+                continue
+            
             instances = generate_recurring_instances(event, start_dt, end_dt)
             result_events.extend(instances)
+            processed_ids.add(event_id)
         
         # Filter events by permissions
         filtered_events = await filter_events_by_permissions(result_events, user["id"], db)
@@ -90,7 +96,6 @@ async def get_events(
     
     # Filter events by permissions
     filtered_events = await filter_events_by_permissions(events, user["id"], db)
-    
     return filtered_events
 
 @router.get("/{event_id}")
