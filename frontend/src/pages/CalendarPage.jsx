@@ -189,11 +189,12 @@ export default function CalendarPage() {
 
   const handleSaveEvent = async (eventData) => {
     try {
+      const dataWithTimezone = { ...eventData, timezone: selectedTimezone };
       if (selectedEvent) {
-        await updateEvent(selectedEvent.id, eventData);
+        await updateEvent(selectedEvent.id, dataWithTimezone);
         toast.success('Событие обновлено');
       } else {
-        await createEvent(eventData);
+        await createEvent(dataWithTimezone);
         toast.success('Событие создано');
       }
       setShowEventModal(false);
