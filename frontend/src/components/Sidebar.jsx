@@ -38,7 +38,6 @@ import {
   DialogFooter,
 } from './ui/dialog';
 import CalendarPermissionsModal from './CalendarPermissionsModal';
-import { TIMEZONES } from '../lib/timezones';
 
 // Available calendar icons
 const CALENDAR_ICONS = {
