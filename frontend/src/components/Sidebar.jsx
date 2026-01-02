@@ -994,7 +994,7 @@ export const Sidebar = ({
                                 {isDefault && <span className="text-xs text-muted-foreground ml-1">({cal.is_public ? 'по умолчанию' : 'приватный'})</span>}
                               </span>
                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
-                                {!isDefault && cal.is_public && (
+                                {cal.is_public && (
                                   <button 
                                     onClick={() => { setSelectedCalendarForPermissions(cal); setShowPermissionsModal(true); }}
                                     className="p-1 rounded hover:bg-background"
