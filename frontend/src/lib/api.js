@@ -60,10 +60,11 @@ export const getUserEvents = (userId, startDate, endDate) => {
 };
 
 // Events
-export const getEvents = (startDate, endDate) => {
+export const getEvents = (startDate, endDate, expandRecurring = true) => {
   const params = new URLSearchParams();
   if (startDate) params.append('start_date', startDate);
   if (endDate) params.append('end_date', endDate);
+  params.append('expand_recurring', expandRecurring.toString());
   return api.get(`/events?${params.toString()}`);
 };
 export const createEvent = (data) => api.post('/events', data);
