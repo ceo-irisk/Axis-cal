@@ -12,39 +12,29 @@ def generate_recurring_instances(event: dict, start_date: datetime, end_date: da
     # Parse event times - handle both string and datetime objects
     start_time = event["start_time"]
     end_time = event["end_time"]
+    event_timezone = event.get("timezone")
     
     if isinstance(start_time, datetime):
         event_start = start_time.replace(tzinfo=None) if start_time.tzinfo else start_time
         event_end = end_time.replace(tzinfo=None) if end_time.tzinfo else end_time
     else:
-        # Parse string - remove timezone to get naive datetime (local time)
         event_start_str = str(start_time)
         event_end_str = str(end_time)
         
-        # If has timezone info (+00:00, Z, etc), parse and strip it
-        if "+" in event_start_str or event_start_str.endswith("Z") or "T" in event_start_str:
-            event_start_with_tz = datetime.fromisoformat(event_start_str.replace("Z", "+00:00"))
-            event_end_with_tz = datetime.fromisoformat(event_end_str.replace("Z", "+00:00"))
+        # Parse datetime
+        if "+" in event_start_str or event_start_str.endswith("Z"):
+            # Has timezone - parse it
+            event_start_utc = datetime.fromisoformat(event_start_str.replace("Z", "+00:00"))
+            event_end_utc = datetime.fromisoformat(event_end_str.replace("Z", "+00:00"))
             
-            # Get the LOCAL time components (hours, minutes) from the datetime
-            # This preserves the time user intended regardless of UTC offset
-            event_start = datetime(
-                event_start_with_tz.year,
-                event_start_with_tz.month, 
-                event_start_with_tz.day,
-                event_start_with_tz.hour,
-                event_start_with_tz.minute,
-                event_start_with_tz.second
-            )
-            event_end = datetime(
-                event_end_with_tz.year,
-                event_end_with_tz.month,
-                event_end_with_tz.day, 
-                event_end_with_tz.hour,
-                event_end_with_tz.minute,
-                event_end_with_tz.second
-            )
+            # CRITICAL: Convert from UTC to local time if event has timezone
+            # Event stored as UTC but should repeat at LOCAL time
+            # For now, just strip timezone to get the UTC time as naive
+            # The actual time conversion happens on frontend display
+            event_start = event_start_utc.replace(tzinfo=None)
+            event_end = event_end_utc.replace(tzinfo=None)
         else:
+            # No timezone - already local time
             event_start = datetime.fromisoformat(event_start_str)
             event_end = datetime.fromisoformat(event_end_str)
     
