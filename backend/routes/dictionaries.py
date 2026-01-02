@@ -23,9 +23,14 @@ async def get_event_types(user: dict = Depends(get_current_user)):
 
 @router.post("/event-types")
 async def create_event_type(type_data: Dict[str, Any] = Body(...), admin: dict = Depends(require_admin)):
+    # Check if event type with this name already exists
+    existing = await db.event_types.find_one({"name": type_data.get("name")})
+    if existing:
+        raise HTTPException(status_code=400, detail=f"Тип события с кодом '{type_data.get('name')}' уже существует")
+    
     # Get max order
-    existing = await db.event_types.find({}, {"_id": 0}).sort("order", -1).to_list(1)
-    max_order = existing[0]["order"] if existing else 0
+    all_types = await db.event_types.find({}, {"_id": 0}).sort("order", -1).to_list(1)
+    max_order = all_types[0]["order"] if all_types else 0
     
     type_dict = {
         "id": str(uuid.uuid4()),
