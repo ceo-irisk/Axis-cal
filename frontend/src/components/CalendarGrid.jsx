@@ -764,7 +764,6 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
           <p className="text-xs text-muted-foreground mb-2">События дня</p>
           <div className="space-y-1">
             {allDayEvents.map(event => {
-              const eventColorClass = getEventColorClass(event);
               const dynamicStyle = getEventDynamicStyle(event, eventTypes);
               const isSelected = selectedEventId === event.id;
               return (
@@ -772,7 +771,7 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
                   key={event.id}
                   onClick={() => onEventSelect?.(event.id)}
                   onDoubleClick={() => onEventClick(event)}
-                  className={`px-3 py-1.5 rounded text-sm cursor-pointer hover:opacity-80 ${eventColorClass} ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
+                  className={`px-3 py-1.5 rounded text-sm cursor-pointer hover:opacity-80 ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
                   style={dynamicStyle || {}}
                 >
                   <div className="flex items-center justify-between">
