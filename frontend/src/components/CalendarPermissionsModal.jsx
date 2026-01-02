@@ -8,6 +8,7 @@ import { getCalendarPermissions, grantCalendarPermission, revokeCalendarPermissi
 import { toast } from 'sonner';
 
 const PERMISSION_LEVELS = [
+  { value: 'view_busy', label: 'Только занятость', icon: Eye, description: 'Видно только "Занято"' },
   { value: 'read', label: 'Чтение', icon: Eye, description: 'Только просмотр событий' },
   { value: 'edit', label: 'Редактирование', icon: Edit, description: 'Просмотр и изменение событий' },
   { value: 'full', label: 'Полный доступ', icon: Shield, description: 'Все права включая удаление' },
