@@ -44,12 +44,8 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
     e.preventDefault();
     if (!selectedUserId) return;
     
-    // Find user email
-    const selectedUser = users.find(u => u.id === selectedUserId);
-    if (!selectedUser) return;
-    
     try {
-      await grantCalendarPermission(calendar.id, selectedUser.email, newPermissionLevel);
+      await grantCalendarPermission(calendar.id, selectedUserId, newPermissionLevel);
       setSelectedUserId('');
       setNewPermissionLevel('read');
       loadData();

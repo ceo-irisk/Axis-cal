@@ -164,11 +164,11 @@ export const deleteCalendar = (id) => api.delete(`/calendars/${id}`);
 
 // Calendar Permissions
 export const getCalendarPermissions = (calendarId) => api.get(`/calendars/${calendarId}/permissions`);
-export const grantCalendarPermission = (calendarId, userEmail, permissionLevel) => {
-  const params = new URLSearchParams();
-  params.append('user_email', userEmail);
-  params.append('permission_level', permissionLevel);
-  return api.post(`/calendars/${calendarId}/permissions?${params.toString()}`);
+export const grantCalendarPermission = (calendarId, userId, permissionLevel) => {
+  return api.post(`/calendars/${calendarId}/permissions`, {
+    user_id: userId,
+    permission_level: permissionLevel
+  });
 };
 export const revokeCalendarPermission = (calendarId, userId) => api.delete(`/calendars/${calendarId}/permissions/${userId}`);
 
