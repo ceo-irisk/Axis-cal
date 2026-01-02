@@ -28,6 +28,12 @@ async def create_ics_subscription(subscription_data: dict = Body(...), user: dic
     name = subscription_data.get("name")
     color = subscription_data.get("color", "#6366f1")
     
+    # Convert webcal:// to https://
+    if url.startswith("webcal://"):
+        url = "https://" + url[9:]
+    elif url.startswith("webcals://"):
+        url = "https://" + url[10:]
+    
     # Validate URL by trying to fetch it
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
