@@ -153,12 +153,15 @@ export const updateEventFields = (fields) => api.put('/event-fields', fields);
 
 // Calendars
 export const getCalendars = () => api.get('/calendars');
-export const addCalendar = (name, color, icon = 'calendar') => {
-  const params = new URLSearchParams();
-  params.append('name', name);
-  params.append('color', color);
-  params.append('icon', icon);
-  return api.post(`/calendars?${params.toString()}`);
+export const addCalendar = (name, icon = 'calendar') => {
+  return api.post('/calendars', { 
+    name, 
+    icon,
+    provider: 'custom',
+    is_public: false,
+    is_active: true,
+    sync_enabled: false
+  });
 };
 export const deleteCalendar = (id) => api.delete(`/calendars/${id}`);
 
