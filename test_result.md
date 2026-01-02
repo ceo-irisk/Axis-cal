@@ -196,8 +196,8 @@ frontend:
         comment: "Frontend testing not performed by testing agent"
 
   - task: "Calendar Hide/Show Functionality"
-    implemented: false
-    working: false
+    implemented: true
+    working: true
     file: "frontend/src/components/Sidebar.jsx, frontend/src/pages/CalendarPage.jsx, frontend/src/components/CalendarGrid.jsx"
     stuck_count: 0
     priority: "high"
@@ -206,6 +206,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ CRITICAL BUG: Calendar hide/show feature crashes the app. Error: 'onHiddenCalendarsChange is not defined'. The Sidebar has toggleCalendarVisibility function (line 443) that calls onHiddenCalendarsChange?.(next), but this prop is not passed from CalendarPage. Root causes: 1) CalendarPage has no hiddenCalendars state 2) No onHiddenCalendarsChange handler passed to Sidebar 3) CalendarGrid has no logic to filter events by calendar visibility. When user clicks eye button in Calendars tab, app shows red error screen. REQUIRED FIXES: Add hiddenCalendars state to CalendarPage, create and pass onHiddenCalendarsChange handler to Sidebar, pass hiddenCalendars to CalendarGrid, implement event filtering in CalendarGrid to hide events from hidden calendars."
+      - working: true
+        agent: "testing"
+        comment: "✅ BUG FIXED: Calendar hide/show functionality is now working correctly. Tested with admin@company.com login. All core features work: 1) Eye icon toggles to EyeOff when calendar is hidden 2) Calendar text gets line-through styling when hidden 3) Icon and text return to normal state when shown again 4) Events from hidden calendars are filtered from view. Minor issue: React warning 'Cannot update a component while rendering' appears when hiding calendar - this is non-critical and doesn't affect functionality. The warning is caused by calling onHiddenCalendarsChange inside setState callback in Sidebar.toggleCalendarVisibility (line 449). Recommendation: Move the parent state update outside the setState callback using useEffect to eliminate the warning."
 
 metadata:
   created_by: "testing_agent"
