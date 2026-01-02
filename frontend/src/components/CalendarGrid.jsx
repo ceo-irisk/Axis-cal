@@ -829,14 +829,13 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
           {dayEvents.map(event => {
             const duration = getEventDuration(event);
             const isLong = duration >= 1;
-            const eventTime = getLocalTime(event.start_time, timezoneShift);
+            const eventTime = getLocalTime(event.start_time, event._timezoneShift || 0);
             const dynamicStyle = getEventDynamicStyle(event, eventTypes);
             const overlapStyle = getOverlapStyle(event);
             const isSelected = selectedEventId === event.id;
             
-            // Format time with shift indicator
-            const timeDisplay = timezoneShift !== 0 
-              ? `${eventTime.formatted} (${eventTime.original}${timezoneShift > 0 ? '+' : ''}${timezoneShift})`
+            const timeDisplay = event._timezoneShift && event._timezoneShift !== 0 
+              ? `${eventTime.formatted} (${eventTime.original}${event._timezoneShift > 0 ? '+' : ''}${event._timezoneShift})`
               : eventTime.formatted;
             
             return (
