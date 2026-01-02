@@ -101,7 +101,7 @@ export default function CalendarPage() {
       // If viewing another user's calendar, load their events
       const eventsPromise = viewingUserId 
         ? getUserEvents(viewingUserId, startStr, endStr)
-        : getEventsWithRecurring(startStr, endStr);
+        : getEvents(startStr, endStr);
 
       const [eventsRes, icsEventsRes, ratingsRes, overloadedRes, templatesRes, eventTypesRes, appliedTemplatesRes] = await Promise.all([
         eventsPromise,
