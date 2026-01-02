@@ -25,8 +25,13 @@ async def create_event(event_data: EventCreate, user: dict = Depends(get_current
     event_dict["created_at"] = datetime.now(timezone.utc).isoformat()
     event_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
     
-    # DON'T convert to UTC - keep as local time string
-    # Frontend sends "2026-01-02T14:00:00" and we save it as is
+    # Convert datetime objects to ISO strings (pydantic converts strings to datetime)
+    if isinstance(event_dict.get("start_time"), datetime):
+        event_dict["start_time"] = event_dict["start_time"].isoformat()
+    if isinstance(event_dict.get("end_time"), datetime):
+        event_dict["end_time"] = event_dict["end_time"].isoformat()
+    if isinstance(event_dict.get("recurrence_end_date"), datetime):
+        event_dict["recurrence_end_date"] = event_dict["recurrence_end_date"].isoformat()
     
     await db.events.insert_one(event_dict)
     
@@ -120,7 +125,13 @@ async def update_event(event_id: str, event_data: EventCreate, user: dict = Depe
     update_dict = event_data.model_dump()
     update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
     
-    # DON'T convert datetime fields - keep as local time
+    # Convert datetime objects to ISO strings
+    if isinstance(update_dict.get("start_time"), datetime):
+        update_dict["start_time"] = update_dict["start_time"].isoformat()
+    if isinstance(update_dict.get("end_time"), datetime):
+        update_dict["end_time"] = update_dict["end_time"].isoformat()
+    if isinstance(update_dict.get("recurrence_end_date"), datetime):
+        update_dict["recurrence_end_date"] = update_dict["recurrence_end_date"].isoformat()
     
     await db.events.update_one({"id": event_id}, {"$set": update_dict})
     
