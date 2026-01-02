@@ -253,6 +253,7 @@ export const Sidebar = ({
       setEventTypes(typesRes.data || []);
       setEventStatuses(statusesRes.data || []);
       setTemplates(templatesRes.data || []);
+      setAllTimezones(timezonesRes.data || []);  // Store all timezones
       setCustomTimezones(timezonesRes.data || []);
       setIcsSubscriptions(icsRes.data || []);
       onCustomTimezonesChange?.(timezonesRes.data || []);
