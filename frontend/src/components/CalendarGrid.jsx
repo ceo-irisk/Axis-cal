@@ -260,7 +260,7 @@ const TimezoneSelector = ({ selectedTimezone, onTimezoneChange, customTimezones 
     <Select value={selectedTimezone} onValueChange={onTimezoneChange}>
       <SelectTrigger className="w-[180px] h-7 text-xs gap-1">
         <Globe className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-        <span className="truncate">{selectedTz?.name || 'UTC (0:00)'}</span>
+        <span className="truncate">{selectedTz?.name || selectedTimezone || 'Локальное время'}</span>
       </SelectTrigger>
       <SelectContent>
         {customTimezones.map(tz => (
