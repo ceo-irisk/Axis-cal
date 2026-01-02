@@ -446,10 +446,14 @@ export const Sidebar = ({
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
-      onHiddenCalendarsChange?.(next);
       return next;
     });
   };
+
+  // Notify parent about hidden calendars changes
+  useEffect(() => {
+    onHiddenCalendarsChange?.(hiddenCalendars);
+  }, [hiddenCalendars, onHiddenCalendarsChange]);
 
   const myCalendars = calendars.filter(c => !c.owner); // Own calendars
   const sharedCalendars = calendars.filter(c => c.owner); // Calendars shared with me
