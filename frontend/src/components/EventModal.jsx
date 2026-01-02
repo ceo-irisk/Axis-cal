@@ -217,27 +217,21 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Get current timezone offset in minutes
-    const timezoneOffset = new Date().getTimezoneOffset();
     
-    // Combine date and time into local datetime string
-    const startDateTimeStr = `${formData.start_date}T${formData.start_time_val}`;
-    const endDateTimeStr = `${formData.end_date}T${formData.end_time_val}`;
-    
-    // Create Date objects (will be interpreted as local time)
-    const startLocal = new Date(startDateTimeStr);
-    const endLocal = new Date(endDateTimeStr);
+    // Combine date and time into ISO string WITHOUT timezone conversion
+    const startDateTimeStr = `${formData.start_date}T${formData.start_time_val}:00`;
+    const endDateTimeStr = `${formData.end_date}T${formData.end_time_val}:00`;
     
     // Prepare recurrence end date
     let recurrenceEndDate = null;
     if (formData.recurrence_type !== 'none' && formData.recurrence_end_date) {
-      recurrenceEndDate = new Date(`${formData.recurrence_end_date}T23:59:59`).toISOString();
+      recurrenceEndDate = `${formData.recurrence_end_date}T23:59:59`;
     }
     
     onSave({
       ...formData,
-      start_time: startLocal.toISOString(),
-      end_time: endLocal.toISOString(),
+      start_time: startDateTimeStr,
+      end_time: endDateTimeStr,
       status: formData.status,
       recurrence_type: formData.recurrence_type,
       recurrence_end_date: recurrenceEndDate,
