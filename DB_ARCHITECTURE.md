@@ -61,7 +61,7 @@
   
   // Флаги
   is_all_day: false,                    // Событие на весь день
-  is_template_event: false,             // Событие из шаблона
+  is_template_event: false,             // Событие из шаблона  / Есть явное ощущение что это надо переделать
   is_blocked: false,                    // Заблокировано
   is_completed: false,                  // Завершено
   is_urgent: false,                     // Срочное
