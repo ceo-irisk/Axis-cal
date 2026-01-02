@@ -9,17 +9,23 @@ def generate_recurring_instances(event: dict, start_date: datetime, end_date: da
     if recurrence_type == "none":
         return instances
     
-    # Parse event times as naive datetime (local time)
-    event_start_str = str(event["start_time"]).replace("Z", "+00:00")
-    event_end_str = str(event["end_time"]).replace("Z", "+00:00")
+    # Parse event times - handle both string and datetime objects
+    start_time = event["start_time"]
+    end_time = event["end_time"]
     
-    # Remove timezone info if present to get naive datetime
-    if "+" in event_start_str or event_start_str.endswith("Z"):
-        event_start = datetime.fromisoformat(event_start_str).replace(tzinfo=None)
-        event_end = datetime.fromisoformat(event_end_str).replace(tzinfo=None)
+    if isinstance(start_time, datetime):
+        event_start = start_time.replace(tzinfo=None) if start_time.tzinfo else start_time
+        event_end = end_time.replace(tzinfo=None) if end_time.tzinfo else end_time
     else:
-        event_start = datetime.fromisoformat(event_start_str)
-        event_end = datetime.fromisoformat(event_end_str)
+        event_start_str = str(start_time).replace("Z", "+00:00")
+        event_end_str = str(end_time).replace("Z", "+00:00")
+        
+        if "+" in event_start_str or event_start_str.endswith("Z"):
+            event_start = datetime.fromisoformat(event_start_str).replace(tzinfo=None)
+            event_end = datetime.fromisoformat(event_end_str).replace(tzinfo=None)
+        else:
+            event_start = datetime.fromisoformat(event_start_str)
+            event_end = datetime.fromisoformat(event_end_str)
     
     duration = event_end - event_start
     
