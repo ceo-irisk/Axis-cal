@@ -1529,35 +1529,42 @@ const ICSSubscriptionForm = ({ onSave, onCancel }) => {
   );
 };
 
-const TimezoneForm = ({ onSave, onCancel }) => {
-  const [name, setName] = useState('');
-  const [label, setLabel] = useState('');
-  const [offset, setOffset] = useState(0);
+const TimezoneForm = ({ timezone, onSave, onCancel }) => {
+  const [name, setName] = useState(timezone?.name || '');
+  const [offset, setOffset] = useState(timezone?.offset || '+0:00');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name.trim() || !label.trim()) return;
-    onSave({ name: name.trim(), label: label.trim(), offset: parseFloat(offset) });
+    if (!name.trim() || !offset.trim()) return;
+    onSave({ name: name.trim(), offset: offset.trim() });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label>Код (латиницей)</Label>
-        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="custom_tz_1" className="mt-1" />
-      </div>
-      <div>
         <Label>Название</Label>
-        <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Мой часовой пояс (GMT+5)" className="mt-1" />
+        <Input 
+          value={name} 
+          onChange={(e) => setName(e.target.value)} 
+          placeholder="Дубай (GMT+4)" 
+          className="mt-1" 
+        />
       </div>
       <div>
-        <Label>Смещение от UTC (часы)</Label>
-        <Input type="number" step="0.5" min="-12" max="14" value={offset} onChange={(e) => setOffset(e.target.value)} className="mt-1" />
-        <p className="text-xs text-muted-foreground mt-1">Например: 3 для GMT+3, -5 для GMT-5</p>
+        <Label>Офсет (формат: +3:00 или -5:00)</Label>
+        <Input 
+          value={offset} 
+          onChange={(e) => setOffset(e.target.value)} 
+          placeholder="+3:00" 
+          className="mt-1" 
+        />
+        <p className="text-xs text-muted-foreground mt-1">
+          Примеры: +0:00, +3:00, -5:00, +5:30
+        </p>
       </div>
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onCancel}>Отмена</Button>
-        <Button type="submit">Создать</Button>
+        <Button type="submit">{timezone ? 'Сохранить' : 'Создать'}</Button>
       </DialogFooter>
     </form>
   );
