@@ -823,7 +823,6 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
             const duration = getEventDuration(event);
             const isLong = duration >= 1;
             const eventTime = getLocalTime(event.start_time, timezoneShift);
-            const eventColorClass = getEventColorClass(event);
             const dynamicStyle = getEventDynamicStyle(event, eventTypes);
             const overlapStyle = getOverlapStyle(event);
             const isSelected = selectedEventId === event.id;
@@ -843,7 +842,6 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
                 className={`
                   absolute px-2 py-1.5 rounded-lg cursor-pointer 
                   hover:opacity-90 transition-opacity group
-                  ${eventColorClass}
                   ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
                 `}
                 style={{...getEventStyle(event), ...overlapStyle, ...(dynamicStyle || {})}} 
