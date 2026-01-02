@@ -143,7 +143,7 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Выберите пользователя" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-[100]" position="popper" sideOffset={5}>
                     {users
                       .filter(u => !permissions.find(p => p.user_id === u.id))
                       .map(user => (
@@ -164,7 +164,7 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
                   <SelectTrigger className="mt-1">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-[100]" position="popper" sideOffset={5}>
                     {PERMISSION_LEVELS.map(level => (
                       <SelectItem key={level.value} value={level.value}>
                         <div className="flex items-start gap-2">
