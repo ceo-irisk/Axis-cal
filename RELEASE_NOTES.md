@@ -243,6 +243,6 @@
 
 ---
 
-**Разработчик:** Emergent AI Agent  
+**Разработчик:** Emergent AI Agent  и ceo-irisk
 **Проект:** Axis Calendar  
 **Репозиторий:** ceo-irisk/Axis-cal
