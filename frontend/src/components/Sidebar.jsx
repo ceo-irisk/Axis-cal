@@ -1721,7 +1721,6 @@ const TemplateEventForm = ({ initialData, eventTypes, templateType, onSave, onCa
   const [isCompleted, setIsCompleted] = useState(initialData?.is_completed || false);
   const [isUrgent, setIsUrgent] = useState(initialData?.is_urgent || false);
   const [isVideoCall, setIsVideoCall] = useState(initialData?.is_video_call || false);
-  const [isUnconfirmed, setIsUnconfirmed] = useState(initialData?.is_unconfirmed || false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -1739,8 +1738,7 @@ const TemplateEventForm = ({ initialData, eventTypes, templateType, onSave, onCa
       is_blocked: isBlocked,
       is_completed: isCompleted,
       is_urgent: isUrgent,
-      is_video_call: isVideoCall,
-      is_unconfirmed: isUnconfirmed
+      is_video_call: isVideoCall
     });
   };
 
