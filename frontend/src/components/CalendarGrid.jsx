@@ -558,7 +558,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                 {isTodayCol && (
                   <div 
                     className="absolute left-0 right-0 border-t-2 border-[#085C53] z-10 pointer-events-none" 
-                    style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60) * 60}px` }}
+                    style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60 + timezoneShift) * 60}px` }}
                   >
                     <div className="absolute -left-1 -top-1.5 w-3 h-3 rounded-full bg-[#085C53]" />
                   </div>
@@ -794,7 +794,7 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
           {isToday(date) && (
             <div 
               className="absolute left-0 right-0 border-t-2 border-[#085C53] z-10 pointer-events-none" 
-              style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60) * 60}px` }}
+              style={{ top: `${(new Date().getHours() + new Date().getMinutes() / 60 + timezoneShift) * 60}px` }}
             >
               <div className="absolute -left-1 -top-1.5 w-3 h-3 rounded-full bg-[#085C53]" />
             </div>
