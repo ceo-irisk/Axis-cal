@@ -987,12 +987,6 @@ export const Sidebar = ({
               <div className="space-y-4">
                 {/* Settings Sub-tabs */}
                 <div className="flex flex-wrap gap-1 border-b border-border pb-2">
-                  <button 
-                      onClick={() => setSettingsTab(SETTINGS_TABS.MY_CALENDARS)} 
-                      className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.MY_CALENDARS ? 'bg-[#085C53] text-white' : 'text-muted-foreground hover:bg-accent'}`}
-                    >
-                      Мои календари
-                    </button>
                   {isAdmin?.() && (
                     <button 
                       onClick={() => setSettingsTab(SETTINGS_TABS.USERS)} 
@@ -1012,12 +1006,6 @@ export const Sidebar = ({
                     className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.DICTIONARIES ? 'bg-[#085C53] text-white' : 'text-muted-foreground hover:bg-accent'}`}
                   >
                     Справочники
-                  </button>
-                  <button 
-                    onClick={() => setSettingsTab(SETTINGS_TABS.EXTERNAL_CALENDARS)} 
-                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.EXTERNAL_CALENDARS ? 'bg-[#085C53] text-white' : 'text-muted-foreground hover:bg-accent'}`}
-                  >
-                    ICS
                   </button>
                   <button 
                     onClick={() => setSettingsTab(SETTINGS_TABS.PROFILE)} 
