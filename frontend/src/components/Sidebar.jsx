@@ -1015,6 +1015,17 @@ export const Sidebar = ({
                   </button>
                 </div>
 
+                {/* Users Sub-tab */}
+                {settingsTab === SETTINGS_TABS.USERS && isAdmin?.() && (
+                  <div className="text-center py-8">
+                    <Users className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+                    <p className="text-sm text-muted-foreground mb-4">Управление пользователями</p>
+                    <button onClick={() => { onShowUsers?.(); setActiveTab(TABS.EVENTS); }} className="btn-primary text-sm">
+                      Открыть
+                    </button>
+                  </div>
+                )}
+
                 {/* Templates Sub-tab */}
                 {settingsTab === SETTINGS_TABS.TEMPLATES && (
                   <div className="space-y-3">
