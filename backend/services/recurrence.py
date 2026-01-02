@@ -10,8 +10,8 @@ def generate_recurring_instances(event: dict, start_date: datetime, end_date: da
         return instances
     
     # Parse event times as naive datetime (local time)
-    event_start_str = event["start_time"].replace("Z", "+00:00")
-    event_end_str = event["end_time"].replace("Z", "+00:00")
+    event_start_str = str(event["start_time"]).replace("Z", "+00:00")
+    event_end_str = str(event["end_time"]).replace("Z", "+00:00")
     
     # Remove timezone info if present to get naive datetime
     if "+" in event_start_str or event_start_str.endswith("Z"):
