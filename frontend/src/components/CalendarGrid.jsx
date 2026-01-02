@@ -51,9 +51,9 @@ const TEMPLATE_EVENT_COLORS = {
   deep_work: 'event-template-deep-work',
 };
 
-// Generate dynamic styles for custom event types
-const getEventDynamicStyle = (event, eventTypes) => {
-  // Special styling for "Занято" events
+// Get dynamic event styles based on status and type color
+const getEventDynamicStyle = (event, eventTypes = []) => {
+  // "Занято" events - special styling
   if (event.is_busy) {
     return {
       background: '#6b7280',
@@ -65,52 +65,35 @@ const getEventDynamicStyle = (event, eventTypes) => {
   
   const type = event.event_type || 'meeting';
   
-  // Find the event type config
+  // Find the event type config for color
   const eventTypeConfig = eventTypes?.find(et => et.name === type);
-  if (!eventTypeConfig) return null;
+  const color = eventTypeConfig?.color || '#085C53';
   
-  const color = eventTypeConfig.color || '#085C53';
-  
-  // If it's a predefined type, return null (use CSS classes)
-  if (EVENT_COLORS[type]) return null;
-  
-  // Generate dynamic styles for custom types
+  // Apply styles based on status
   if (event.status === 'template') {
+    // Template: solid border, transparent background
     return {
       border: `2px solid ${color}`,
-      background: 'transparent'
+      background: 'transparent',
+      color: color
     };
   }
+  
   if (event.status === 'tentative') {
+    // Tentative: dashed border, transparent background
     return {
       border: `2px dashed ${color}`,
-      background: 'transparent'
+      background: 'transparent',
+      color: color
     };
   }
-  // Confirmed style
+  
+  // Confirmed: left border + light fill
   return {
     borderLeft: `3px solid ${color}`,
-    background: `${color}15` // 15 = ~8% opacity in hex
+    background: `${color}15`, // 15 = ~8% opacity in hex
+    color: color
   };
-};
-
-// Get event color class based on status and type (for predefined types)
-const getEventColorClass = (event) => {
-  // "Занято" events use dynamic styles only
-  if (event.is_busy) return '';
-  
-  const type = event.event_type || 'meeting';
-  
-  // Only return CSS class if it's a predefined type
-  if (!EVENT_COLORS[type]) return '';
-  
-  if (event.status === 'template') {
-    return TEMPLATE_EVENT_COLORS[type] || 'event-template-meeting';
-  }
-  if (event.status === 'tentative') {
-    return UNCONFIRMED_EVENT_COLORS[type] || 'event-unconfirmed-meeting';
-  }
-  return EVENT_COLORS[type] || 'event-meeting';
 };
 
 // Event status icons
