@@ -259,8 +259,12 @@ export default function CalendarPage() {
   const currentRating = ratings[selectedDateStr];
   const currentViolations = ruleViolations[selectedDateStr];
 
-  // Filter events by hidden calendars
-  const visibleEvents = events.filter(e => !hiddenCalendars.has(e.calendar_id));
+  // Filter events by hidden calendars (including ICS subscriptions)
+  const visibleEvents = events.filter(e => {
+    if (e.calendar_id && hiddenCalendars.has(e.calendar_id)) return false;
+    if (e.ics_subscription_id && hiddenCalendars.has(e.ics_subscription_id)) return false;
+    return true;
+  });
 
   const getTitle = () => {
     if (mainView === MAIN_VIEW.USERS) return 'Пользователи';
