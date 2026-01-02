@@ -1245,6 +1245,50 @@ export const Sidebar = ({
         </div>
       </aside>
 
+      {/* Add Calendar Form Modal */}
+      <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Новый календарь</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Название</Label>
+              <Input 
+                value={newCalName}
+                onChange={(e) => setNewCalName(e.target.value)}
+                placeholder="Рабочий календарь"
+                className="mt-1"
+              />
+            </div>
+            
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">Иконка</Label>
+              <div className="grid grid-cols-5 gap-1.5">
+                {Object.entries(CALENDAR_ICONS).map(([key, IconComp]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setNewCalIcon(key)}
+                    className={`p-2.5 rounded-lg hover:bg-background transition-colors ${
+                      newCalIcon === key ? 'bg-[#085C53] text-white' : 'bg-accent'
+                    }`}
+                    title={key}
+                  >
+                    <IconComp className="w-5 h-5 mx-auto" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddForm(false)}>Отмена</Button>
+            <Button onClick={handleAddCalendar}>Создать</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+
       {/* Event Type Modal */}
       <Dialog open={showTypeModal} onOpenChange={setShowTypeModal}>
         <DialogContent>
