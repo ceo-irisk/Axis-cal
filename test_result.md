@@ -228,6 +228,8 @@ agent_communication:
     message: "Added recurring events and ICS subscriptions functionality. Need to test: 1) Recurring events API (/api/recurring-events) generates instances correctly 2) ICS subscriptions CRUD (/api/ics-subscriptions) 3) Event creation with recurrence_type field"
   - agent: "testing"
     message: "✅ RECURRING EVENTS & ICS SUBSCRIPTIONS TESTING COMPLETE: All new APIs working correctly. Recurring events API generates instances properly for all recurrence types (daily, workdays, weekly, monthly, yearly). ICS subscriptions CRUD operations work with proper URL validation. Event creation with recurrence_type field functions correctly. Fixed timezone comparison issue in recurring instances generation. All 47 tests passed with 100% success rate."
+  - agent: "testing"
+    message: "🔴 CRITICAL BUG FOUND: Calendar hide/show functionality is BROKEN. When clicking the eye button to hide a calendar, the app crashes with 'ReferenceError: onHiddenCalendarsChange is not defined'. The Sidebar component calls onHiddenCalendarsChange?.(next) on line 448, but this prop is not passed from CalendarPage. Additionally, even if the error is fixed, the CalendarGrid component has no logic to filter events based on hidden calendars, so the feature would still not work. FIX REQUIRED: 1) Add hiddenCalendars state to CalendarPage 2) Pass onHiddenCalendarsChange handler to Sidebar 3) Pass hiddenCalendars to CalendarGrid 4) Implement event filtering in CalendarGrid based on calendar visibility."
   - task: "Backend Refactoring - Authentication Routes"
     implemented: true
     working: true
