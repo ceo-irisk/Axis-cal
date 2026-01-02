@@ -842,12 +842,12 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
             return (
               <div 
                 key={event.id}
-                draggable
-                onDragStart={(e) => handleDragStart(e, event)}
-                onClick={(e) => { e.stopPropagation(); onEventSelect?.(event.id); }}
-                onDoubleClick={(e) => { e.stopPropagation(); onEventClick(event); }}
+                draggable={!event.is_busy}
+                onDragStart={(e) => !event.is_busy && handleDragStart(e, event)}
+                onClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventSelect?.(event.id); }}
+                onDoubleClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventClick(event); }}
                 className={`
-                  absolute px-2 py-1.5 rounded-lg cursor-pointer 
+                  absolute px-2 py-1.5 rounded-lg ${event.is_busy ? 'cursor-default' : 'cursor-pointer'}
                   hover:opacity-90 transition-opacity group
                   ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
                 `}
@@ -863,8 +863,10 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
                   </div>
                   <EventIcons event={event} />
                 </div>
-                {/* Resize handle */}
-                <div className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize opacity-0 group-hover:opacity-100 bg-black/20 rounded-b" />
+                {/* Resize handle - hide for busy events */}
+                {!event.is_busy && (
+                  <div className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize opacity-0 group-hover:opacity-100 bg-black/20 rounded-b" />
+                )}
               </div>
             );
           })}
