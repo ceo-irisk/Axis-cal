@@ -85,7 +85,7 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
     
     existing_template_events = await db.events.find({
         "created_by": user["id"],
-        "is_template_event": True,
+        "status": "template",
         "start_time": {
             "$gte": start_of_day.isoformat(),
             "$lt": end_of_day.isoformat()
@@ -124,17 +124,15 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
             "start_time": event_start.isoformat(),
             "end_time": event_end.isoformat(),
             "event_type": event_template.get("event_type", "meeting"),
-            "status": "confirmed",
+            "status": "template",
             "created_by": user["id"],
             "calendar_id": default_calendar_id,
-            "is_template_event": True,
             "attendees": [],
             "location": event_template.get("location", ""),
             "is_all_day": False,
-            "is_unconfirmed": False,
+            "is_urgent": False,
             "is_blocked": False,
             "is_completed": False,
-            "is_urgent": False,
             "is_video_call": False,
             "recurrence_type": "none",
             "created_at": datetime.now(timezone.utc).isoformat(),
@@ -166,7 +164,7 @@ async def remove_template_from_day(date: str, user: dict = Depends(get_current_u
     
     result = await db.events.delete_many({
         "created_by": user["id"],
-        "is_template_event": True,
+        "status": "template",
         "start_time": {
             "$gte": start_of_day.isoformat(),
             "$lt": end_of_day.isoformat()
@@ -183,7 +181,7 @@ async def get_applied_templates(
 ):
     query = {
         "created_by": user["id"],
-        "is_template_event": True
+        "status": "template"
     }
     
     if start_date and end_date:
