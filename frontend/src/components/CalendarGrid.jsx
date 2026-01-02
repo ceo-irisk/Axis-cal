@@ -587,7 +587,6 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                   const duration = getEventDuration(event);
                   const isLong = duration >= 1;
                   const eventTime = getLocalTime(event.start_time, timezoneShift);
-                  const eventColorClass = getEventColorClass(event);
                   const dynamicStyle = getEventDynamicStyle(event, eventTypes);
                   const overlapStyle = getOverlapStyle(event, dayEvents);
                   const isSelected = selectedEventId === event.id;
@@ -607,7 +606,6 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                       className={`
                         absolute px-1 py-1 rounded-md text-xs cursor-pointer 
                         hover:opacity-90 transition-opacity overflow-hidden group
-                        ${eventColorClass}
                         ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
                       `} 
                       style={{...getEventStyle(event), ...overlapStyle, ...(dynamicStyle || {})}} 
