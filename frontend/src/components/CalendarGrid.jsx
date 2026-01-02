@@ -167,12 +167,33 @@ export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, tem
     return sign * (hours + minutes / 60);
   };
   
+  // Calculate timezone shift for each event
+  const calculateEventShift = (event) => {
+    if (!event.timezone || !selectedTimezone) return 0;
+    
+    const eventTz = customTimezones.find(tz => tz.name === event.timezone);
+    const selectedTz = customTimezones.find(tz => tz.name === selectedTimezone);
+    
+    if (!eventTz || !selectedTz) return 0;
+    
+    const eventOffset = parseOffset(eventTz.offset);
+    const selectedOffset = parseOffset(selectedTz.offset);
+    
+    return selectedOffset - eventOffset;
+  };
+  
+  // Add shift to each event
+  const eventsWithShift = events.map(event => ({
+    ...event,
+    _timezoneShift: calculateEventShift(event)
+  }));
+  
   const selectedTz = customTimezones.find(tz => tz.name === selectedTimezone) || customTimezones[0];
-  const timezoneShift = selectedTz ? parseOffset(selectedTz.offset) : 0;
+  const currentTimezoneOffset = selectedTz ? parseOffset(selectedTz.offset) : 0;
 
-  if (view === 'day') return <DayView date={selectedDate} events={events} templates={templates} appliedTemplates={appliedTemplates} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} timezoneShift={timezoneShift} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} eventTypes={eventTypes} />;
-  if (view === 'week') return <WeekView date={selectedDate} events={events} templates={templates} appliedTemplates={appliedTemplates} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} timezoneShift={timezoneShift} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} eventTypes={eventTypes} />;
-  return <MonthView currentDate={currentDate} selectedDate={selectedDate} events={events} overloadedDays={overloadedDays} ratings={ratings} onDateClick={onDateClick} onCellDoubleClick={onCellDoubleClick} onEventClick={onEventClick} selectedEventId={selectedEventId} onEventSelect={onEventSelect} eventTypes={eventTypes} />;
+  if (view === 'day') return <DayView date={selectedDate} events={eventsWithShift} templates={templates} appliedTemplates={appliedTemplates} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} currentTimezoneOffset={currentTimezoneOffset} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} eventTypes={eventTypes} />;
+  if (view === 'week') return <WeekView date={selectedDate} events={eventsWithShift} templates={templates} appliedTemplates={appliedTemplates} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} currentTimezoneOffset={currentTimezoneOffset} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} eventTypes={eventTypes} />;
+  return <MonthView currentDate={currentDate} selectedDate={selectedDate} events={eventsWithShift} overloadedDays={overloadedDays} ratings={ratings} onDateClick={onDateClick} onCellDoubleClick={onCellDoubleClick} onEventClick={onEventClick} selectedEventId={selectedEventId} onEventSelect={onEventSelect} eventTypes={eventTypes} />;
 };
 
 const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings, onDateClick, onCellDoubleClick, onEventClick, selectedEventId, onEventSelect, eventTypes }) => {
