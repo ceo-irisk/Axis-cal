@@ -21,29 +21,30 @@ async def get_calendars(user: dict = Depends(get_current_user)):
     # Get user's own calendars
     calendars = await db.calendars.find({"user_id": user["id"]}, {"_id": 0}).to_list(100)
     
-    # Get subscribed users
-    subscriptions = await db.user_subscriptions.find({"user_id": user["id"]}, {"_id": 0}).to_list(100)
-    subscribed_user_ids = [sub["target_user_id"] for sub in subscriptions]
+    # Get calendars where user has permissions
+    permissions = await db.calendar_permissions.find({"user_id": user["id"]}, {"_id": 0}).to_list(100)
+    permitted_calendar_ids = [p["calendar_id"] for p in permissions]
     
-    # Get calendars from subscribed users
-    if subscribed_user_ids:
-        subscribed_calendars = await db.calendars.find(
-            {"user_id": {"$in": subscribed_user_ids}},
+    # Get shared calendars
+    if permitted_calendar_ids:
+        shared_calendars = await db.calendars.find(
+            {"id": {"$in": permitted_calendar_ids}},
             {"_id": 0}
         ).to_list(100)
         
-        # Get user info for subscribed calendars
+        # Get owner info for shared calendars
+        owner_ids = [c["user_id"] for c in shared_calendars]
         users = await db.users.find(
-            {"id": {"$in": subscribed_user_ids}},
+            {"id": {"$in": owner_ids}},
             {"_id": 0, "password": 0}
         ).to_list(100)
         user_map = {u["id"]: u for u in users}
         
-        # Attach user info to subscribed calendars
-        for cal in subscribed_calendars:
+        # Attach owner info to shared calendars
+        for cal in shared_calendars:
             cal["owner"] = user_map.get(cal["user_id"])
         
-        calendars.extend(subscribed_calendars)
+        calendars.extend(shared_calendars)
     
     return calendars
 
