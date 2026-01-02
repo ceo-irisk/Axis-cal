@@ -37,11 +37,15 @@ def generate_recurring_instances(event: dict, start_date: datetime, end_date: da
     
     recurrence_end = None
     if event.get("recurrence_end_date"):
-        recurrence_end_str = event["recurrence_end_date"].replace("Z", "+00:00")
-        if "+" in recurrence_end_str or recurrence_end_str.endswith("Z"):
-            recurrence_end = datetime.fromisoformat(recurrence_end_str).replace(tzinfo=None)
+        rec_end = event["recurrence_end_date"]
+        if isinstance(rec_end, datetime):
+            recurrence_end = rec_end.replace(tzinfo=None) if rec_end.tzinfo else rec_end
         else:
-            recurrence_end = datetime.fromisoformat(recurrence_end_str)
+            rec_end_str = str(rec_end).replace("Z", "+00:00")
+            if "+" in rec_end_str:
+                recurrence_end = datetime.fromisoformat(rec_end_str).replace(tzinfo=None)
+            else:
+                recurrence_end = datetime.fromisoformat(rec_end_str)
     
     current_date = event_start
     instance_count = 0
