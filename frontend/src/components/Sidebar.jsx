@@ -689,7 +689,8 @@ export const Sidebar = ({
                       <div className="space-y-2">
                         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Весь день</p>
                         {allDayEvents.map((event) => {
-                          const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
+                          const isUnconfirmed = event.status === 'tentative';
+                          const isTemplate = event.status === 'template';
                           const eventColor = getEventTypeColor(event);
                           return (
                             <button 
@@ -723,7 +724,8 @@ export const Sidebar = ({
                           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">События</p>
                         )}
                         {timedEvents.map((event) => {
-                          const isUnconfirmed = event.status === 'tentative' || event.is_unconfirmed;
+                          const isUnconfirmed = event.status === 'tentative';
+                          const isTemplate = event.status === 'template';
                           const eventColor = getEventTypeColor(event);
                           return (
                             <button 
