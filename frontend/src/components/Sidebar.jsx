@@ -1902,21 +1902,6 @@ const TemplateEventForm = ({ initialData, eventTypes, templateType, onSave, onCa
         </div>
       </div>
 
-      {/* Unconfirmed toggle */}
-      <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-accent/50">
-        <div className="flex items-center gap-2">
-          <span className="text-sm">Не согласовано</span>
-          <span className="text-xs text-muted-foreground">(пунктирная рамка)</span>
-        </div>
-        <button
-          type="button"
-          onClick={() => setIsUnconfirmed(!isUnconfirmed)}
-          className={`w-10 h-5 rounded-full transition-colors relative ${isUnconfirmed ? 'bg-[#085C53]' : 'bg-muted'}`}
-        >
-          <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${isUnconfirmed ? 'left-5' : 'left-0.5'}`} />
-        </button>
-      </div>
-
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onCancel}>Назад</Button>
         <Button type="submit">Сохранить событие</Button>
