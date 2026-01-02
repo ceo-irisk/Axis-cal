@@ -796,7 +796,7 @@ export const Sidebar = ({
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Мои календари</p>
                     <button
-                      onClick={() => setShowAddForm(true)}
+                      onClick={() => { setShowAddForm(true); setActiveTab(TABS.CALENDARS); }}
                       className="p-1 rounded-lg hover:bg-accent"
                       title="Создать календарь"
                     >
@@ -872,7 +872,16 @@ export const Sidebar = ({
                 
                 {/* External ICS calendars - always show */}
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Внешние календари</p>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Внешние календари</p>
+                    <button
+                      onClick={() => setShowICSModal(true)}
+                      className="p-1 rounded-lg hover:bg-accent"
+                      title="Добавить ICS календарь"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
                   {icsSubscriptions.length === 0 ? (
                     <p className="text-xs text-muted-foreground text-center py-4">Нет внешних календарей</p>
                   ) : (
