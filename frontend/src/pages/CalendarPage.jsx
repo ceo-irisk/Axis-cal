@@ -47,6 +47,7 @@ export default function CalendarPage() {
   const [defaultEventTime, setDefaultEventTime] = useState(null);
   const [selectedTimezone, setSelectedTimezone] = useState(user?.timezone || 'Europe/Moscow');
   const [customTimezones, setCustomTimezones] = useState([]);
+  const [hiddenCalendars, setHiddenCalendars] = useState(new Set());
   
   // User switching for viewing others' calendars
   const [viewingUserId, setViewingUserId] = useState(null); // null = viewing own calendar
@@ -257,6 +258,9 @@ export default function CalendarPage() {
   const selectedDateEvents = events.filter(e => e.start_time?.startsWith(selectedDateStr));
   const currentRating = ratings[selectedDateStr];
   const currentViolations = ruleViolations[selectedDateStr];
+
+  // Filter events by hidden calendars
+  const visibleEvents = events.filter(e => !hiddenCalendars.has(e.calendar_id));
 
   const getTitle = () => {
     if (mainView === MAIN_VIEW.USERS) return 'Пользователи';
