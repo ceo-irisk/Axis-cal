@@ -247,13 +247,7 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
     }
   };
 
-    recurrence_type: 'none',
-    recurrence_end_date: '',
-    recurrence_custom_days: [],
-  };
-};
-
-export const EventModal = ({ 
+  const [customFieldsData, setCustomFieldsData] = useState({}); 
   event, 
   defaultDate, 
   defaultHour, 
