@@ -1094,7 +1094,6 @@ export const Sidebar = ({
                 {/* Dictionaries Sub-tab */}
                 {settingsTab === SETTINGS_TABS.DICTIONARIES && (
                   <div className="space-y-4">
-                    <p className="text-xs text-yellow-500">DEBUG: Showing DICTIONARIES section, settingsTab={settingsTab}</p>
                     {/* Event Types */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
@@ -1107,11 +1106,12 @@ export const Sidebar = ({
                         </button>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-xs text-blue-500">DEBUG: eventTypes.length = {eventTypes.length}</p>
-                        {eventTypes.length === 0 && (
-                          <p className="text-xs text-red-500">⚠️ Массив eventTypes пустой!</p>
-                        )}
-                        {eventTypes.map((type, index) => (
+                        {eventTypes.length === 0 ? (
+                          <p className="text-xs text-muted-foreground text-center py-4">
+                            Нет доступных типов событий
+                          </p>
+                        ) : (
+                          eventTypes.map((type, index) => (
                           <div key={type.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-accent/50 group">
                             {/* Reorder buttons */}
                             <div className="flex flex-col gap-0.5 opacity-0 group-hover:opacity-100">
