@@ -1201,7 +1201,12 @@ export const Sidebar = ({
                       
                       {/* All Timezones */}
                       <div className="space-y-1 max-h-64 overflow-y-auto">
-                        {customTimezones.map(tz => (
+                        {customTimezones.length === 0 ? (
+                          <p className="text-xs text-muted-foreground text-center py-4">
+                            Нет доступных часовых поясов
+                          </p>
+                        ) : (
+                          customTimezones.map(tz => (
                           <div key={tz.id} className="flex items-center gap-2 p-2 rounded-lg bg-accent/50 hover:bg-accent group">
                             <Globe className="w-3.5 h-3.5 flex-shrink-0 text-[#085C53]" />
                             <span className="flex-1 text-sm">{tz.name}</span>
