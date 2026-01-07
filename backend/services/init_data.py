@@ -2,6 +2,7 @@
 Инициализация дефолтных данных при старте приложения
 """
 import uuid
+import os
 from datetime import datetime, timezone
 from models.user import UserRole
 from services.auth import hash_password
@@ -12,10 +13,12 @@ logger = logging.getLogger(__name__)
 async def initialize_default_data(db):
     """Initialize all default data on startup"""
     
-    # 1. Create default admin
-    admin_email = "admin@company.com"
-    admin_password = "Admin123!"
+    # 1. Create default admin user from environment variables
+    # Безопасность: логин и пароль берутся из .env файла
+    admin_email = os.environ.get('ADMIN_EMAIL', 'admin@company.com')
+    admin_password = os.environ.get('ADMIN_PASSWORD', 'admin123')
     
+    # Проверяем существование пользователя (идемпотентность)
     existing_admin = await db.users.find_one({"email": admin_email})
     if not existing_admin:
         admin_user = {
@@ -29,7 +32,40 @@ async def initialize_default_data(db):
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.users.insert_one(admin_user)
-        logger.info(f"Created default admin: {admin_email}")
+        
+        # Создаем дефолтные календари для админа
+        default_calendars = [
+            {
+                "id": str(uuid.uuid4()),
+                "user_id": admin_user["id"],
+                "name": "Открытый",
+                "provider": "custom",
+                "icon": "book-open",
+                "is_default": True,
+                "is_public": True,
+                "is_active": True,
+                "sync_enabled": False,
+                "credentials": {},
+                "created_at": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "user_id": admin_user["id"],
+                "name": "Закрытый",
+                "provider": "custom",
+                "icon": "lock",
+                "is_default": True,
+                "is_public": False,
+                "is_active": True,
+                "sync_enabled": False,
+                "credentials": {},
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+        ]
+        await db.calendars.insert_many(default_calendars)
+        logger.info(f"✅ Created default admin: {admin_email} with default calendars")
+    else:
+        logger.info(f"ℹ️  Admin user already exists: {admin_email}")
     
     # 2. Create default event types
     event_types_count = await db.event_types.count_documents({})
