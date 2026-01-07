@@ -392,6 +392,7 @@ export default function CalendarPage() {
           onSave={handleSaveEvent}
           onDelete={handleDeleteEvent}
           onClose={() => setShowEventModal(false)}
+          selectedTimezone={selectedTimezone}
           // ✨ NEW: Pass recurring instance info
           isRecurringInstance={selectedEvent?.is_recurring_instance || false}
           recurringParentId={selectedEvent?.recurrence_parent_id || null}
