@@ -209,6 +209,7 @@ export const EventModal = ({
   onSave, 
   onDelete, 
   onClose,
+  selectedTimezone,  // Текущий выбранный timezone в календаре
   isRecurringInstance = false,  // ✨ NEW: Flag for recurring instance
   recurringParentId = null,     // ✨ NEW: Parent ID for recurring instances  
   instanceDate = null           // ✨ NEW: Date of this instance (YYYY-MM-DD)
