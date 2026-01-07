@@ -111,8 +111,9 @@ const TimePicker = ({ value, onChange, label }) => {
   );
 };
 
-const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
-  const userTimezone = getUserTimezone();
+const getInitialFormData = (event, defaultDate, defaultHour, calendars, selectedTimezone) => {
+  // Используем выбранный timezone в календаре или timezone браузера
+  const userTimezone = selectedTimezone || getUserTimezone();
   
   if (event) {
     let status = event.status || 'confirmed';
@@ -121,7 +122,7 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
     let startDateTime, endDateTime;
     
     if (event.start_time && event.timezone) {
-      // Событие имеет timezone - конвертируем из UTC в локальный timezone
+      // Событие имеет timezone - конвертируем из UTC в выбранный timezone
       startDateTime = utcToLocal(event.start_time, userTimezone);
       endDateTime = event.end_time ? utcToLocal(event.end_time, userTimezone) : startDateTime;
     } else {
