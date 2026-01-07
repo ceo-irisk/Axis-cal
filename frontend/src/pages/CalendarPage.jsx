@@ -7,7 +7,7 @@ import {
   getAllICSEvents, getEventTypes, getAppliedTemplates, removeTemplateFromDay,
   getUserEvents
 } from '../lib/api';
-import { getLocalTimezoneName } from '../lib/timezones';
+import { getUserTimezone } from '../lib/timezones';
 import Sidebar from '../components/Sidebar';
 import CalendarGrid from '../components/CalendarGrid';
 import EventModal from '../components/EventModal';
