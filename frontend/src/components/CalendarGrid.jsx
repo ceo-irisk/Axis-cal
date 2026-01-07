@@ -820,14 +820,10 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
           {dayEvents.map(event => {
             const duration = getEventDuration(event);
             const isLong = duration >= 1;
-            const eventTime = getLocalTime(event.start_time, event._timezoneShift || 0);
+            const eventTimeDisplay = event._displayStartTime || formatTime(new Date(event.start_time));
             const dynamicStyle = getEventDynamicStyle(event, eventTypes);
             const overlapStyle = getOverlapStyle(event);
             const isSelected = selectedEventId === event.id;
-            
-            const timeDisplay = event._timezoneShift && event._timezoneShift !== 0 
-              ? `${eventTime.formatted} (${eventTime.original}${event._timezoneShift > 0 ? '+' : ''}${event._timezoneShift})`
-              : eventTime.formatted;
             
             return (
               <div 
