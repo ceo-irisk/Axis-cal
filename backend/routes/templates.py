@@ -128,7 +128,10 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
             "recurrence_type": "none",
             "timezone": user.get("timezone", "Europe/Moscow"),
             "created_at": datetime.now(timezone.utc).isoformat(),
-            "updated_at": datetime.now(timezone.utc).isoformat()
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            # ✨ NEW: Сохраняем связь с шаблоном
+            "template_id": template_id,
+            "template_name": template.get("name", "Unknown Template")
         }
         
         created_events.append(event_dict)
