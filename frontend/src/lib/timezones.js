@@ -69,27 +69,18 @@ export const getTimezoneById = (id) => {
 
 // Convert local time to UTC
 export const localToUTC = (localDateTimeString, timezone) => {
-  console.log('🔧 localToUTC called:');
-  console.log('  Input:', localDateTimeString);
-  console.log('  Timezone:', timezone);
-  
   const tz = getTimezoneById(timezone);
-  console.log('  TZ object:', tz);
   
   // Парсим дату/время
   const [datePart, timePart] = localDateTimeString.split('T');
   const [year, month, day] = datePart.split('-').map(Number);
   const [hours, minutes] = timePart.split(':').map(Number);
   
-  console.log('  Parsed:', { year, month, day, hours, minutes });
-  
-  // Создаём дату БЕЗ применения timezone (как будто это локальное время)
+  // Создаём дату в UTC с введёнными значениями
   const dateInTimezone = Date.UTC(year, month - 1, day, hours, minutes, 0);
-  console.log('  Date.UTC result:', new Date(dateInTimezone).toISOString());
   
   // Вычитаем offset: если offset +3 (Москва), то 21:00 Moscow - 3 = 18:00 UTC
   const utcTimestamp = dateInTimezone - (tz.offset * 60 * 60 * 1000);
-  console.log('  After offset subtraction:', new Date(utcTimestamp).toISOString());
   
   return new Date(utcTimestamp).toISOString();
 };
