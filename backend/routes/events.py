@@ -45,8 +45,22 @@ async def get_events(
     end_date: Optional[str] = Query(None),
     user_id: Optional[str] = Query(None),
     expand_recurring: bool = Query(True),
+    skip: int = Query(0, ge=0),  # ✨ NEW: Pagination offset
+    limit: int = Query(100, ge=1, le=1000),  # ✨ NEW: Pagination limit
     user: dict = Depends(get_current_user)
 ):
+    """
+    Get events with optional filtering and pagination
+    
+    Pagination:
+    - skip: Number of events to skip (default: 0)
+    - limit: Maximum number of events to return (default: 100, max: 1000)
+    - Works with date filtering for efficient queries
+    
+    Expanding recurring events:
+    - expand_recurring=true: Generates instances (ignores pagination for recurring)
+    - expand_recurring=false: Returns only base events (pagination applied)
+    """
     # Build query for date range
     query = {}
     if start_date and end_date:
@@ -55,6 +69,26 @@ async def get_events(
             {"end_time": {"$gte": start_date, "$lte": end_date}}
         ]
     
+    # When NOT expanding recurring - apply pagination to base events
+    if not expand_recurring:
+        events = await db.events.find(query, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
+        filtered_events = await filter_events_by_permissions(events, user["id"], db)
+        
+        # Get total count for pagination info
+        total_count = await db.events.count_documents(query)
+        
+        return {
+            "events": filtered_events,
+            "pagination": {
+                "skip": skip,
+                "limit": limit,
+                "total": total_count,
+                "has_more": (skip + limit) < total_count
+            }
+        }
+    
+    # When expanding recurring - load all and generate instances
+    # (pagination less effective here as we need to generate instances)
     events = await db.events.find(query, {"_id": 0}).to_list(1000)
     
     # Expand recurring events if requested
