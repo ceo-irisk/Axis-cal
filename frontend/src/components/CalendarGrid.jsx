@@ -274,25 +274,26 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
 };
 
 // Timezone selector component - compact version
-const TimezoneSelector = ({ selectedTimezone, onTimezoneChange, customTimezones = [] }) => {
-  const selectedTz = customTimezones.find(tz => tz.name === selectedTimezone);
+const TimezoneSelector = ({ selectedTimezone, onTimezoneChange }) => {
+  const selectedTz = getTimezoneById(selectedTimezone);
   
   return (
     <Select value={selectedTimezone} onValueChange={onTimezoneChange}>
-      <SelectTrigger className="w-[180px] h-7 text-xs gap-1">
+      <SelectTrigger className="w-[200px] h-7 text-xs gap-1">
         <Globe className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-        <span className="truncate">{selectedTz?.name || selectedTimezone || 'Локальное время'}</span>
+        <span className="truncate">{selectedTz?.label || 'UTC'}</span>
       </SelectTrigger>
-      <SelectContent>
-        {customTimezones.map(tz => (
-          <SelectItem key={tz.id} value={tz.name} className="text-xs">
-            {tz.name} ({tz.offset})
+      <SelectContent className="max-h-[300px]">
+        {TIMEZONES.map(tz => (
+          <SelectItem key={tz.id} value={tz.id} className="text-xs">
+            {tz.label}
           </SelectItem>
         ))}
       </SelectContent>
     </Select>
   );
 };
+
 
 const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventId, onEventSelect, currentTimezoneOffset, selectedTimezone, onTimezoneChange, customTimezones, eventTypes }) => {
   const weekStart = startOfWeek(date, { weekStartsOn: 1 });
