@@ -109,6 +109,7 @@ export const Sidebar = ({
   onShowCalendar,
   mainView,
   onEventTypesChange,
+  onTemplatesChange,
   viewingUserId,
   onViewingUserChange,
   onHiddenCalendarsChange,
