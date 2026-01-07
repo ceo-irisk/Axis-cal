@@ -40,7 +40,8 @@ export default function CalendarPage() {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [selectedEventId, setSelectedEventId] = useState(null);
+  const [selectedEventIds, setSelectedEventIds] = useState([]); // Множественное выделение
+  const [copiedEvents, setCopiedEvents] = useState([]); // Для копирования/вставки
   const [showEventModal, setShowEventModal] = useState(false);
   const [showSurveyModal, setShowSurveyModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
