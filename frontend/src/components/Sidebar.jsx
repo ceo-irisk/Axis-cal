@@ -1,6 +1,6 @@
 import { useAuth } from '../lib/auth';
 import { useTheme } from '../lib/theme';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   getCalendars, addCalendar, deleteCalendar,
   getEventTypes, createEventType, updateEventType, deleteEventType,
@@ -9,6 +9,7 @@ import {
   getICSSubscriptions, createICSSubscription, deleteICSSubscription,
   getUsers
 } from '../lib/api';
+import { utcToLocal, formatTime, getTimezoneById } from '../lib/timezones';
 import { 
   Sun, Moon, LogOut, Plus, Trash2, Eye, EyeOff, ChevronLeft, ChevronRight, ChevronUp, ChevronDown,
   Calendar, LayoutGrid, Settings, Star, AlertTriangle, Clock, MapPin, FileText,
