@@ -66,6 +66,36 @@ export default function CalendarPage() {
     }
   }, []);
 
+  // Handle pasting copied events
+  const handlePasteEvents = useCallback(async () => {
+    if (copiedEvents.length === 0) return;
+    
+    try {
+      const targetDateStr = format(selectedDate, 'yyyy-MM-dd');
+      
+      for (const event of copiedEvents) {
+        // Create new event based on copied event
+        const newEventData = {
+          title: event.title,
+          description: event.description || '',
+          start_time: `${targetDateStr}T${event.start_time.split('T')[1]}`,
+          end_time: `${targetDateStr}T${event.end_time.split('T')[1]}`,
+          calendar_id: event.calendar_id,
+          event_type_id: event.event_type_id,
+          timezone: selectedTimezone
+        };
+        
+        await createEvent(newEventData);
+      }
+      
+      toast.success(`Вставлено событий: ${copiedEvents.length}`);
+      fetchData(); // Refresh events
+    } catch (error) {
+      console.error('Error pasting events:', error);
+      toast.error('Ошибка вставки событий');
+    }
+  }, [copiedEvents, selectedDate, selectedTimezone, fetchData]);
+
   // Handle keyboard events for deleting selected event
   useEffect(() => {
     const handleKeyDown = (e) => {
