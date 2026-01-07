@@ -276,7 +276,7 @@ export const EventModal = ({
       ...formData,
       start_time: startDateTimeUTC,
       end_time: endDateTimeUTC,
-      timezone: userTimezone, // Сохраняем timezone
+      timezone: finalTimezone, // Сохраняем timezone
       status: formData.status,
       recurrence_type: formData.recurrence_type,
       recurrence_end_date: recurrenceEndDate,
