@@ -119,7 +119,8 @@ export const Sidebar = ({
   onEventTypesChange,
   viewingUserId,
   onViewingUserChange,
-  onHiddenCalendarsChange
+  onHiddenCalendarsChange,
+  selectedTimezone
 }) => {
   const { user, logout, isAdmin, switchUser } = useAuth();
   const { theme, setTheme } = useTheme();
