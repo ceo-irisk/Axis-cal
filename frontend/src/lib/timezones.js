@@ -123,8 +123,9 @@ export const formatForInput = (date) => {
 
 // Get formatted time for display (HH:MM)
 export const formatTime = (date) => {
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
+  // Используем UTC методы, потому что date уже скорректирован на нужный timezone
+  const hours = String(date.getUTCHours()).padStart(2, '0');
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
   return `${hours}:${minutes}`;
 };
 
