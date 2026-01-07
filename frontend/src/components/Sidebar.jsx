@@ -424,8 +424,43 @@ export const Sidebar = ({
   const handleRate = (stars) => onRateDay?.(stars, ratingNotes);
 
   // Разделяем события на all-day и обычные
-  const allDayEvents = events.filter(e => e.is_all_day);
-  const timedEvents = events.filter(e => !e.is_all_day);
+  // Конвертируем события в выбранный timezone
+  const eventsInTimezone = useMemo(() => {
+    if (!selectedTimezone) return events;
+    
+    return events.map(event => {
+      if (event.start_time && event.timezone) {
+        try {
+          const startLocal = utcToLocal(event.start_time, selectedTimezone);
+          const endLocal = event.end_time ? utcToLocal(event.end_time, selectedTimezone) : startLocal;
+          
+          // Получаем исходное время для отображения
+          const startOriginal = utcToLocal(event.start_time, event.timezone);
+          const originalTz = getTimezoneById(event.timezone);
+          const currentTz = getTimezoneById(selectedTimezone);
+          
+          const showOriginalTime = event.timezone !== selectedTimezone;
+          
+          return {
+            ...event,
+            _localStartTime: startLocal,
+            _localEndTime: endLocal,
+            _displayStartTime: formatTime(startLocal),
+            _displayEndTime: formatTime(endLocal),
+            _originalStartTime: showOriginalTime ? formatTime(startOriginal) : null,
+            _originalTimezone: showOriginalTime ? originalTz : null,
+            _timezoneOffset: currentTz.offset - originalTz.offset,
+          };
+        } catch (e) {
+          return event;
+        }
+      }
+      return event;
+    });
+  }, [events, selectedTimezone]);
+  
+  const allDayEvents = eventsInTimezone.filter(e => e.is_all_day);
+  const timedEvents = eventsInTimezone.filter(e => !e.is_all_day);
 
   // Calculate total event hours for dashboard (исключаем all-day события)
   const totalMinutes = timedEvents.reduce((acc, event) => {
