@@ -130,6 +130,14 @@ export const formatTime = (date) => {
   return `${hours}:${minutes}`;
 };
 
+// Format date as YYYY-MM-DD using UTC methods
+export const formatDate = (date) => {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 // Calculate time difference between two timezones in hours
 export const getTimezoneOffset = (fromTz, toTz) => {
   const from = getTimezoneById(fromTz);
