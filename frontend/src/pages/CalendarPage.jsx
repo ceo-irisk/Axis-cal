@@ -241,13 +241,13 @@ export default function CalendarPage() {
 
   const handleEventClick = (event) => {
     setSelectedEvent(event);
-    setSelectedEventId(null);
+    setSelectedEventIds([]);
     setShowEventModal(true);
   };
 
   const handleCreateEvent = () => {
     setSelectedEvent(null);
-    setSelectedEventId(null);
+    setSelectedEventIds([]);
     setDefaultEventTime(null);
     setShowEventModal(true);
   };
