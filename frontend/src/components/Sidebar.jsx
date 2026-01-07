@@ -742,7 +742,7 @@ export const Sidebar = ({
                               <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground ml-4">
                                 <span className="flex items-center gap-1 font-mono truncate">
                                   <Clock className="w-3 h-3 flex-shrink-0" />
-                                  {event._displayStartTime || formatEventTime(event.start_time)}
+                                  {event._displayStartTime || formatTime(event._localStartTime || utcToLocal(event.start_time, selectedTimezone))}
                                   {event._originalStartTime && event._timezoneOffset !== 0 && (
                                     <span className="text-[10px] opacity-70">
                                       ({event._originalStartTime} {event._timezoneOffset >= 0 ? '+' : ''}{event._timezoneOffset})
