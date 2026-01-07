@@ -247,27 +247,24 @@ export const EventModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Используем выбранный timezone в календаре, или timezone события (при редактировании), или timezone браузера
-    const userTimezone = selectedTimezone || formData.timezone || getUserTimezone();
+    // КРИТИЧЕСКИ ВАЖНО: Используем ТОЛЬКО selectedTimezone для новых событий
+    // Для редактирования используем timezone события
+    const userTimezone = event ? (formData.timezone || selectedTimezone) : selectedTimezone;
     
-    console.log('🔍 EventModal handleSubmit:');
-    console.log('  selectedTimezone:', selectedTimezone);
-    console.log('  formData.timezone:', formData.timezone);
-    console.log('  getUserTimezone():', getUserTimezone());
-    console.log('  Final userTimezone:', userTimezone);
+    // Если timezone не определен - используем UTC как дефолт
+    if (!userTimezone) {
+      console.error('⚠️ WARNING: No timezone selected! Using UTC as fallback');
+    }
+    
+    const finalTimezone = userTimezone || 'UTC';
     
     // Combine date and time into local datetime string
     const localStartStr = `${formData.start_date}T${formData.start_time_val}`;
     const localEndStr = `${formData.end_date}T${formData.end_time_val}`;
     
-    console.log('  localStartStr:', localStartStr);
-    
     // Convert local time to UTC
-    const startDateTimeUTC = localToUTC(localStartStr, userTimezone);
-    const endDateTimeUTC = localToUTC(localEndStr, userTimezone);
-    
-    console.log('  startDateTimeUTC:', startDateTimeUTC);
-    console.log('  endDateTimeUTC:', endDateTimeUTC);
+    const startDateTimeUTC = localToUTC(localStartStr, finalTimezone);
+    const endDateTimeUTC = localToUTC(localEndStr, finalTimezone);
     
     // Prepare recurrence end date
     let recurrenceEndDate = null;
