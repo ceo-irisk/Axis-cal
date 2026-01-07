@@ -250,13 +250,24 @@ export const EventModal = ({
     // Используем выбранный timezone в календаре, или timezone события (при редактировании), или timezone браузера
     const userTimezone = selectedTimezone || formData.timezone || getUserTimezone();
     
+    console.log('🔍 EventModal handleSubmit:');
+    console.log('  selectedTimezone:', selectedTimezone);
+    console.log('  formData.timezone:', formData.timezone);
+    console.log('  getUserTimezone():', getUserTimezone());
+    console.log('  Final userTimezone:', userTimezone);
+    
     // Combine date and time into local datetime string
     const localStartStr = `${formData.start_date}T${formData.start_time_val}`;
     const localEndStr = `${formData.end_date}T${formData.end_time_val}`;
     
+    console.log('  localStartStr:', localStartStr);
+    
     // Convert local time to UTC
     const startDateTimeUTC = localToUTC(localStartStr, userTimezone);
     const endDateTimeUTC = localToUTC(localEndStr, userTimezone);
+    
+    console.log('  startDateTimeUTC:', startDateTimeUTC);
+    console.log('  endDateTimeUTC:', endDateTimeUTC);
     
     // Prepare recurrence end date
     let recurrenceEndDate = null;
