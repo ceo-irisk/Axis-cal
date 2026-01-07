@@ -372,7 +372,6 @@ export default function CalendarPage() {
                 loading={loading}
                 selectedTimezone={selectedTimezone}
                 onTimezoneChange={setSelectedTimezone}
-                customTimezones={customTimezones}
                 eventTypes={eventTypes}
               />
             </>
