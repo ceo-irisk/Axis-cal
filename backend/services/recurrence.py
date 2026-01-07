@@ -1,7 +1,7 @@
 from typing import List, Optional
 from datetime import datetime, timedelta, timezone
 
-async def generate_recurring_instances(
+def generate_recurring_instances(
     event: dict, 
     start_date: datetime, 
     end_date: datetime,
