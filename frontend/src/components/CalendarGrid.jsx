@@ -179,7 +179,7 @@ export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, tem
             ...event,
             _localStartTime: startLocal,
             _localEndTime: endLocal,
-            _displayStartDate: format(startLocal, 'yyyy-MM-dd'),
+            _displayStartDate: formatDate(startLocal),
             _displayStartTime: formatTime(startLocal),
             _displayEndTime: formatTime(endLocal),
             _originalStartTime: showOriginalTime ? formatTime(startOriginal) : null,
