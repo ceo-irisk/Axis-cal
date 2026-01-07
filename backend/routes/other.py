@@ -242,6 +242,115 @@ async def get_user_events(
     target_calendars = await db.calendars.find({"user_id": user_id}, {"_id": 0}).to_list(100)
     target_calendar_ids = {c["id"] for c in target_calendars}
     
+
+
+# ✨ NEW: Event counts for sidebar calendar (optimized for performance)
+@analytics_router.get("/event-counts")
+async def get_event_counts(
+    start_date: str = Query(..., description="Start date YYYY-MM-DD"),
+    end_date: str = Query(..., description="End date YYYY-MM-DD"),
+    user: dict = Depends(get_current_user)
+):
+    """
+    Get event counts per day for sidebar mini calendar
+    Optimized for fast loading - returns only counts, not full events
+    
+    Returns:
+    {
+      "2026-01-15": 5,
+      "2026-01-16": 3,
+      "2026-01-17": 0,
+      ...
+    }
+    """
+    from collections import defaultdict
+    from services.recurrence import generate_recurring_instances
+    from services.permissions import filter_events_by_permissions
+    
+    # Parse dates
+    start_dt = datetime.fromisoformat(start_date + "T00:00:00")
+    end_dt = datetime.fromisoformat(end_date + "T23:59:59")
+    
+    # Get all events in range (lightweight query - only needed fields)
+    query = {
+        "$or": [
+            {"start_time": {"$gte": start_dt.isoformat(), "$lte": end_dt.isoformat()}},
+            {"end_time": {"$gte": start_dt.isoformat(), "$lte": end_dt.isoformat()}}
+        ]
+    }
+    
+    events = await db.events.find(
+        query,
+        {"_id": 0, "id": 1, "start_time": 1, "end_time": 1, "created_by": 1, "calendar_id": 1, "recurrence_type": 1}
+    ).to_list(10000)
+    
+    # Filter by permissions (lightweight)
+    filtered_events = await filter_events_by_permissions(events, user["id"], db)
+    
+    # Count events per day
+    counts = defaultdict(int)
+    
+    for event in filtered_events:
+        # Get event date
+        start_time_str = event.get("start_time", "")
+        if start_time_str:
+            try:
+                event_dt = datetime.fromisoformat(start_time_str.replace("Z", "+00:00"))
+                event_date = event_dt.strftime("%Y-%m-%d")
+                counts[event_date] += 1
+            except:
+                continue
+    
+    # Handle recurring events (generate instances and count)
+    all_recurring = await db.events.find(
+        {"recurrence_type": {"$nin": ["none", None, ""]}},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    if all_recurring:
+        # Load exceptions
+        recurring_event_ids = [e["id"] for e in all_recurring]
+        exceptions_list = await db.recurring_exceptions.find(
+            {"parent_event_id": {"$in": recurring_event_ids}},
+            {"_id": 0}
+        ).to_list(1000)
+        
+        # Group exceptions by parent
+        exceptions_by_parent = {}
+        for exc in exceptions_list:
+            parent_id = exc["parent_event_id"]
+            if parent_id not in exceptions_by_parent:
+                exceptions_by_parent[parent_id] = []
+            exceptions_by_parent[parent_id].append(exc)
+        
+        # Generate instances for recurring events
+        for rec_event in all_recurring:
+            event_exceptions = exceptions_by_parent.get(rec_event["id"], [])
+            instances = generate_recurring_instances(rec_event, start_dt, end_dt, event_exceptions)
+            
+            # Filter instances by permissions
+            filtered_instances = await filter_events_by_permissions(instances, user["id"], db)
+            
+            for instance in filtered_instances:
+                start_time_str = instance.get("start_time", "")
+                if start_time_str:
+                    try:
+                        event_dt = datetime.fromisoformat(start_time_str.replace("Z", "+00:00"))
+                        event_date = event_dt.strftime("%Y-%m-%d")
+                        counts[event_date] += 1
+                    except:
+                        continue
+    
+    # Fill in missing dates with 0
+    current_date = start_dt
+    while current_date <= end_dt:
+        date_str = current_date.strftime("%Y-%m-%d")
+        if date_str not in counts:
+            counts[date_str] = 0
+        current_date += timedelta(days=1)
+    
+    return dict(counts)
+
     user_events = [
         e for e in filtered_events
         if e.get("calendar_id") in target_calendar_ids or e.get("created_by") == user_id
