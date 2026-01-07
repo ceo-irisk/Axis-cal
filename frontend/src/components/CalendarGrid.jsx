@@ -657,11 +657,11 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
 
   const getEventStyle = (event) => {
     try {
-      const start = new Date(event.start_time);
-      const end = new Date(event.end_time);
-      // Apply event's timezone shift for positioning
-      const shiftHours = event._timezoneShift || 0;
-      const shiftedStartHour = start.getHours() + start.getMinutes() / 60 + shiftHours;
+      // Используем локальное время если доступно
+      const start = event._localStartTime || new Date(event.start_time);
+      const end = event._localEndTime || new Date(event.end_time);
+      
+      const shiftedStartHour = start.getHours() + start.getMinutes() / 60;
       const duration = (end - start) / 3600000;
       const topOffset = shiftedStartHour * 60;
       return { top: `${topOffset}px`, height: `${Math.max(duration * 60, 30)}px` };
