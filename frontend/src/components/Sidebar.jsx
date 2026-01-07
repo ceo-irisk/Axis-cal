@@ -205,14 +205,13 @@ export const Sidebar = ({
   const fetchDictionaries = async () => {
     try {
       console.log('🔵 fetchDictionaries: Начинаем загрузку данных...');
-      const [typesRes, statusesRes, templatesRes, timezonesRes, icsRes] = await Promise.all([
+      const [typesRes, statusesRes, templatesRes, icsRes] = await Promise.all([
         getEventTypes().catch(e => {
           console.error('❌ getEventTypes failed:', e);
           return { data: [] };
         }),
         getEventStatuses().catch(e => { console.error('❌ getEventStatuses failed:', e); return { data: [] }; }),
         getTemplates().catch(e => { console.error('❌ getTemplates failed:', e); return { data: [] }; }),
-        getCustomTimezones().catch(e => { console.error('❌ getCustomTimezones failed:', e); return { data: [] }; }),
         getICSSubscriptions().catch(e => { console.error('❌ getICSSubscriptions failed:', e); return { data: [] }; })
       ]);
       
@@ -225,9 +224,7 @@ export const Sidebar = ({
       console.log('🔍 После setEventTypes, eventTypes должен быть:', typesRes.data);
       setEventStatuses(statusesRes.data || []);
       setTemplates(templatesRes.data || []);
-      setCustomTimezones(timezonesRes.data || []);
       setIcsSubscriptions(icsRes.data || []);
-      onCustomTimezonesChange?.(timezonesRes.data || []);
       onEventTypesChange?.(typesRes.data || []);
     } catch (e) { 
       console.error('💥 fetchDictionaries полностью провалился:', e); 
