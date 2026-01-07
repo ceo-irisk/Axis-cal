@@ -92,13 +92,7 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
         }
     }, {"_id": 0}).to_list(100)
     
-    # Delete existing template events for this day
-    if existing_template_events:
-        event_ids = [e["id"] for e in existing_template_events]
-        await db.events.delete_many({"id": {"$in": event_ids}})
-        logger.info(f"Deleted {len(event_ids)} existing template events for {target_date}")
-    
-    # Create events from template
+    # Prepare events to create
     created_events = []
     for event_template in template.get("events", []):
         # Parse relative time
@@ -133,15 +127,50 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
             "timezone": user.get("timezone", "Europe/Moscow"),
             "created_at": datetime.now(timezone.utc).isoformat(),
             "updated_at": datetime.now(timezone.utc).isoformat(),
-            # ✨ NEW: Сохраняем связь с шаблоном
+            # ✨ Template tracking
             "template_id": template_id,
             "template_name": template.get("name", "Unknown Template")
         }
         
         created_events.append(event_dict)
     
-    if created_events:
-        await db.events.insert_many(created_events)
+    # 🔒 TRANSACTION: Delete old + Insert new atomically
+    try:
+        # Try to use transaction (requires replica set)
+        async with await client.start_session() as session:
+            async with session.start_transaction():
+                # Delete existing template events for this day
+                if existing_template_events:
+                    event_ids = [e["id"] for e in existing_template_events]
+                    result = await db.events.delete_many(
+                        {"id": {"$in": event_ids}},
+                        session=session
+                    )
+                    logger.info(f"Deleted {result.deleted_count} existing template events for {target_date}")
+                
+                # Create new events
+                if created_events:
+                    await db.events.insert_many(created_events, session=session)
+                
+                logger.info(f"✅ Transaction committed: Applied template with {len(created_events)} events")
+    except Exception as e:
+        # Fallback for standalone MongoDB (no replica set)
+        if "Transaction" in str(e) or "not supported" in str(e).lower():
+            logger.warning("⚠️  Transactions not supported (standalone MongoDB). Using non-atomic operations.")
+            
+            # Delete existing template events
+            if existing_template_events:
+                event_ids = [e["id"] for e in existing_template_events]
+                result = await db.events.delete_many({"id": {"$in": event_ids}})
+                logger.info(f"Deleted {result.deleted_count} existing template events for {target_date}")
+            
+            # Create new events
+            if created_events:
+                await db.events.insert_many(created_events)
+        else:
+            # Re-raise other errors
+            logger.error(f"❌ Template application failed: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Failed to apply template: {str(e)}")
     
     return {"message": f"Template applied with {len(created_events)} events", "events": created_events}
 
