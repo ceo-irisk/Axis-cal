@@ -154,7 +154,7 @@ export const Sidebar = ({
   // User switcher dropdown state
   const [showUserSwitcher, setShowUserSwitcher] = useState(false);
   
-  // Dictionaries state
+  // Dictionaries state (ВСЕ локально, не из props)
   const [eventTypes, setEventTypes] = useState([]);
   const [eventStatuses, setEventStatuses] = useState([]);
   const [templates, setTemplates] = useState([]);
@@ -243,21 +243,34 @@ export const Sidebar = ({
 
   const fetchDictionaries = async () => {
     try {
+      console.log('🔵 fetchDictionaries: Начинаем загрузку данных...');
       const [typesRes, statusesRes, templatesRes, timezonesRes, icsRes] = await Promise.all([
-        getEventTypes(),
-        getEventStatuses(),
-        getTemplates(),
-        getCustomTimezones(),
-        getICSSubscriptions()
+        getEventTypes().catch(e => {
+          console.error('❌ getEventTypes failed:', e);
+          return { data: [] };
+        }),
+        getEventStatuses().catch(e => { console.error('❌ getEventStatuses failed:', e); return { data: [] }; }),
+        getTemplates().catch(e => { console.error('❌ getTemplates failed:', e); return { data: [] }; }),
+        getCustomTimezones().catch(e => { console.error('❌ getCustomTimezones failed:', e); return { data: [] }; }),
+        getICSSubscriptions().catch(e => { console.error('❌ getICSSubscriptions failed:', e); return { data: [] }; })
       ]);
+      
+      console.log('🟢 fetchDictionaries: Данные получены!');
+      console.log('  typesRes:', typesRes);
+      console.log('  typesRes.data:', typesRes.data);
+      console.log('  typesRes.data length:', (typesRes.data || []).length);
+      
       setEventTypes(typesRes.data || []);
+      console.log('🔍 После setEventTypes, eventTypes должен быть:', typesRes.data);
       setEventStatuses(statusesRes.data || []);
       setTemplates(templatesRes.data || []);
       setCustomTimezones(timezonesRes.data || []);
       setIcsSubscriptions(icsRes.data || []);
       onCustomTimezonesChange?.(timezonesRes.data || []);
       onEventTypesChange?.(typesRes.data || []);
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      console.error('💥 fetchDictionaries полностью провалился:', e); 
+    }
   };
 
   // Custom Timezones handlers

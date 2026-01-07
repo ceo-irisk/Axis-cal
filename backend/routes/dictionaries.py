@@ -19,17 +19,20 @@ def init_db(database):
 # Event Types
 @router.get("/event-types")
 async def get_event_types(user: dict = Depends(get_current_user)):
-    # ✨ NEW: Try cache first
-    cached = await cache.get_event_types()
-    if cached is not None:
-        logger.debug("Returning cached event types")
-        return cached
+    # ✨ ОТКЛЮЧАЕМ КЕШ ВРЕМЕННО ДЛЯ ДЕБАГА
+    # cached = await cache.get_event_types()
+    # if cached is not None:
+    #     logger.debug("Returning cached event types")
+    #     return cached
     
     # Cache miss - fetch from DB
     event_types = await db.event_types.find({"is_active": True}, {"_id": 0}).sort("order", 1).to_list(100)
     
-    # ✨ NEW: Store in cache
-    await cache.set_event_types(event_types, expire=3600)  # 1 hour
+    logger.info(f"🔍 DEBUG get_event_types: Возвращаем {len(event_types)} типов")
+    logger.info(f"🔍 DEBUG first type: {event_types[0] if event_types else 'NONE'}")
+    
+    # ✨ ОТКЛЮЧАЕМ КЕШ
+    # await cache.set_event_types(event_types, expire=3600)
     
     return event_types
 
