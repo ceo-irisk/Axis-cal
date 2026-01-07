@@ -5,11 +5,13 @@ from dotenv import load_dotenv
 from pathlib import Path
 import os
 import logging
+import redis.asyncio as redis
 
 # Import routes
 from routes import auth, users, events, calendars, templates, ratings, dictionaries, ics, other, recurring_exceptions
 from dependencies import init_db as init_dependencies_db
 from services.init_data import initialize_default_data, create_indexes
+from services import cache
 
 # Load environment
 ROOT_DIR = Path(__file__).parent
@@ -23,6 +25,24 @@ logger = logging.getLogger(__name__)
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
+
+# Redis connection (with graceful degradation)
+redis_client = None
+try:
+    redis_url = os.environ.get('REDIS_URL', 'redis://localhost:6379')
+    cache_enabled = os.environ.get('ENABLE_CACHING', 'true').lower() == 'true'
+    
+    if cache_enabled:
+        redis_client = redis.from_url(redis_url, decode_responses=False)
+        logger.info(f"✅ Redis connection configured: {redis_url}")
+    else:
+        logger.info("ℹ️  Caching disabled via ENABLE_CACHING=false")
+except Exception as e:
+    logger.warning(f"⚠️  Redis connection failed: {str(e)}. Running without cache.")
+    redis_client = None
+
+# Initialize cache service
+cache.init_redis(redis_client)
 
 # Create the main app
 app = FastAPI(title="Executive Calendar API")
