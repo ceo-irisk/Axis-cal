@@ -642,8 +642,8 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                     >
                       <div className="flex items-start justify-between gap-1 h-full">
                         <div className="flex-1 min-w-0 flex flex-col">
-                          <span className="text-[10px] font-mono opacity-70">
-                            {eventTimeDisplay}
+                          <span className="text-[10px] font-mono opacity-70 truncate">
+                            {timeDisplayText}
                           </span>
                           <span className={`font-medium leading-tight ${isLong ? 'text-[11px]' : 'text-[10px]'}`}>
                             {event.title}
