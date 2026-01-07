@@ -137,7 +137,7 @@ async def get_events(
             # Get exceptions for this event
             event_exceptions = exceptions_by_parent.get(event_id, [])
             
-            instances = await generate_recurring_instances(event, start_dt, end_dt, event_exceptions)
+            instances = generate_recurring_instances(event, start_dt, end_dt, event_exceptions)
             result_events.extend(instances)
             processed_ids.add(event_id)
         
