@@ -1333,46 +1333,6 @@ const ICSSubscriptionForm = ({ onSave, onCancel }) => {
   );
 };
 
-const TimezoneForm = ({ timezone, onSave, onCancel }) => {
-  const [name, setName] = useState(timezone?.name || '');
-  const [offset, setOffset] = useState(timezone?.offset || '+0:00');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!name.trim() || !offset.trim()) return;
-    onSave({ name: name.trim(), offset: offset.trim() });
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <Label>Название</Label>
-        <Input 
-          value={name} 
-          onChange={(e) => setName(e.target.value)} 
-          placeholder="Дубай (GMT+4)" 
-          className="mt-1" 
-        />
-      </div>
-      <div>
-        <Label>Офсет (формат: +3:00 или -5:00)</Label>
-        <Input 
-          value={offset} 
-          onChange={(e) => setOffset(e.target.value)} 
-          placeholder="+3:00" 
-          className="mt-1" 
-        />
-        <p className="text-xs text-muted-foreground mt-1">
-          Примеры: +0:00, +3:00, -5:00, +5:30
-        </p>
-      </div>
-      <DialogFooter>
-        <Button type="button" variant="outline" onClick={onCancel}>Отмена</Button>
-        <Button type="submit">{timezone ? 'Сохранить' : 'Создать'}</Button>
-      </DialogFooter>
-    </form>
-  );
-};
 
 const EventTypeForm = ({ initialData, onSave, onCancel }) => {
   const [name, setName] = useState(initialData?.name || '');
