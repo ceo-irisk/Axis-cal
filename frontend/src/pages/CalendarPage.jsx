@@ -296,6 +296,7 @@ export default function CalendarPage() {
         onShowCalendar={() => setMainView(MAIN_VIEW.CALENDAR)}
         mainView={mainView}
         onEventTypesChange={setEventTypes}
+        onTemplatesChange={setTemplates}
         viewingUserId={viewingUserId}
         onViewingUserChange={setViewingUserId}
         onHiddenCalendarsChange={setHiddenCalendars}
