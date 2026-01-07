@@ -41,7 +41,7 @@
 ---
 
 ### 2. 🏷️ Template ID для События из Шаблонов
-**Статус**: 🚧 В процессе
+**Статус**: ✅ Завершено
 
 **Проблема**: События из шаблонов не связаны с источником
 
@@ -51,9 +51,9 @@
 - Frontend отображает источник шаблона в форме события
 
 **Файлы**:
-- [ ] `backend/models/event.py` - добавлено поле `template_id`
-- [ ] `backend/routes/templates.py` - сохранение `template_id` при применении
-- [ ] `frontend/src/components/EventModal.jsx` - отображение поля "Шаблон"
+- ✅ `backend/models/event.py` - добавлено поле `template_id` и `template_name`
+- ✅ `backend/routes/templates.py` - сохранение `template_id` при применении
+- ✅ `frontend/src/components/EventModal.jsx` - отображение поля "Создано из шаблона"
 
 **API Changes**:
 ```javascript
@@ -67,6 +67,11 @@ event: {
   template_name: "Рабочий день"  // Для удобства отображения
 }
 ```
+
+**UX Improvements**:
+- При редактировании события из шаблона отображается бейдж с названием шаблона
+- Только события действительно созданные из шаблона показывают источник
+- Ручные события со статусом "template" не показывают источник (нет template_id)
 
 ---
 
