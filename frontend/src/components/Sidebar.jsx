@@ -185,12 +185,12 @@ export const Sidebar = ({
       
       try {
         const [typesRes, statusesRes, templatesRes, timezonesRes, icsRes, subsRes, usersRes] = await Promise.all([
-          getEventTypes(),
-          getEventStatuses(),
-          getTemplates(),
-          getCustomTimezones(),
-          getICSSubscriptions(),
-          getSubscriptions(),
+          getEventTypes().catch((e) => { console.error('Error loading event types:', e); return { data: [] }; }),
+          getEventStatuses().catch((e) => { console.error('Error loading event statuses:', e); return { data: [] }; }),
+          getTemplates().catch((e) => { console.error('Error loading templates:', e); return { data: [] }; }),
+          getCustomTimezones().catch((e) => { console.error('Error loading timezones:', e); return { data: [] }; }),
+          getICSSubscriptions().catch((e) => { console.error('Error loading ICS subscriptions:', e); return { data: [] }; }),
+          getSubscriptions().catch((e) => { console.error('Error loading subscriptions:', e); return { data: [] }; }),
           getUsers().catch(() => ({ data: [] }))
         ]);
         setEventTypes(typesRes.data || []);
