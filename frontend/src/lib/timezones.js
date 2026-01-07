@@ -70,22 +70,34 @@ export const getTimezoneById = (id) => {
 // Convert local time to UTC
 export const localToUTC = (localDateTimeString, timezone) => {
   // localDateTimeString format: "2024-01-15T14:30"
-  // Create date in specified timezone and convert to UTC
-  const date = new Date(localDateTimeString);
+  // Пользователь ввел это время в указанном timezone
+  // Нужно конвертировать в UTC
+  
   const tz = getTimezoneById(timezone);
   
-  // Subtract timezone offset to get UTC
-  const utcDate = new Date(date.getTime() - (tz.offset * 60 * 60 * 1000));
-  return utcDate.toISOString();
+  // Парсим дату/время как есть (без timezone)
+  const [datePart, timePart] = localDateTimeString.split('T');
+  const [year, month, day] = datePart.split('-').map(Number);
+  const [hours, minutes] = timePart.split(':').map(Number);
+  
+  // Создаём UTC дату с этими значениями
+  const utcDate = new Date(Date.UTC(year, month - 1, day, hours, minutes, 0));
+  
+  // Вычитаем offset timezone чтобы получить настоящее UTC время
+  // Если timezone +3, то 14:30 в этом timezone = 11:30 UTC
+  const correctedUTC = new Date(utcDate.getTime() - (tz.offset * 60 * 60 * 1000));
+  
+  return correctedUTC.toISOString();
 };
 
 // Convert UTC to local timezone
 export const utcToLocal = (utcDateTimeString, timezone) => {
-  // utcDateTimeString format: "2024-01-15T14:30:00Z"
+  // utcDateTimeString format: "2024-01-15T14:30:00Z" или "2024-01-15T14:30:00.000Z"
   const date = new Date(utcDateTimeString);
   const tz = getTimezoneById(timezone);
   
-  // Add timezone offset
+  // Добавляем offset timezone
+  // Если UTC время 11:30 и timezone +3, то локальное время = 14:30
   const localDate = new Date(date.getTime() + (tz.offset * 60 * 60 * 1000));
   return localDate;
 };
