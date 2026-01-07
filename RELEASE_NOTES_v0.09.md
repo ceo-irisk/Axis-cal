@@ -157,7 +157,7 @@ except:
 ---
 
 ### 5. 🔄 Исключения для Повторяющихся Событий
-**Статус**: ✅ Завершено (Backend), ⏳ Frontend в процессе
+**Статус**: ✅ Завершено (Backend + Frontend)
 
 **Проблема**: Невозможно изменить/отменить один экземпляр повторяющегося события
 
@@ -165,6 +165,7 @@ except:
 - Новая коллекция `recurring_exceptions`
 - Действия: cancel, reschedule, modify
 - Логика генерации учитывает исключения
+- ✅ Frontend UI для управления исключениями
 
 **Файлы**:
 - ✅ `backend/models/recurring_exception.py` - модель RecurringException
@@ -172,8 +173,9 @@ except:
 - ✅ `backend/services/recurrence.py` - учет исключений при генерации
 - ✅ `backend/routes/events.py` - загрузка исключений при expand_recurring
 - ✅ `backend/server.py` - регистрация recurring_exceptions router
-- [ ] `frontend/src/components/CalendarGrid.jsx` - обработка drag одного экземпляра (TODO)
-- [ ] `frontend/src/components/EventModal.jsx` - UI для управления исключениями (TODO)
+- ✅ `frontend/src/lib/api.js` - добавлены API функции для исключений
+- ✅ `frontend/src/components/EventModal.jsx` - UI для управления исключениями
+- ✅ `frontend/src/pages/CalendarPage.jsx` - передача recurring info в modal
 
 **API Endpoints**:
 ```javascript
@@ -246,6 +248,8 @@ POST /api/recurring-exceptions
 - ✅ История: все исключения сохраняются с причинами
 - ✅ Права доступа: проверяются для каждого действия
 - ✅ Восстановление: удаление исключения восстанавливает нормальный экземпляр
+- ✅ UI: Интуитивные кнопки действий в EventModal
+- ✅ Feedback: Toast уведомления о результате
 
 ---
 
@@ -430,8 +434,8 @@ ENABLE_CACHING=true
 
 ### 🔧 Технический Долг:
 
-- [ ] Frontend для recurring exceptions (drag-and-drop одного экземпляра)
-- [ ] Frontend обработка устаревшего кеша
+- [ ] Drag-and-drop для изменения времени одного экземпляра recurring
+- [ ] Frontend обработка устаревшего кеша (toast + reload)
 - [ ] Расширить кеширование на другие сущности
 - [ ] Добавить метрики производительности
 
