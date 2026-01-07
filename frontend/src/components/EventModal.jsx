@@ -263,8 +263,9 @@ export const EventModal = ({
     
     onSave({
       ...formData,
-      start_time: startDateTimeStr,
-      end_time: endDateTimeStr,
+      start_time: startDateTimeUTC,
+      end_time: endDateTimeUTC,
+      timezone: userTimezone, // Сохраняем timezone
       status: formData.status,
       recurrence_type: formData.recurrence_type,
       recurrence_end_date: recurrenceEndDate,
