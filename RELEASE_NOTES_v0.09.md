@@ -157,33 +157,95 @@ except:
 ---
 
 ### 5. 🔄 Исключения для Повторяющихся Событий
-**Статус**: ⏳ Ожидает выполнения
+**Статус**: ✅ Завершено (Backend), ⏳ Frontend в процессе
 
 **Проблема**: Невозможно изменить/отменить один экземпляр повторяющегося события
 
 **Решение**: 
 - Новая коллекция `recurring_exceptions`
 - Действия: cancel, reschedule, modify
-- Frontend: drag-and-drop одного экземпляра
+- Логика генерации учитывает исключения
 
 **Файлы**:
-- [ ] `backend/models/event.py` - модель RecurringException
-- [ ] `backend/routes/events.py` - CRUD для исключений
-- [ ] `backend/services/recurrence.py` - учет исключений при генерации
-- [ ] `frontend/src/components/CalendarGrid.jsx` - обработка drag одного экземпляра
+- ✅ `backend/models/recurring_exception.py` - модель RecurringException
+- ✅ `backend/routes/recurring_exceptions.py` - CRUD для исключений (5 endpoints)
+- ✅ `backend/services/recurrence.py` - учет исключений при генерации
+- ✅ `backend/routes/events.py` - загрузка исключений при expand_recurring
+- ✅ `backend/server.py` - регистрация recurring_exceptions router
+- [ ] `frontend/src/components/CalendarGrid.jsx` - обработка drag одного экземпляра (TODO)
+- [ ] `frontend/src/components/EventModal.jsx` - UI для управления исключениями (TODO)
+
+**API Endpoints**:
+```javascript
+POST   /api/recurring-exceptions         # Создать исключение
+GET    /api/recurring-exceptions         # Получить все исключения
+GET    /api/recurring-exceptions/{id}    # Получить одно исключение
+PUT    /api/recurring-exceptions/{id}    # Обновить исключение
+DELETE /api/recurring-exceptions/{id}    # Удалить исключение (восстановить)
+```
 
 **Schema**:
 ```javascript
-recurring_exceptions: {
-  id: "uuid",
-  parent_event_id: "uuid",
-  exception_date: "2026-01-20",
-  action: "cancel" | "reschedule" | "modify",
-  new_start_time?: "...",
-  new_end_time?: "...",
-  modified_fields?: {...}
+{
+  "id": "uuid",
+  "parent_event_id": "recurring-event-id",
+  "exception_date": "2026-01-20",
+  "action": "cancel" | "reschedule" | "modify",
+  
+  // Для reschedule
+  "new_start_time": "2026-01-20T15:00:00",
+  "new_end_time": "2026-01-20T16:00:00",
+  
+  // Для modify
+  "modified_fields": {
+    "title": "Новое название",
+    "description": "Новое описание"
+  },
+  
+  "note": "Причина изменения"
 }
 ```
+
+**Примеры использования**:
+```javascript
+// Отменить один экземпляр
+POST /api/recurring-exceptions
+{
+  "parent_event_id": "event-123",
+  "exception_date": "2026-01-20",
+  "action": "cancel",
+  "note": "Праздник"
+}
+
+// Перенести один экземпляр
+POST /api/recurring-exceptions
+{
+  "parent_event_id": "event-123",
+  "exception_date": "2026-01-27",
+  "action": "reschedule",
+  "new_start_time": "2026-01-27T15:00:00",
+  "new_end_time": "2026-01-27T16:00:00",
+  "note": "Перенесено по просьбе клиента"
+}
+
+// Изменить детали одного экземпляра
+POST /api/recurring-exceptions
+{
+  "parent_event_id": "event-123",
+  "exception_date": "2026-02-03",
+  "action": "modify",
+  "modified_fields": {
+    "title": "Планерка (онлайн)",
+    "is_video_call": true
+  }
+}
+```
+
+**Преимущества**:
+- ✅ Гибкость: можно отменить/перенести/изменить один экземпляр
+- ✅ История: все исключения сохраняются с причинами
+- ✅ Права доступа: проверяются для каждого действия
+- ✅ Восстановление: удаление исключения восстанавливает нормальный экземпляр
 
 ---
 
