@@ -262,9 +262,16 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
                     </div>
                   );
                 })}
-                {events.filter(e => e.start_time?.startsWith(format(day, 'yyyy-MM-dd'))).length > 3 && (
-                  <p className="text-xs text-muted-foreground px-2">+{events.filter(e => e.start_time?.startsWith(format(day, 'yyyy-MM-dd'))).length - 3}</p>
-                )}
+                {(() => {
+                  const dateStr = format(day, 'yyyy-MM-dd');
+                  const dayEventsCount = events.filter(e => {
+                    const eventDateStr = e._displayStartDate || (e.start_time ? e.start_time.substring(0, 10) : null);
+                    return eventDateStr === dateStr;
+                  }).length;
+                  return dayEventsCount > 3 && (
+                    <p className="text-xs text-muted-foreground px-2">+{dayEventsCount - 3}</p>
+                  );
+                })()}
               </div>
             </button>
           );
