@@ -394,6 +394,10 @@ export default function CalendarPage() {
           onSave={handleSaveEvent}
           onDelete={handleDeleteEvent}
           onClose={() => setShowEventModal(false)}
+          // ✨ NEW: Pass recurring instance info
+          isRecurringInstance={selectedEvent?.is_recurring_instance || false}
+          recurringParentId={selectedEvent?.recurrence_parent_id || null}
+          instanceDate={selectedEvent?.start_time ? selectedEvent.start_time.split('T')[0] : null}
         />
       )}
 
