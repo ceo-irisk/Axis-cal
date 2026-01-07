@@ -231,32 +231,6 @@ export const Sidebar = ({
     }
   };
 
-  // Custom Timezones handlers
-  const handleSaveTimezone = async (data) => {
-    try {
-      if (editingTimezone) {
-        // Update existing timezone
-        await updateCustomTimezone(editingTimezone.id, data.name, data.offset);
-      } else {
-        // Create new timezone
-        await createCustomTimezone(data.name, data.offset);
-      }
-      setShowTimezoneModal(false);
-      setEditingTimezone(null);
-      fetchDictionaries();
-    } catch (e) {
-      toast.error(e.response?.data?.detail || 'Ошибка сохранения');
-    }
-  };
-
-  const handleDeleteTimezone = async (id) => {
-    try {
-      await deleteCustomTimezone(id);
-      toast.success('Часовой пояс удалён');
-      fetchDictionaries();
-    } catch (e) { toast.error('Ошибка удаления'); }
-  };
-
   // ICS Subscriptions handlers
   const handleSaveICSSubscription = async (data) => {
     try {
