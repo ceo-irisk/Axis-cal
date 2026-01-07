@@ -1,13 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { format, addHours } from 'date-fns';
-import { X, Trash2, Clock, MapPin, Users, FileText, Square, CheckCircle2, Zap, Video, CalendarDays, ChevronUp, ChevronDown, Repeat, Calendar, BookOpen, Lock, Briefcase, Home, Target, Plane, Heart, Coffee, Dumbbell, GraduationCap, ShoppingCart, Mail, Phone, Settings } from 'lucide-react';
+import { X, Trash2, Clock, MapPin, Users, FileText, Square, CheckCircle2, Zap, Video, CalendarDays, ChevronUp, ChevronDown, Repeat, Calendar, BookOpen, Lock, Briefcase, Home, Target, Plane, Heart, Coffee, Dumbbell, GraduationCap, ShoppingCart, Mail, Phone, Settings, XCircle, Edit } from 'lucide-react';  // ✨ NEW: Added XCircle, Edit
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Switch } from '../components/ui/switch';
-import { getEventFields } from '../lib/api';
+import { getEventFields, createRecurringException } from '../lib/api';  // ✨ NEW: Added createRecurringException
+import { toast } from 'sonner';  // ✨ NEW: For notifications
 
 // Available calendar icons (same as in Sidebar)
 const CALENDAR_ICONS = {
@@ -245,13 +246,91 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
   };
 
     is_video_call: false,
+
+
+  // ✨ NEW: Handle recurring instance actions
+  const handleRecurringAction = async (action) => {
+    if (!recurringParentId || !instanceDate) {
+      toast.error('Не удалось определить экземпляр события');
+      return;
+    }
+
+    try {
+      if (action === 'cancel') {
+        // Cancel this instance
+        await createRecurringException({
+          parent_event_id: recurringParentId,
+          exception_date: instanceDate,
+          action: 'cancel',
+          note: 'Отменено пользователем'
+        });
+        
+        toast.success('Экземпляр отменен');
+        onClose();
+        // Trigger refresh
+        if (onSave) {
+          onSave(null);
+        }
+      } else if (action === 'modify') {
+        // Modify only this instance
+        const modifiedFields = {};
+        
+        // Collect changed fields
+        if (formData.title !== event?.title) modifiedFields.title = formData.title;
+        if (formData.description !== event?.description) modifiedFields.description = formData.description;
+        if (formData.location !== event?.location) modifiedFields.location = formData.location;
+        if (formData.event_type !== event?.event_type) modifiedFields.event_type = formData.event_type;
+        if (formData.status !== event?.status) modifiedFields.status = formData.status;
+        if (formData.is_urgent !== event?.is_urgent) modifiedFields.is_urgent = formData.is_urgent;
+        if (formData.is_blocked !== event?.is_blocked) modifiedFields.is_blocked = formData.is_blocked;
+        if (formData.is_completed !== event?.is_completed) modifiedFields.is_completed = formData.is_completed;
+        if (formData.is_video_call !== event?.is_video_call) modifiedFields.is_video_call = formData.is_video_call;
+        
+        if (Object.keys(modifiedFields).length === 0) {
+          toast.error('Нет изменений для сохранения');
+          return;
+        }
+
+        await createRecurringException({
+          parent_event_id: recurringParentId,
+          exception_date: instanceDate,
+          action: 'modify',
+          modified_fields: modifiedFields,
+          note: 'Изменен только этот экземпляр'
+        });
+        
+        toast.success('Экземпляр изменен');
+        onClose();
+        // Trigger refresh
+        if (onSave) {
+          onSave(null);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to create exception:', error);
+      toast.error('Не удалось создать исключение');
+    }
+  };
+
     recurrence_type: 'none',
     recurrence_end_date: '',
     recurrence_custom_days: [],
   };
 };
 
-export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], eventTypes = [], onSave, onDelete, onClose }) => {
+export const EventModal = ({ 
+  event, 
+  defaultDate, 
+  defaultHour, 
+  calendars = [], 
+  eventTypes = [], 
+  onSave, 
+  onDelete, 
+  onClose,
+  isRecurringInstance = false,  // ✨ NEW: Flag for recurring instance
+  recurringParentId = null,     // ✨ NEW: Parent ID for recurring instances  
+  instanceDate = null           // ✨ NEW: Date of this instance (YYYY-MM-DD)
+}) => {
   const [customFields, setCustomFields] = useState([]);
   
   const initialData = useMemo(
@@ -673,7 +752,32 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
 
           {/* Footer */}
           <div className="flex items-center justify-between pt-4 border-t border-border">
-            {event && (
+            {/* ✨ NEW: Recurring Instance Actions */}
+            {isRecurringInstance && recurringParentId && (
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleRecurringAction('cancel')}
+                  className="text-red-600 hover:bg-red-50"
+                >
+                  <XCircle className="w-4 h-4 mr-1" />
+                  Отменить этот экземпляр
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleRecurringAction('modify')}
+                >
+                  <Edit className="w-4 h-4 mr-1" />
+                  Изменить только этот
+                </Button>
+              </div>
+            )}
+            
+            {event && !isRecurringInstance && (
               <Button 
                 type="button" 
                 variant="ghost" 
@@ -683,6 +787,18 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
               >
                 <Trash2 className="w-4 h-4 mr-2" />
                 Удалить
+              </Button>
+            )}
+            {event && isRecurringInstance && (
+              <Button 
+                type="button" 
+                variant="ghost" 
+                onClick={() => onDelete(recurringParentId)} 
+                className="text-red-500 hover:text-red-400 hover:bg-red-500/10" 
+                data-testid="delete-event-button"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Удалить всю серию
               </Button>
             )}
             <div className="flex gap-2 ml-auto">
