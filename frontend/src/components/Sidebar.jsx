@@ -221,6 +221,7 @@ export const Sidebar = ({
       setTemplates(templatesRes.data || []);
       setIcsSubscriptions(icsRes.data || []);
       onEventTypesChange?.(typesRes.data || []);
+      onTemplatesChange?.(templatesRes.data || []);
     } catch (e) { 
       console.error('💥 fetchDictionaries полностью провалился:', e); 
     }
