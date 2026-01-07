@@ -248,6 +248,26 @@ export const getAllICSEvents = (startDate, endDate) => {
   return api.get(`/ics-subscriptions/all-events?${params.toString()}`);
 };
 
+
+
+// ✨ NEW: Recurring Exceptions API
+export const getRecurringExceptions = (parentEventId = null) => {
+  const params = parentEventId ? `?parent_event_id=${parentEventId}` : '';
+  return api.get(`/recurring-exceptions${params}`);
+};
+
+export const createRecurringException = (exceptionData) => {
+  return api.post('/recurring-exceptions', exceptionData);
+};
+
+export const updateRecurringException = (exceptionId, exceptionData) => {
+  return api.put(`/recurring-exceptions/${exceptionId}`, exceptionData);
+};
+
+export const deleteRecurringException = (exceptionId) => {
+  return api.delete(`/recurring-exceptions/${exceptionId}`);
+};
+
 // Recurring Events
 export const getEventsWithRecurring = (startDate, endDate) => {
   const params = new URLSearchParams();
