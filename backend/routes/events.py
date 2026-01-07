@@ -65,6 +65,23 @@ async def get_events(
             {"_id": 0}
         ).to_list(1000)
         
+        # Load ALL exceptions for recurring events
+        recurring_event_ids = [e["id"] for e in all_recurring]
+        exceptions_list = []
+        if recurring_event_ids:
+            exceptions_list = await db.recurring_exceptions.find(
+                {"parent_event_id": {"$in": recurring_event_ids}},
+                {"_id": 0}
+            ).to_list(1000)
+        
+        # Group exceptions by parent event ID
+        exceptions_by_parent = {}
+        for exc in exceptions_list:
+            parent_id = exc["parent_event_id"]
+            if parent_id not in exceptions_by_parent:
+                exceptions_by_parent[parent_id] = []
+            exceptions_by_parent[parent_id].append(exc)
+        
         # Parse dates
         start_dt = datetime.fromisoformat(start_date)
         if start_dt.tzinfo is None:
@@ -74,7 +91,7 @@ async def get_events(
         if end_dt.tzinfo is None:
             end_dt = end_dt.replace(tzinfo=timezone.utc)
         
-        # Generate instances for all recurring events
+        # Generate instances for all recurring events (with exceptions)
         result_events = list(events)
         processed_ids = set()
         
@@ -83,7 +100,10 @@ async def get_events(
             if event_id in processed_ids:
                 continue
             
-            instances = generate_recurring_instances(event, start_dt, end_dt)
+            # Get exceptions for this event
+            event_exceptions = exceptions_by_parent.get(event_id, [])
+            
+            instances = generate_recurring_instances(event, start_dt, end_dt, event_exceptions)
             result_events.extend(instances)
             processed_ids.add(event_id)
         
