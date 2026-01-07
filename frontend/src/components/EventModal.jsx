@@ -246,7 +246,8 @@ export const EventModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    const userTimezone = formData.timezone || getUserTimezone();
+    // Используем выбранный timezone в календаре, или timezone события (при редактировании), или timezone браузера
+    const userTimezone = selectedTimezone || formData.timezone || getUserTimezone();
     
     // Combine date and time into local datetime string
     const localStartStr = `${formData.start_date}T${formData.start_time_val}`;
