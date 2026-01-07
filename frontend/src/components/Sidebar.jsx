@@ -58,15 +58,6 @@ const CALENDAR_ICONS = {
   'settings': Settings2,
 };
 
-// Helper to format event time in local timezone
-const formatEventTime = (isoString) => {
-  try {
-    const date = new Date(isoString);
-    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-  } catch {
-    return isoString?.slice(11, 16) || '00:00';
-  }
-};
 
 // Event icons component
 const EventIcons = ({ event }) => {
