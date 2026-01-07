@@ -76,21 +76,44 @@ event: {
 ---
 
 ### 3. 🗑️ Удаление Системы Подписок
-**Статус**: ⏳ Ожидает выполнения
+**Статус**: ✅ Завершено
 
 **Проблема**: Две системы прав (subscriptions + permissions) запутывают пользователей
 
 **Решение**: 
 - Полное удаление `user_subscriptions`
 - Оставляем только `calendar_permissions`
+- Упрощена логика фильтрации событий
 
-**Файлы для изменения**:
-- [ ] `backend/routes/calendars.py` - удалить subscriptions_router
-- [ ] `backend/routes/other.py` - удалить зависимости от подписок
-- [ ] `backend/services/permissions.py` - упростить логику фильтрации
-- [ ] MongoDB - удалить коллекцию `user_subscriptions`
+**Файлы**:
+- ✅ `backend/routes/calendars.py` - удален subscriptions_router (3 endpoints)
+- ✅ `backend/server.py` - удалена регистрация subscriptions_router
+- ✅ `backend/routes/other.py` - обновлен get_user_events (проверка через permissions)
+- ✅ `backend/services/permissions.py` - упрощена логика (удалены subscriptions)
 
-**Breaking Changes**: API эндпоинты `/api/subscriptions/*` будут удалены
+**Breaking Changes**: 
+```
+❌ DELETE /api/subscriptions (весь router удален)
+❌ GET /api/subscriptions
+❌ POST /api/subscriptions
+❌ DELETE /api/subscriptions/{target_user_id}
+```
+
+**Migration**: 
+Если использовались подписки, замените на calendar_permissions:
+```javascript
+// Вместо: "Подписаться на пользователя"
+// Используйте: "Дать права на календарь"
+POST /api/calendars/{calendar_id}/permissions
+{
+  "user_id": "user-id",
+  "permission_level": "view" // или "view_busy", "edit", "full"
+}
+```
+
+**Преимущества**:
+- ✅ Упрощена система прав (одна вместо двух)
+- ✅ Меньше кода (удалено ~80 строк)
 
 ---
 
