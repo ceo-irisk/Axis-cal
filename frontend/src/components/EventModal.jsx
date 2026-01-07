@@ -251,16 +251,9 @@ export const EventModal = ({
     const localStartStr = `${formData.start_date}T${formData.start_time_val}`;
     const localEndStr = `${formData.end_date}T${formData.end_time_val}`;
     
-    console.log('🔍 EventModal handleSubmit:');
-    console.log('  Local start string:', localStartStr);
-    console.log('  User timezone:', userTimezone);
-    
     // Convert local time to UTC
     const startDateTimeUTC = localToUTC(localStartStr, userTimezone);
     const endDateTimeUTC = localToUTC(localEndStr, userTimezone);
-    
-    console.log('  UTC start time:', startDateTimeUTC);
-    console.log('  UTC end time:', endDateTimeUTC);
     
     // Prepare recurrence end date
     let recurrenceEndDate = null;
