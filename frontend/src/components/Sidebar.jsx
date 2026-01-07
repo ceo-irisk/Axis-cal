@@ -636,9 +636,9 @@ export const Sidebar = ({
           {/* Tabs */}
           <div className="flex border-b border-border">
             {[
-              { id: TABS.EVENTS, icon: Calendar, label: 'События' },
-              { id: TABS.CALENDARS, icon: LayoutGrid, label: 'Календари' },
-              { id: TABS.DASHBOARD, icon: Star, label: 'Дашборд' },
+              { id: TABS.EVENTS, icon: LayoutList, label: 'События' },
+              { id: TABS.CALENDARS, icon: Calendar, label: 'Календари' },
+              { id: TABS.DASHBOARD, icon: LayoutDashboard, label: 'Дашборд' },
               { id: TABS.SETTINGS, icon: Settings, label: 'Настройки' },
             ].map(tab => (
               <button
