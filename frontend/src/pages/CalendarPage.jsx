@@ -295,7 +295,6 @@ export default function CalendarPage() {
         onShowUsers={() => setMainView(MAIN_VIEW.USERS)}
         onShowCalendar={() => setMainView(MAIN_VIEW.CALENDAR)}
         mainView={mainView}
-        onCustomTimezonesChange={setCustomTimezones}
         onEventTypesChange={setEventTypes}
         viewingUserId={viewingUserId}
         onViewingUserChange={setViewingUserId}
