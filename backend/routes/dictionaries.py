@@ -3,6 +3,7 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
 from models.other import EventTypeConfig, EventStatusConfig, EventTypeReorderRequest
 from dependencies import get_current_user, require_admin
+from services import cache  # ✨ NEW: Import cache
 import uuid
 import logging
 
@@ -18,7 +19,18 @@ def init_db(database):
 # Event Types
 @router.get("/event-types")
 async def get_event_types(user: dict = Depends(get_current_user)):
+    # ✨ NEW: Try cache first
+    cached = await cache.get_event_types()
+    if cached is not None:
+        logger.debug("Returning cached event types")
+        return cached
+    
+    # Cache miss - fetch from DB
     event_types = await db.event_types.find({"is_active": True}, {"_id": 0}).sort("order", 1).to_list(100)
+    
+    # ✨ NEW: Store in cache
+    await cache.set_event_types(event_types, expire=3600)  # 1 hour
+    
     return event_types
 
 @router.post("/event-types")
@@ -43,6 +55,9 @@ async def create_event_type(type_data: Dict[str, Any] = Body(...), admin: dict =
     
     await db.event_types.insert_one(type_dict)
     
+    # ✨ NEW: Invalidate cache
+    await cache.invalidate_event_types()
+    
     # Fetch clean data without _id
     created_type = await db.event_types.find_one({"id": type_dict["id"]}, {"_id": 0})
     return created_type
@@ -51,6 +66,10 @@ async def create_event_type(type_data: Dict[str, Any] = Body(...), admin: dict =
 async def reorder_event_types(reorder_data: EventTypeReorderRequest, admin: dict = Depends(require_admin)):
     for idx, type_id in enumerate(reorder_data.type_ids):
         await db.event_types.update_one({"id": type_id}, {"$set": {"order": idx}})
+    
+    # ✨ NEW: Invalidate cache
+    await cache.invalidate_event_types()
+    
     return {"message": "Event types reordered"}
 
 @router.put("/event-types/{type_id}")
@@ -64,6 +83,10 @@ async def update_event_type(
         raise HTTPException(status_code=404, detail="Event type not found")
     
     await db.event_types.update_one({"id": type_id}, {"$set": type_data})
+    
+    # ✨ NEW: Invalidate cache
+    await cache.invalidate_event_types()
+    
     updated = await db.event_types.find_one({"id": type_id}, {"_id": 0})
     return updated
 
