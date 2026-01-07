@@ -179,73 +179,8 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
     is_blocked: false,
     is_completed: false,
     is_urgent: false,
-
-
-  // ✨ NEW: Handle recurring instance actions
-  const handleRecurringAction = async (action) => {
-    if (!recurringParentId || !instanceDate) {
-      toast.error('Не удалось определить экземпляр события');
-      return;
-    }
-
-    try {
-      if (action === 'cancel') {
-        // Cancel this instance
-        await createRecurringException({
-          parent_event_id: recurringParentId,
-          exception_date: instanceDate,
-          action: 'cancel',
-          note: 'Отменено пользователем'
-        });
-        
-        toast.success('Экземпляр отменен');
-        onClose();
-        // Trigger refresh
-        if (onSave) {
-          onSave(null);
-        }
-      } else if (action === 'modify') {
-        // Modify only this instance
-        const modifiedFields = {};
-        
-        // Collect changed fields
-        if (formData.title !== event?.title) modifiedFields.title = formData.title;
-        if (formData.description !== event?.description) modifiedFields.description = formData.description;
-        if (formData.location !== event?.location) modifiedFields.location = formData.location;
-        if (formData.event_type !== event?.event_type) modifiedFields.event_type = formData.event_type;
-        if (formData.status !== event?.status) modifiedFields.status = formData.status;
-        if (formData.is_urgent !== event?.is_urgent) modifiedFields.is_urgent = formData.is_urgent;
-        if (formData.is_blocked !== event?.is_blocked) modifiedFields.is_blocked = formData.is_blocked;
-        if (formData.is_completed !== event?.is_completed) modifiedFields.is_completed = formData.is_completed;
-        if (formData.is_video_call !== event?.is_video_call) modifiedFields.is_video_call = formData.is_video_call;
-        
-        if (Object.keys(modifiedFields).length === 0) {
-          toast.error('Нет изменений для сохранения');
-          return;
-        }
-
-        await createRecurringException({
-          parent_event_id: recurringParentId,
-          exception_date: instanceDate,
-          action: 'modify',
-          modified_fields: modifiedFields,
-          note: 'Изменен только этот экземпляр'
-        });
-        
-        toast.success('Экземпляр изменен');
-        onClose();
-        // Trigger refresh
-        if (onSave) {
-          onSave(null);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to create exception:', error);
-      toast.error('Не удалось создать исключение');
-    }
-  };
-
     is_video_call: false,
+    recurrence_type: 'none',
 
 
   // ✨ NEW: Handle recurring instance actions
