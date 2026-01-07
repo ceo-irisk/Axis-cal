@@ -161,11 +161,21 @@ def generate_recurring_instances(
                 instances.append(instance)
             # Normal instance (no exception)
             else:
+                # ВАЖНО: Добавляем timezone info к времени, чтобы frontend правильно конвертировал
+                instance_start = current_date.isoformat()
+                instance_end = (current_date + duration).isoformat()
+                
+                # Если родительское событие в UTC формате, добавляем +00:00
+                # чтобы frontend понял что это UTC время
+                if event.get("timezone"):
+                    instance_start += "+00:00"
+                    instance_end += "+00:00"
+                
                 instance = {
                     **event,
                     "id": f"{event['id']}-{instance_count}",
-                    "start_time": current_date.isoformat(),
-                    "end_time": (current_date + duration).isoformat(),
+                    "start_time": instance_start,
+                    "end_time": instance_end,
                     "recurrence_parent_id": event["id"],
                     "is_recurring_instance": True
                 }
