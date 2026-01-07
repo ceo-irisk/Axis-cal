@@ -2,7 +2,7 @@ import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, isToday, parseISO, addMinutes, setHours, setMinutes } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { ChevronDown, Square, CheckCircle2, Zap, Video, Globe, Repeat } from 'lucide-react';
-import { getLocalTimezoneOffset, formatShiftedTime } from '../lib/timezones';
+import { TIMEZONES, getTimezoneById, utcToLocal, formatTime } from '../lib/timezones';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 // Helper to parse ISO time and get local hours/minutes with timezone shift
