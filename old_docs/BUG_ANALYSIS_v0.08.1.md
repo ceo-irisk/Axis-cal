@@ -1,4 +1,4 @@
-# 🐛 Анализ Проблем и Решения - Axis Calendar v0.09
+# 🐛 Анализ Проблем и Решения - Axis Calendar v0.08.1
 
 Дата: 2026-01-07
 Автор: AI Assistant (Claude)

@@ -1,4 +1,4 @@
-# 📋 Axis Calendar v0.09 Pre-Beta Release Notes
+# 📋 Axis Calendar v0.08.1 Pre-Beta Release Notes
 
 **Release Date**: 2026-01-07  
 **Status**: 🚧 In Progress
