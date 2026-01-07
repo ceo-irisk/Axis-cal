@@ -208,16 +208,6 @@ export const updateEventStatus = (id, name, label, color, order = 0, isActive = 
 };
 export const deleteEventStatus = (id) => api.delete(`/dictionaries/event-statuses/${id}`);
 
-// Timezones
-export const getCustomTimezones = () => api.get('/dictionaries/timezones');
-export const createCustomTimezone = (name, offset) => {
-  return api.post('/dictionaries/timezones', { name, offset });
-};
-export const updateCustomTimezone = (id, name, offset) => {
-  return api.put(`/dictionaries/timezones/${id}`, { name, offset });
-};
-export const deleteCustomTimezone = (id) => api.delete(`/dictionaries/timezones/${id}`);
-
 // ICS Subscriptions
 export const getICSSubscriptions = () => api.get('/ics-subscriptions');
 export const createICSSubscription = (data) => api.post('/ics-subscriptions', data);
