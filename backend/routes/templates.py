@@ -3,6 +3,7 @@ from typing import List, Optional
 from datetime import datetime, timezone, timedelta
 from models.template import Template, TemplateBase
 from dependencies import get_current_user, require_manager_or_admin
+from motor.motor_asyncio import AsyncIOMotorClientSession
 import uuid
 import logging
 
@@ -10,10 +11,13 @@ router = APIRouter(prefix="/templates", tags=["templates"])
 logger = logging.getLogger(__name__)
 
 db = None
+client = None  # For transactions
 
 def init_db(database):
-    global db
+    global db, client
     db = database
+    # Get client from database for transactions
+    client = db.client
 
 @router.post("")
 async def create_template(template_data: TemplateBase, user: dict = Depends(require_manager_or_admin)):
