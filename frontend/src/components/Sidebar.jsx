@@ -115,7 +115,6 @@ export const Sidebar = ({
   onShowUsers,
   onShowCalendar,
   mainView,
-  onCustomTimezonesChange,
   onEventTypesChange,
   viewingUserId,
   onViewingUserChange,
