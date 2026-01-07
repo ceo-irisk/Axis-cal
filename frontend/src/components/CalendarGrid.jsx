@@ -290,7 +290,7 @@ const TimezoneSelector = ({ selectedTimezone, onTimezoneChange }) => {
 };
 
 
-const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventId, onEventSelect, currentTimezoneOffset, selectedTimezone, onTimezoneChange, customTimezones, eventTypes }) => {
+const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventId, onEventSelect, selectedTimezone, onTimezoneChange, eventTypes }) => {
   const weekStart = startOfWeek(date, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
