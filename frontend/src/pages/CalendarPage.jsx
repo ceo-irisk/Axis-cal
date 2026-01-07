@@ -299,6 +299,7 @@ export default function CalendarPage() {
         viewingUserId={viewingUserId}
         onViewingUserChange={setViewingUserId}
         onHiddenCalendarsChange={setHiddenCalendars}
+        selectedTimezone={selectedTimezone}
       />
       
       <main className="main-content-full flex-1" data-testid="calendar-main">
