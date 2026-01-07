@@ -46,6 +46,10 @@ class EventBase(BaseModel):
     recurrence_end_date: Optional[datetime] = None
     recurrence_parent_id: Optional[str] = None
     recurrence_custom_days: Optional[List[str]] = None
+    
+    # Template fields (для событий созданных из шаблона)
+    template_id: Optional[str] = None
+    template_name: Optional[str] = None  # Для удобства отображения
 
 class EventCreate(EventBase):
     pass
