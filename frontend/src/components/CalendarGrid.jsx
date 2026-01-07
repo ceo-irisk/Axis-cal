@@ -339,7 +339,8 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
       const start = event._localStartTime || new Date(event.start_time);
       const end = event._localEndTime || new Date(event.end_time);
       
-      const shiftedStartHour = start.getHours() + start.getMinutes() / 60;
+      // ВАЖНО: используем getUTCHours/getUTCMinutes, так как _localStartTime уже содержит скорректированное время
+      const shiftedStartHour = start.getUTCHours() + start.getUTCMinutes() / 60;
       const duration = (end - start) / 3600000;
       const topOffset = shiftedStartHour * 60;
       return { 
