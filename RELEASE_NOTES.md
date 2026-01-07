@@ -207,7 +207,7 @@
 ## 🚀 Деплой
 
 Приложение развернуто и доступно по адресу:
-**https://code-check-25.preview.emergentagent.com**
+**https://repo-launcher-80.preview.emergentagent.com**
 
 **Учетные данные:**
 - Администратор: admin@company.com / admin123
