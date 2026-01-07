@@ -75,19 +75,28 @@ export const localToUTC = (localDateTimeString, timezone) => {
   
   const tz = getTimezoneById(timezone);
   
-  // Парсим дату/время как есть (без timezone)
+  // Парсим дату/время
   const [datePart, timePart] = localDateTimeString.split('T');
   const [year, month, day] = datePart.split('-').map(Number);
   const [hours, minutes] = timePart.split(':').map(Number);
   
-  // Создаём UTC дату с этими значениями
-  const utcDate = new Date(Date.UTC(year, month - 1, day, hours, minutes, 0));
+  // Создаём дату БЕЗ применения timezone (как будто это локальное время)
+  // Date.UTC создаёт дату в UTC, поэтому числовые значения интерпретируются как UTC
+  // Например: Date.UTC(2024, 0, 7, 21, 0) = "2024-01-07T21:00:00.000Z"
+  // Но пользователь ввёл 21:00 в своём timezone (например, Moscow GMT+3)
+  // Значит реальное UTC время = 21:00 - 3 = 18:00 UTC
   
-  // Вычитаем offset timezone чтобы получить настоящее UTC время
-  // Если timezone +3, то 14:30 в этом timezone = 11:30 UTC
-  const correctedUTC = new Date(utcDate.getTime() - (tz.offset * 60 * 60 * 1000));
+  // Чтобы получить правильное UTC время, нужно:
+  // 1. Интерпретировать введённое время как время в указанном timezone
+  // 2. Вычесть offset чтобы получить UTC
   
-  return correctedUTC.toISOString();
+  // Создаём дату в UTC с введёнными значениями
+  const dateInTimezone = Date.UTC(year, month - 1, day, hours, minutes, 0);
+  
+  // Вычитаем offset: если offset +3 (Москва), то 21:00 Moscow - 3 = 18:00 UTC
+  const utcTimestamp = dateInTimezone - (tz.offset * 60 * 60 * 1000);
+  
+  return new Date(utcTimestamp).toISOString();
 };
 
 // Convert UTC to local timezone
