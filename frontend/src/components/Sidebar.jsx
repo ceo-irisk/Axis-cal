@@ -1112,60 +1112,6 @@ export const Sidebar = ({
                       <p className="text-xs text-amber-500 mt-3 text-center">Редактирование флагов — скоро</p>
                     </div>
 
-                    {/* Timezones */}
-                    <div className="border-t border-border pt-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-sm font-medium">Часовые пояса</h3>
-                        {isAdmin?.() && (
-                          <button 
-                            onClick={() => { setEditingTimezone(null); setShowTimezoneModal(true); }}
-                            className="p-1.5 rounded-lg hover:bg-accent"
-                            title="Добавить часовой пояс"
-                          >
-                            <Plus className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                      
-                      <p className="text-xs text-muted-foreground mb-3">
-                        Часовые пояса доступные в календаре
-                      </p>
-                      
-                      {/* All Timezones */}
-                      <div className="space-y-1 max-h-64 overflow-y-auto">
-                        {customTimezones.length === 0 ? (
-                          <p className="text-xs text-muted-foreground text-center py-4">
-                            Нет доступных часовых поясов
-                          </p>
-                        ) : (
-                          customTimezones.map(tz => (
-                          <div key={tz.id} className="flex items-center gap-2 p-2 rounded-lg bg-accent/50 hover:bg-accent group">
-                            <Globe className="w-3.5 h-3.5 flex-shrink-0 text-[#085C53]" />
-                            <span className="flex-1 text-sm">{tz.name}</span>
-                            <code className="text-xs text-muted-foreground">{tz.offset}</code>
-                            {isAdmin?.() && (
-                              <div className="flex gap-1 opacity-0 group-hover:opacity-100">
-                                <button 
-                                  onClick={() => { setEditingTimezone(tz); setShowTimezoneModal(true); }}
-                                  className="p-1 rounded hover:bg-background"
-                                  title="Редактировать"
-                                >
-                                  <Edit2 className="w-3 h-3" />
-                                </button>
-                                <button 
-                                  onClick={() => handleDeleteTimezone(tz.id)} 
-                                  className="p-1 rounded hover:bg-red-500/20"
-                                  title="Удалить"
-                                >
-                                  <Trash2 className="w-3 h-3 text-red-500" />
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        ))
-                        )}
-                      </div>
-                    </div>
                   </div>
                 )}
 
