@@ -156,44 +156,39 @@ const TemplateSelector = ({ day, templates, appliedTemplates, onApplyTemplate, o
 };
 
 export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, templates, appliedTemplates = [], overloadedDays, ratings, view, onDateClick, onCellDoubleClick, onEventClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, onEventDelete, selectedEventId, onEventSelect, loading, selectedTimezone, onTimezoneChange, eventTypes = [] }) => {
-  // Parse offset string (format: "+3:00" or "-5:00")
-  const parseOffset = (offsetStr) => {
-    if (!offsetStr) return 0;
-    const match = offsetStr.match(/([+-])?(\d+):(\d+)/);
-    if (!match) return 0;
-    const sign = match[1] === '-' ? -1 : 1;
-    const hours = parseInt(match[2]);
-    const minutes = parseInt(match[3]);
-    return sign * (hours + minutes / 60);
-  };
   
-  // Calculate timezone shift for each event
-  const calculateEventShift = (event) => {
-    if (!event.timezone || !selectedTimezone) return 0;
-    
-    const eventTz = customTimezones.find(tz => tz.name === event.timezone);
-    const selectedTz = customTimezones.find(tz => tz.name === selectedTimezone);
-    
-    if (!eventTz || !selectedTz) return 0;
-    
-    const eventOffset = parseOffset(eventTz.offset);
-    const selectedOffset = parseOffset(selectedTz.offset);
-    
-    return selectedOffset - eventOffset;
-  };
-  
-  // Add shift to each event
-  const eventsWithShift = events.map(event => ({
-    ...event,
-    _timezoneShift: calculateEventShift(event)
-  }));
-  
-  const selectedTz = customTimezones.find(tz => tz.name === selectedTimezone) || customTimezones[0];
-  const currentTimezoneOffset = selectedTz ? parseOffset(selectedTz.offset) : 0;
+  // Конвертируем события из UTC в выбранный timezone
+  const eventsInTimezone = useMemo(() => {
+    return events.map(event => {
+      // Если у события есть start_time и timezone
+      if (event.start_time && event.timezone) {
+        try {
+          // Конвертируем UTC время в selectedTimezone
+          const startLocal = utcToLocal(event.start_time, selectedTimezone);
+          const endLocal = event.end_time ? utcToLocal(event.end_time, selectedTimezone) : startLocal;
+          
+          return {
+            ...event,
+            _localStartTime: startLocal,
+            _localEndTime: endLocal,
+            _displayStartDate: format(startLocal, 'yyyy-MM-dd'),
+            _displayStartTime: formatTime(startLocal),
+            _displayEndTime: formatTime(endLocal),
+          };
+        } catch (e) {
+          console.error('Error converting event timezone:', e, event);
+          // Fallback - используем исходное время
+          return event;
+        }
+      }
+      // Старый формат без timezone
+      return event;
+    });
+  }, [events, selectedTimezone]);
 
-  if (view === 'day') return <DayView date={selectedDate} events={eventsWithShift} templates={templates} appliedTemplates={appliedTemplates} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} currentTimezoneOffset={currentTimezoneOffset} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} eventTypes={eventTypes} />;
-  if (view === 'week') return <WeekView date={selectedDate} events={eventsWithShift} templates={templates} appliedTemplates={appliedTemplates} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} currentTimezoneOffset={currentTimezoneOffset} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} eventTypes={eventTypes} />;
-  return <MonthView currentDate={currentDate} selectedDate={selectedDate} events={eventsWithShift} overloadedDays={overloadedDays} ratings={ratings} onDateClick={onDateClick} onCellDoubleClick={onCellDoubleClick} onEventClick={onEventClick} selectedEventId={selectedEventId} onEventSelect={onEventSelect} eventTypes={eventTypes} />;
+  if (view === 'day') return <DayView date={selectedDate} events={eventsInTimezone} templates={templates} appliedTemplates={appliedTemplates} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} eventTypes={eventTypes} />;
+  if (view === 'week') return <WeekView date={selectedDate} events={eventsInTimezone} templates={templates} appliedTemplates={appliedTemplates} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} eventTypes={eventTypes} />;
+  return <MonthView currentDate={currentDate} selectedDate={selectedDate} events={eventsInTimezone} overloadedDays={overloadedDays} ratings={ratings} onDateClick={onDateClick} onCellDoubleClick={onCellDoubleClick} onEventClick={onEventClick} selectedEventId={selectedEventId} onEventSelect={onEventSelect} eventTypes={eventTypes} />;
 };
 
 const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings, onDateClick, onCellDoubleClick, onEventClick, selectedEventId, onEventSelect, eventTypes }) => {
