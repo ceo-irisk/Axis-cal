@@ -245,9 +245,15 @@ export const EventModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Combine date and time into ISO string WITHOUT timezone conversion
-    const startDateTimeStr = `${formData.start_date}T${formData.start_time_val}:00`;
-    const endDateTimeStr = `${formData.end_date}T${formData.end_time_val}:00`;
+    const userTimezone = formData.timezone || getUserTimezone();
+    
+    // Combine date and time into local datetime string
+    const localStartStr = `${formData.start_date}T${formData.start_time_val}`;
+    const localEndStr = `${formData.end_date}T${formData.end_time_val}`;
+    
+    // Convert local time to UTC
+    const startDateTimeUTC = localToUTC(localStartStr, userTimezone);
+    const endDateTimeUTC = localToUTC(localEndStr, userTimezone);
     
     // Prepare recurrence end date
     let recurrenceEndDate = null;
