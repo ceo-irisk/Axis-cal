@@ -843,7 +843,7 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <span className="text-xs font-mono opacity-70">
-                      {timeDisplay}
+                      {eventTimeDisplay}
                     </span>
                     <span className="font-medium text-sm truncate">{event.title}</span>
                   </div>
