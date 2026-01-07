@@ -311,11 +311,11 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
 
   const getEventStyle = (event) => {
     try {
-      const start = new Date(event.start_time);
-      const end = new Date(event.end_time);
-      // Apply event's timezone shift for positioning
-      const shiftHours = event._timezoneShift || 0;
-      const shiftedStartHour = start.getHours() + start.getMinutes() / 60 + shiftHours;
+      // Используем локальное время если доступно, иначе парсим UTC
+      const start = event._localStartTime || new Date(event.start_time);
+      const end = event._localEndTime || new Date(event.end_time);
+      
+      const shiftedStartHour = start.getHours() + start.getMinutes() / 60;
       const duration = (end - start) / 3600000;
       const topOffset = shiftedStartHour * 60;
       return { 
@@ -328,7 +328,9 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
   const getDayEvents = (day) => {
     return events.filter(e => {
       const dateStr = format(day, 'yyyy-MM-dd');
-      return e.start_time?.startsWith(dateStr) && !e.is_all_day;
+      // Используем _displayStartDate для фильтрации
+      const eventDateStr = e._displayStartDate || (e.start_time ? e.start_time.substring(0, 10) : null);
+      return eventDateStr === dateStr && !e.is_all_day;
     });
   };
 
