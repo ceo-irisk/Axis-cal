@@ -61,6 +61,7 @@ api_router.include_router(other.analytics_router)
 api_router.include_router(other.event_fields_router)
 api_router.include_router(other.recurring_router)
 api_router.include_router(other.user_events_router)
+api_router.include_router(recurring_exceptions.router)  # ✨ NEW
 
 # Health check routes
 @api_router.get("/")
