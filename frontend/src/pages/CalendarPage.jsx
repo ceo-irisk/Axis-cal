@@ -136,7 +136,7 @@ export default function CalendarPage() {
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedEventIds, copiedEvents, events, showEventModal, handleDeleteEventById, selectedDate]);
+  }, [selectedEventIds, copiedEvents, events, showEventModal, handleDeleteEventById, selectedDate, handlePasteEvents]);
 
   const handleEventSelect = (eventId, shiftKey = false) => {
     if (shiftKey) {
