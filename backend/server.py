@@ -7,7 +7,7 @@ import os
 import logging
 
 # Import routes
-from routes import auth, users, events, calendars, templates, ratings, dictionaries, ics, other
+from routes import auth, users, events, calendars, templates, ratings, dictionaries, ics, other, recurring_exceptions
 from dependencies import init_db as init_dependencies_db
 from services.init_data import initialize_default_data, create_indexes
 
@@ -41,6 +41,7 @@ def init_all_routes():
     dictionaries.init_db(db)
     ics.init_db(db)
     other.init_db(db)
+    recurring_exceptions.init_db(db)  # ✨ NEW
     init_dependencies_db(db)
 
 init_all_routes()
@@ -61,6 +62,7 @@ api_router.include_router(other.analytics_router)
 api_router.include_router(other.event_fields_router)
 api_router.include_router(other.recurring_router)
 api_router.include_router(other.user_events_router)
+api_router.include_router(recurring_exceptions.router)  # ✨ NEW
 api_router.include_router(recurring_exceptions.router)  # ✨ NEW
 
 # Health check routes
