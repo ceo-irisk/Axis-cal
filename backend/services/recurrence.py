@@ -147,12 +147,20 @@ def generate_recurring_instances(
                 modify_info = modified_dates[instance_date_str]
                 modified_fields = modify_info["modified_fields"]
                 
+                # ВАЖНО: Добавляем timezone info к времени
+                instance_start = current_date.isoformat()
+                instance_end = (current_date + duration).isoformat()
+                
+                if event.get("timezone"):
+                    instance_start += "+00:00"
+                    instance_end += "+00:00"
+                
                 instance = {
                     **event,
                     **modified_fields,  # Apply modifications
                     "id": f"{event['id']}-{instance_count}",
-                    "start_time": current_date.isoformat(),
-                    "end_time": (current_date + duration).isoformat(),
+                    "start_time": instance_start,
+                    "end_time": instance_end,
                     "recurrence_parent_id": event["id"],
                     "is_recurring_instance": True,
                     "is_modified": True,
