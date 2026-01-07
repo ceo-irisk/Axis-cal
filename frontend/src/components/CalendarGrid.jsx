@@ -533,7 +533,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
         
         {/* Timezone selector - right side */}
         <div className={`flex-shrink-0 ${COL_RIGHT} p-1 border-b border-l border-border/30 flex items-center justify-center`}>
-          <TimezoneSelector selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} customTimezones={customTimezones} />
+          <TimezoneSelector selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} />
         </div>
         
         {/* Scrollbar placeholder to match grid scrollbar */}
