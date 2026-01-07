@@ -158,15 +158,12 @@ export const Sidebar = ({
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [showApplyModal, setShowApplyModal] = useState(false);
-  const [showTimezoneModal, setShowTimezoneModal] = useState(false);
   const [showICSModal, setShowICSModal] = useState(false);
   const [editingType, setEditingType] = useState(null);
   const [editingStatus, setEditingStatus] = useState(null);
   const [editingTemplate, setEditingTemplate] = useState(null);
-  const [editingTimezone, setEditingTimezone] = useState(null);  // NEW
   const [selectedTemplateForApply, setSelectedTemplateForApply] = useState(null);
   const [applyDate, setApplyDate] = useState(format(new Date(), 'yyyy-MM-dd'));
-  const [customTimezones, setCustomTimezones] = useState([]);
   const [icsSubscriptions, setIcsSubscriptions] = useState([]);
 
   useEffect(() => {
