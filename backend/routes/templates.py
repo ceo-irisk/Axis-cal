@@ -167,10 +167,17 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
             # Create new events
             if created_events:
                 await db.events.insert_many(created_events)
+                # Удаляем _id добавленный MongoDB перед возвратом
+                for event in created_events:
+                    event.pop('_id', None)
         else:
             # Re-raise other errors
             logger.error(f"❌ Template application failed: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Failed to apply template: {str(e)}")
+    
+    # Удаляем _id из событий перед возвратом (если транзакция успешна)
+    for event in created_events:
+        event.pop('_id', None)
     
     return {"message": f"Template applied with {len(created_events)} events", "events": created_events}
 
