@@ -167,6 +167,14 @@ export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, tem
           const startLocal = utcToLocal(event.start_time, selectedTimezone);
           const endLocal = event.end_time ? utcToLocal(event.end_time, selectedTimezone) : startLocal;
           
+          // Получаем исходное время в timezone события (для отображения)
+          const startOriginal = utcToLocal(event.start_time, event.timezone);
+          const originalTz = getTimezoneById(event.timezone);
+          const currentTz = getTimezoneById(selectedTimezone);
+          
+          // Показываем исходное время только если timezone отличается
+          const showOriginalTime = event.timezone !== selectedTimezone;
+          
           return {
             ...event,
             _localStartTime: startLocal,
@@ -174,6 +182,9 @@ export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, tem
             _displayStartDate: format(startLocal, 'yyyy-MM-dd'),
             _displayStartTime: formatTime(startLocal),
             _displayEndTime: formatTime(endLocal),
+            _originalStartTime: showOriginalTime ? formatTime(startOriginal) : null,
+            _originalTimezone: showOriginalTime ? originalTz : null,
+            _timezoneOffset: currentTz.offset - originalTz.offset,
           };
         } catch (e) {
           console.error('Error converting event timezone:', e, event);
