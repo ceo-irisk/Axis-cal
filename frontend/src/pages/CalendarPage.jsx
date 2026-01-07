@@ -98,27 +98,60 @@ export default function CalendarPage() {
 
   // Handle keyboard events for deleting selected event
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Backspace' && selectedEventId && !showEventModal) {
-        e.preventDefault();
-        const eventToDelete = events.find(ev => ev.id === selectedEventId);
-        if (eventToDelete) {
-          // Delete without confirmation
-          handleDeleteEventById(selectedEventId);
-        }
+    const handleKeyDown = async (e) => {
+      // Не обрабатываем если открыто модальное окно или фокус в input/textarea
+      if (showEventModal || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
       }
-      // Escape to deselect
+
+      // Delete/Backspace - удалить выделенные события
+      if ((e.key === 'Backspace' || e.key === 'Delete') && selectedEventIds.length > 0) {
+        e.preventDefault();
+        // Удаляем все выделенные события
+        for (const eventId of selectedEventIds) {
+          await handleDeleteEventById(eventId);
+        }
+        setSelectedEventIds([]);
+      }
+      
+      // Escape - снять выделение
       if (e.key === 'Escape') {
-        setSelectedEventId(null);
+        setSelectedEventIds([]);
+      }
+      
+      // Cmd+C / Ctrl+C - копировать выделенные события
+      if ((e.metaKey || e.ctrlKey) && e.key === 'c' && selectedEventIds.length > 0) {
+        e.preventDefault();
+        const eventsToCopy = events.filter(ev => selectedEventIds.includes(ev.id));
+        setCopiedEvents(eventsToCopy);
+        toast.success(`Скопировано событий: ${eventsToCopy.length}`);
+      }
+      
+      // Cmd+V / Ctrl+V - вставить скопированные события
+      if ((e.metaKey || e.ctrlKey) && e.key === 'v' && copiedEvents.length > 0) {
+        e.preventDefault();
+        await handlePasteEvents();
       }
     };
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedEventId, events, showEventModal, handleDeleteEventById]);
+  }, [selectedEventIds, copiedEvents, events, showEventModal, handleDeleteEventById, selectedDate]);
 
-  const handleEventSelect = (eventId) => {
-    setSelectedEventId(eventId === selectedEventId ? null : eventId);
+  const handleEventSelect = (eventId, shiftKey = false) => {
+    if (shiftKey) {
+      // Shift+Click - добавить/удалить из выделения
+      setSelectedEventIds(prev => {
+        if (prev.includes(eventId)) {
+          return prev.filter(id => id !== eventId);
+        } else {
+          return [...prev, eventId];
+        }
+      });
+    } else {
+      // Обычный клик - выделить только это событие
+      setSelectedEventIds([eventId]);
+    }
   };
 
   const fetchData = useCallback(async () => {
