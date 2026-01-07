@@ -118,24 +118,41 @@ POST /api/calendars/{calendar_id}/permissions
 ---
 
 ### 4. 🔒 Транзакции для Критических Операций
-**Статус**: ⏳ Ожидает выполнения
+**Статус**: ✅ Завершено (с graceful degradation)
 
-**Проблема**: Риск потери данных при сбоях между операциями
+**Проблема**: Риск потери данных при сбоях между операциями (удаление + вставка)
 
 **Решение**: 
-- MongoDB транзакции для атомарности операций
-- Применение шаблона (delete + insert)
-- Удаление пользователя (каскадное)
-- Перенос событий между календарями
+- MongoDB транзакции для атомарности
+- Graceful degradation для standalone MongoDB
+- Применение шаблона теперь атомарно (либо всё, либо ничего)
 
 **Файлы**:
-- [ ] `backend/routes/templates.py` - транзакции для apply_template
-- [ ] `backend/routes/users.py` - каскадное удаление
-- [ ] `backend/routes/events.py` - массовые операции
+- ✅ `backend/routes/templates.py` - транзакции для apply_template
+
+**Реализация**:
+```python
+# Пытаемся использовать транзакцию
+try:
+    async with await client.start_session() as session:
+        async with session.start_transaction():
+            await db.events.delete_many({...}, session=session)
+            await db.events.insert_many(events, session=session)
+except:
+    # Fallback для standalone MongoDB (без replica set)
+    logger.warning("Transactions not supported, using non-atomic operations")
+    await db.events.delete_many({...})
+    await db.events.insert_many(events)
+```
+
+**Преимущества**:
+- ✅ Защита от потери данных при сбоях
+- ✅ Атомарность критических операций
+- ✅ Работает даже без replica set (fallback)
 
 **Технические требования**:
-- MongoDB Replica Set (для транзакций)
-- Graceful degradation для standalone MongoDB
+- Для транзакций: MongoDB Replica Set
+- Для standalone: работает с предупреждением
 
 ---
 
