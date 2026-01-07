@@ -201,7 +201,13 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
   }, [currentDate]);
 
   const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-  const getDayEvents = (date) => events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd'))).slice(0, 3);
+  const getDayEvents = (date) => {
+    const dateStr = format(date, 'yyyy-MM-dd');
+    return events.filter(e => {
+      const eventDateStr = e._displayStartDate || (e.start_time ? e.start_time.substring(0, 10) : null);
+      return eventDateStr === dateStr;
+    }).slice(0, 3);
+  };
   const isOverloaded = (date) => overloadedDays.some(d => d.date === format(date, 'yyyy-MM-dd') && d.is_overloaded);
   const getDayRating = (date) => ratings[format(date, 'yyyy-MM-dd')]?.rating;
 
