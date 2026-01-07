@@ -352,6 +352,18 @@ export const EventModal = ({ event, defaultDate, defaultHour, calendars = [], ev
             )}
           </div>
 
+          {/* ✨ NEW: Template Source (только для событий из шаблона) */}
+          {event && event.template_id && event.template_name && (
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1.5 block">Создано из шаблона</Label>
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/50 border border-border/50">
+                <ChevronDown className="w-4 h-4 text-[#085C53] fill-[#085C53]" />
+                <span className="text-sm font-medium text-[#085C53]">{event.template_name}</span>
+                <span className="text-xs text-muted-foreground ml-auto">Шаблон</span>
+              </div>
+            </div>
+          )}
+
           {/* All day toggle */}
           <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-accent/50">
             <div className="flex items-center gap-2">
