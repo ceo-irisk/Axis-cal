@@ -433,7 +433,7 @@ export default function CalendarPage() {
                 onApplyTemplate={handleApplyTemplate}
                 onRemoveTemplate={handleRemoveTemplate}
                 onEventDelete={handleDeleteEvent}
-                selectedEventId={selectedEventId}
+                selectedEventIds={selectedEventIds}
                 onEventSelect={handleEventSelect}
                 loading={loading}
                 selectedTimezone={selectedTimezone}
