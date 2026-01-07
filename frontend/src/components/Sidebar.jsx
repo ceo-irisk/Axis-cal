@@ -8,7 +8,7 @@ import {
   getTemplates, createTemplate, updateTemplate, deleteTemplate, applyTemplate,
   getCustomTimezones, createCustomTimezone, updateCustomTimezone, deleteCustomTimezone,
   getICSSubscriptions, createICSSubscription, deleteICSSubscription,
-  getSubscriptions, createSubscription, deleteSubscription, getUsers
+  getUsers
 } from '../lib/api';
 import { 
   Sun, Moon, LogOut, Plus, Trash2, Eye, EyeOff, ChevronLeft, ChevronRight, ChevronUp, ChevronDown,
