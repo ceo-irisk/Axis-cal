@@ -50,7 +50,7 @@ api_router.include_router(auth.router)
 api_router.include_router(users.router)
 api_router.include_router(events.router)
 api_router.include_router(calendars.router)
-api_router.include_router(calendars.subscriptions_router)
+# subscriptions_router удален - используем только calendar_permissions
 api_router.include_router(templates.router)
 api_router.include_router(ratings.router)
 api_router.include_router(ratings.survey_router)
