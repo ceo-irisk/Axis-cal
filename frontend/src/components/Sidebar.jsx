@@ -145,11 +145,8 @@ export const Sidebar = ({
   const [hoveredStar, setHoveredStar] = useState(0);
   const [ratingNotes, setRatingNotes] = useState('');
   
-  // Subscriptions
-  const [subscriptions, setSubscriptions] = useState([]);
+  // All users for admin
   const [allUsers, setAllUsers] = useState([]);
-  const [showAddSubscription, setShowAddSubscription] = useState(false);
-  const [selectedUserForSub, setSelectedUserForSub] = useState('');
   
   // User switcher dropdown state
   const [showUserSwitcher, setShowUserSwitcher] = useState(false);
