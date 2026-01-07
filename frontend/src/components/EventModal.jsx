@@ -196,6 +196,7 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
     recurrence_type: 'none',
     recurrence_end_date: '',
     recurrence_custom_days: [],
+    timezone: userTimezone, // Timezone пользователя для новых событий
   };
 };
 
