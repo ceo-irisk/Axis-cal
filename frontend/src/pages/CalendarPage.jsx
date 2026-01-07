@@ -56,7 +56,7 @@ export default function CalendarPage() {
     try {
       await deleteEvent(eventId);
       setShowEventModal(false);
-      setSelectedEventId(null);
+      setSelectedEventIds(prev => prev.filter(id => id !== eventId));
       // Remove event from local state immediately
       setEvents(prev => prev.filter(e => e.id !== eventId));
     } catch (error) {
