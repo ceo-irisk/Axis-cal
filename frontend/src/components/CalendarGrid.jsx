@@ -664,8 +664,16 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
 
 const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventId, onEventSelect, selectedTimezone, onTimezoneChange, eventTypes }) => {
   const hours = Array.from({ length: 24 }, (_, i) => i); // Все 24 часа
-  const dayEvents = events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd')) && !e.is_all_day);
-  const allDayEvents = events.filter(e => e.start_time?.startsWith(format(date, 'yyyy-MM-dd')) && e.is_all_day);
+  
+  const dateStr = format(date, 'yyyy-MM-dd');
+  const dayEvents = events.filter(e => {
+    const eventDateStr = e._displayStartDate || (e.start_time ? e.start_time.substring(0, 10) : null);
+    return eventDateStr === dateStr && !e.is_all_day;
+  });
+  const allDayEvents = events.filter(e => {
+    const eventDateStr = e._displayStartDate || (e.start_time ? e.start_time.substring(0, 10) : null);
+    return eventDateStr === dateStr && e.is_all_day;
+  });
   
   const [draggedEvent, setDraggedEvent] = useState(null);
 
