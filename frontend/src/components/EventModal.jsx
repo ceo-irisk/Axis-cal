@@ -112,12 +112,23 @@ const TimePicker = ({ value, onChange, label }) => {
 };
 
 const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
+  const userTimezone = getUserTimezone();
+  
   if (event) {
     let status = event.status || 'confirmed';
     
-    // Parse ISO dates and convert to local time
-    const startDateTime = event.start_time ? new Date(event.start_time) : new Date();
-    const endDateTime = event.end_time ? new Date(event.end_time) : new Date();
+    // Parse ISO dates - события приходят в UTC, конвертируем в локальное время
+    let startDateTime, endDateTime;
+    
+    if (event.start_time && event.timezone) {
+      // Событие имеет timezone - конвертируем из UTC в локальный timezone
+      startDateTime = utcToLocal(event.start_time, userTimezone);
+      endDateTime = event.end_time ? utcToLocal(event.end_time, userTimezone) : startDateTime;
+    } else {
+      // Старый формат без timezone - используем как есть
+      startDateTime = event.start_time ? new Date(event.start_time) : new Date();
+      endDateTime = event.end_time ? new Date(event.end_time) : new Date();
+    }
     
     // Parse recurrence end date if present
     let recurrence_end = '';
@@ -153,6 +164,7 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars) => {
       recurrence_type: event.recurrence_type || 'none',
       recurrence_end_date: recurrence_end,
       recurrence_custom_days: custom_days,
+      timezone: event.timezone || userTimezone, // Сохраняем timezone события
     };
   }
   
