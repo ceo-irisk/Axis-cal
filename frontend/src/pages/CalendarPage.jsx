@@ -8,6 +8,7 @@ import {
   getUserEvents
 } from '../lib/api';
 import { getUserTimezone } from '../lib/timezones';
+import { toast } from 'sonner';
 import Sidebar from '../components/Sidebar';
 import CalendarGrid from '../components/CalendarGrid';
 import EventModal from '../components/EventModal';
