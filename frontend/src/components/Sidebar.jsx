@@ -6,7 +6,6 @@ import {
   getEventTypes, createEventType, updateEventType, deleteEventType,
   getEventStatuses, createEventStatus, updateEventStatus, deleteEventStatus,
   getTemplates, createTemplate, updateTemplate, deleteTemplate, applyTemplate,
-  getCustomTimezones, createCustomTimezone, updateCustomTimezone, deleteCustomTimezone,
   getICSSubscriptions, createICSSubscription, deleteICSSubscription,
   getUsers
 } from '../lib/api';
