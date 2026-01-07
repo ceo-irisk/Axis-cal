@@ -226,8 +226,8 @@ export const EventModal = ({
 
   // Update form when event changes
   useEffect(() => {
-    setFormData(getInitialFormData(event, defaultDate, defaultHour, calendars));
-  }, [event, defaultDate, defaultHour, calendars]);
+    setFormData(getInitialFormData(event, defaultDate, defaultHour, calendars, selectedTimezone));
+  }, [event, defaultDate, defaultHour, calendars, selectedTimezone]);
 
   useEffect(() => {
     getEventFields().then(res => setCustomFields(res.data?.fields || [])).catch(console.error);
