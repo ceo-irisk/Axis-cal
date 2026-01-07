@@ -1080,6 +1080,7 @@ export const Sidebar = ({
                 {/* Dictionaries Sub-tab */}
                 {settingsTab === SETTINGS_TABS.DICTIONARIES && (
                   <div className="space-y-4">
+                    <p className="text-xs text-yellow-500">DEBUG: Showing DICTIONARIES section, settingsTab={settingsTab}</p>
                     {/* Event Types */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
