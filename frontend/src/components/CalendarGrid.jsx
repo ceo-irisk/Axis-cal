@@ -155,7 +155,7 @@ const TemplateSelector = ({ day, templates, appliedTemplates, onApplyTemplate, o
   );
 };
 
-export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, templates, appliedTemplates = [], overloadedDays, ratings, view, onDateClick, onCellDoubleClick, onEventClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, onEventDelete, selectedEventId, onEventSelect, loading, selectedTimezone, onTimezoneChange, customTimezones = [], eventTypes = [] }) => {
+export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, templates, appliedTemplates = [], overloadedDays, ratings, view, onDateClick, onCellDoubleClick, onEventClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, onEventDelete, selectedEventId, onEventSelect, loading, selectedTimezone, onTimezoneChange, eventTypes = [] }) => {
   // Parse offset string (format: "+3:00" or "-5:00")
   const parseOffset = (offsetStr) => {
     if (!offsetStr) return 0;
