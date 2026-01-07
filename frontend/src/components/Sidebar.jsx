@@ -749,9 +749,14 @@ export const Sidebar = ({
                                 <EventIcons event={event} />
                               </div>
                               <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground ml-4">
-                                <span className="flex items-center gap-1 font-mono">
-                                  <Clock className="w-3 h-3" />
-                                  {formatEventTime(event.start_time)}
+                                <span className="flex items-center gap-1 font-mono truncate">
+                                  <Clock className="w-3 h-3 flex-shrink-0" />
+                                  {event._displayStartTime || formatEventTime(event.start_time)}
+                                  {event._originalStartTime && event._timezoneOffset !== 0 && (
+                                    <span className="text-[10px] opacity-70">
+                                      ({event._originalStartTime} {event._timezoneOffset >= 0 ? '+' : ''}{event._timezoneOffset})
+                                    </span>
+                                  )}
                                 </span>
                                 {event.location && (
                                   <span className="flex items-center gap-1 truncate">
