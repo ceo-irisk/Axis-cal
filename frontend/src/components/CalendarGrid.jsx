@@ -867,6 +867,13 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
             const overlapStyle = getOverlapStyle(event);
             const isSelected = selectedEventId === event.id;
             
+            // Формируем отображение времени с исходным timezone если отличается
+            let timeDisplayText = eventTimeDisplay;
+            if (event._originalStartTime && event._originalTimezone) {
+              const offset = event._timezoneOffset >= 0 ? `+${event._timezoneOffset}` : event._timezoneOffset;
+              timeDisplayText = `${eventTimeDisplay} (${event._originalStartTime} ${offset})`;
+            }
+            
             return (
               <div 
                 key={event.id}
