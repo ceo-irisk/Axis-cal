@@ -209,14 +209,21 @@ async def get_user_events(
 ):
     from services.permissions import filter_events_by_permissions
     
-    # Check if current user is subscribed to target user
-    subscription = await db.user_subscriptions.find_one({
-        "user_id": user["id"],
-        "target_user_id": user_id
-    })
-    
-    if not subscription and user["id"] != user_id:
-        raise HTTPException(status_code=403, detail="Not subscribed to this user")
+    # Check if current user has permissions to view target user's calendars
+    # (Removed subscription check - now only calendar_permissions matter)
+    if user["id"] != user_id:
+        # Check if user has any permissions to target user's calendars
+        target_calendars = await db.calendars.find({"user_id": user_id}, {"_id": 0}).to_list(100)
+        target_calendar_ids = [c["id"] for c in target_calendars]
+        
+        if target_calendar_ids:
+            has_permission = await db.calendar_permissions.find_one({
+                "calendar_id": {"$in": target_calendar_ids},
+                "user_id": user["id"]
+            })
+            
+            if not has_permission:
+                raise HTTPException(status_code=403, detail="No permission to view this user's calendar")
     
     # Get events
     query = {}
