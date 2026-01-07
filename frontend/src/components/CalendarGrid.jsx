@@ -393,7 +393,8 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
   const getAllDayEvents = (day) => {
     return events.filter(e => {
       const dateStr = format(day, 'yyyy-MM-dd');
-      return e.start_time?.startsWith(dateStr) && e.is_all_day;
+      const eventDateStr = e._displayStartDate || (e.start_time ? e.start_time.substring(0, 10) : null);
+      return eventDateStr === dateStr && e.is_all_day;
     });
   };
 
