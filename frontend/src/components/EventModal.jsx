@@ -217,8 +217,8 @@ export const EventModal = ({
   const [customFields, setCustomFields] = useState([]);
   
   const initialData = useMemo(
-    () => getInitialFormData(event, defaultDate, defaultHour, calendars),
-    [event, defaultDate, defaultHour, calendars]
+    () => getInitialFormData(event, defaultDate, defaultHour, calendars, selectedTimezone),
+    [event, defaultDate, defaultHour, calendars, selectedTimezone]
   );
   
   const [formData, setFormData] = useState(initialData);
