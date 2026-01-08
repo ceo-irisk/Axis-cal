@@ -753,10 +753,24 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
         return (eStart < eventEnd && eEnd > eventStart);
       });
       
+      // Sort overlapping events deterministically:
+      // 1. By start time (ascending)
+      // 2. By end time (ascending) - shorter events first
+      // 3. By title (alphabetically)
+      // 4. By id (alphabetically) as last resort
       overlapping.sort((a, b) => {
         const aStart = new Date(a.start_time).getTime();
         const bStart = new Date(b.start_time).getTime();
         if (aStart !== bStart) return aStart - bStart;
+        
+        const aEnd = new Date(a.end_time).getTime();
+        const bEnd = new Date(b.end_time).getTime();
+        if (aEnd !== bEnd) return aEnd - bEnd;
+        
+        const aTitle = (a.title || '').toLowerCase();
+        const bTitle = (b.title || '').toLowerCase();
+        if (aTitle !== bTitle) return aTitle.localeCompare(bTitle);
+        
         return (a.id || '').localeCompare(b.id || '');
       });
       
