@@ -1250,6 +1250,12 @@ export const Sidebar = ({
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-medium">Правила дня</h3>
+                      <button 
+                        onClick={() => { setEditingRule(null); setShowRuleModal(true); }}
+                        className="p-1.5 rounded-lg hover:bg-accent"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
                     </div>
                     
                     {dayRules.length === 0 ? (
@@ -1257,7 +1263,7 @@ export const Sidebar = ({
                     ) : (
                       <div className="space-y-2">
                         {dayRules.map(rule => (
-                          <div key={rule.id} className="p-3 rounded-lg bg-accent/50">
+                          <div key={rule.id} className="p-3 rounded-lg bg-accent/50 hover:bg-accent group">
                             <div className="flex items-start justify-between gap-2">
                               <div className="flex-1">
                                 <p className="font-medium text-sm">{rule.name}</p>
@@ -1269,8 +1275,26 @@ export const Sidebar = ({
                                   {rule.rule_type === 'max_hours' && ' часов'}
                                 </p>
                               </div>
-                              <div className={`px-2 py-1 rounded text-xs ${rule.is_active ? 'bg-green-500/20 text-green-600' : 'bg-gray-500/20 text-gray-600'}`}>
-                                {rule.is_active ? 'Активно' : 'Неактивно'}
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                  onClick={() => handleToggleRule(rule)}
+                                  className={`p-1.5 rounded hover:bg-background transition-colors ${rule.is_active ? 'text-green-600' : 'text-gray-500'}`}
+                                  title={rule.is_active ? 'Отключить' : 'Включить'}
+                                >
+                                  {rule.is_active ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                                </button>
+                                <button
+                                  onClick={() => { setEditingRule(rule); setShowRuleModal(true); }}
+                                  className="p-1.5 rounded hover:bg-background"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteRule(rule.id)}
+                                  className="p-1.5 rounded hover:bg-red-500/20"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                                </button>
                               </div>
                             </div>
                           </div>
