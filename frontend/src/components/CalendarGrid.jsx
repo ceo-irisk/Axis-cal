@@ -197,12 +197,12 @@ export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, tem
     });
   }, [events, selectedTimezone]);
 
-  if (view === 'day') return <DayView date={selectedDate} events={eventsInTimezone} templates={templates} appliedTemplates={appliedTemplates} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} eventTypes={eventTypes} />;
-  if (view === 'week') return <WeekView date={selectedDate} events={eventsInTimezone} templates={templates} appliedTemplates={appliedTemplates} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventId={selectedEventId} onEventSelect={onEventSelect} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} eventTypes={eventTypes} />;
-  return <MonthView currentDate={currentDate} selectedDate={selectedDate} events={eventsInTimezone} overloadedDays={overloadedDays} ratings={ratings} onDateClick={onDateClick} onCellDoubleClick={onCellDoubleClick} onEventClick={onEventClick} selectedEventId={selectedEventId} onEventSelect={onEventSelect} eventTypes={eventTypes} />;
+  if (view === 'day') return <DayView date={selectedDate} events={eventsInTimezone} templates={templates} appliedTemplates={appliedTemplates} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventIds={selectedEventIds} onEventSelect={onEventSelect} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} eventTypes={eventTypes} />;
+  if (view === 'week') return <WeekView date={selectedDate} events={eventsInTimezone} templates={templates} appliedTemplates={appliedTemplates} onDateClick={onDateClick} onEventClick={onEventClick} onCellDoubleClick={onCellDoubleClick} onEventUpdate={onEventUpdate} onApplyTemplate={onApplyTemplate} onRemoveTemplate={onRemoveTemplate} selectedEventIds={selectedEventIds} onEventSelect={onEventSelect} selectedTimezone={selectedTimezone} onTimezoneChange={onTimezoneChange} eventTypes={eventTypes} />;
+  return <MonthView currentDate={currentDate} selectedDate={selectedDate} events={eventsInTimezone} overloadedDays={overloadedDays} ratings={ratings} onDateClick={onDateClick} onCellDoubleClick={onCellDoubleClick} onEventClick={onEventClick} selectedEventIds={selectedEventIds} onEventSelect={onEventSelect} eventTypes={eventTypes} />;
 };
 
-const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings, onDateClick, onCellDoubleClick, onEventClick, selectedEventId, onEventSelect, eventTypes }) => {
+const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings, onDateClick, onCellDoubleClick, onEventClick, selectedEventIds, onEventSelect, eventTypes }) => {
   const days = useMemo(() => {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
@@ -314,7 +314,7 @@ const TimezoneSelector = ({ selectedTimezone, onTimezoneChange }) => {
 };
 
 
-const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventId, onEventSelect, selectedTimezone, onTimezoneChange, eventTypes }) => {
+const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventIds, onEventSelect, selectedTimezone, onTimezoneChange, eventTypes }) => {
   const weekStart = startOfWeek(date, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
@@ -681,7 +681,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
   );
 };
 
-const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventId, onEventSelect, selectedTimezone, onTimezoneChange, eventTypes }) => {
+const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCellDoubleClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, selectedEventIds, onEventSelect, selectedTimezone, onTimezoneChange, eventTypes }) => {
   const hours = Array.from({ length: 24 }, (_, i) => i); // Все 24 часа
   
   const dateStr = format(date, 'yyyy-MM-dd');
