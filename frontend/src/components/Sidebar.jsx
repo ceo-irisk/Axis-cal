@@ -89,6 +89,9 @@ const SETTINGS_TABS = {
   USERS: 'users',
   TEMPLATES: 'templates',
   DICTIONARIES: 'dictionaries',
+  DAY_RULES: 'day_rules',
+  SURVEYS: 'surveys',
+  REPORTS: 'reports',
   PROFILE: 'profile'
 };
 
