@@ -61,60 +61,7 @@ import {
   ReportsSettings 
 } from './sidebar/settings';
 
-// Available calendar icons
-const CALENDAR_ICONS = {
-  'calendar': Calendar,
-  'book-open': BookOpen,
-  'lock': Lock,
-  'briefcase': Briefcase,
-  'home': Home,
-  'target': Target,
-  'plane': Plane,
-  'heart': Heart,
-  'coffee': Coffee,
-  'dumbbell': Dumbbell,
-  'graduation-cap': GraduationCap,
-  'shopping-cart': ShoppingCart,
-  'mail': Mail,
-  'phone': Phone,
-  'settings': Settings2,
-};
-
-
-// Event icons component
-const EventIcons = ({ event }) => {
-  const icons = [];
-  if (event.is_blocked) icons.push(<Square key="blocked" className="w-3 h-3 text-red-500 fill-red-500" />);
-  if (event.is_completed) icons.push(<CheckCircle2 key="completed" className="w-3 h-3 text-green-500" />);
-  if (event.is_urgent) icons.push(<Zap key="urgent" className="w-3 h-3 text-amber-500 fill-amber-500" />);
-  if (event.is_video_call) icons.push(<Video key="video" className="w-3 h-3 text-blue-500" />);
-  if (icons.length === 0) return null;
-  return <div className="flex items-center gap-0.5">{icons}</div>;
-};
-
-const CALENDAR_COLORS = [
-  '#085C53', '#06b6d4', '#f59e0b', '#ef4444', '#10b981', '#6366f1', '#ec4899', '#14b8a6'
-];
-
-// Tab identifiers
-const TABS = {
-  EVENTS: 'events',
-  CALENDARS: 'calendars', 
-  DASHBOARD: 'dashboard',
-  SETTINGS: 'settings'
-};
-
-// Settings sub-tabs
-const SETTINGS_TABS = {
-  MY_CALENDARS: 'my_calendars',
-  USERS: 'users',
-  TEMPLATES: 'templates',
-  DICTIONARIES: 'dictionaries',
-  DAY_RULES: 'day_rules',
-  SURVEYS: 'surveys',
-  REPORTS: 'reports',
-  PROFILE: 'profile'
-};
+// Constants and components are now imported from modular files
 
 export const Sidebar = ({ 
   isOpen, 
