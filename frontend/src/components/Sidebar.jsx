@@ -138,7 +138,7 @@ export const Sidebar = ({
   const [showPermissionsModal, setShowPermissionsModal] = useState(false);
   const [selectedCalendarForPermissions, setSelectedCalendarForPermissions] = useState(null);
   const [hiddenCalendars, setHiddenCalendars] = useState(new Set());
-  const [activeTab, setActiveTab] = useState(TABS.EVENTS);
+  const [activeTab, setActiveTab] = useState(TABS.DASHBOARD);
   const [settingsTab, setSettingsTab] = useState(SETTINGS_TABS.TEMPLATES);
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [hoveredStar, setHoveredStar] = useState(0);
@@ -658,9 +658,9 @@ export const Sidebar = ({
           {/* Tabs */}
           <div className="flex border-b border-border">
             {[
+              { id: TABS.DASHBOARD, icon: LayoutDashboard, label: 'Дашборд' },
               { id: TABS.EVENTS, icon: LayoutList, label: 'События' },
               { id: TABS.CALENDARS, icon: Calendar, label: 'Календари' },
-              { id: TABS.DASHBOARD, icon: LayoutDashboard, label: 'Дашборд' },
               { id: TABS.SETTINGS, icon: Settings, label: 'Настройки' },
             ].map(tab => (
               <button
