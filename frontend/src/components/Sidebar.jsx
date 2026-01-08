@@ -179,12 +179,14 @@ export const Sidebar = ({
       } catch (e) { console.error(e); }
       
       try {
-        const [typesRes, statusesRes, templatesRes, icsRes, usersRes] = await Promise.all([
+        const [typesRes, statusesRes, templatesRes, icsRes, usersRes, rulesRes, questionsRes] = await Promise.all([
           getEventTypes().catch((e) => { console.error('Error loading event types:', e); return { data: [] }; }),
           getEventStatuses().catch((e) => { console.error('Error loading event statuses:', e); return { data: [] }; }),
           getTemplates().catch((e) => { console.error('Error loading templates:', e); return { data: [] }; }),
           getICSSubscriptions().catch((e) => { console.error('Error loading ICS subscriptions:', e); return { data: [] }; }),
-          getUsers().catch(() => ({ data: [] }))
+          getUsers().catch(() => ({ data: [] })),
+          getRules().catch((e) => { console.error('Error loading rules:', e); return { data: [] }; }),
+          getSurveyQuestions().catch((e) => { console.error('Error loading survey questions:', e); return { data: [] }; })
         ]);
         setEventTypes(typesRes.data || []);
         console.log('🔍 DEBUG: Loaded eventTypes:', typesRes.data, 'Length:', (typesRes.data || []).length);
@@ -192,6 +194,8 @@ export const Sidebar = ({
         setTemplates(templatesRes.data || []);
         setIcsSubscriptions(icsRes.data || []);
         setAllUsers(usersRes.data || []);
+        setDayRules(rulesRes.data || []);
+        setSurveyQuestions(questionsRes.data || []);
         onEventTypesChange?.(typesRes.data || []);
       } catch (e) { console.error(e); }
     };
