@@ -15,12 +15,14 @@ export const MobileCalendarPage = ({
   onCreateEvent,
   eventTypes = []
 }) => {
-  const { user } = useAuth();
+  const auth = useAuth();
+  const user = auth?.user;
   const [currentDate, setCurrentDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [viewMode, setViewMode] = useState('two-day'); // 'two-day' or 'month'
   const [activeView, setActiveView] = useState('grid');
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Load events
   useEffect(() => {
