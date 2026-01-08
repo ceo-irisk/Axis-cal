@@ -917,7 +917,12 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
                   ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
                   ${draggedEvent?.id === event.id ? 'opacity-50 scale-95' : ''}
                 `}
-                style={{...getEventStyle(event), ...overlapStyle, ...(dynamicStyle || {})}} 
+                style={{
+                  ...getEventStyle(event), 
+                  ...overlapStyle, 
+                  ...(dynamicStyle || {}),
+                  pointerEvents: draggedEvent && draggedEvent.id !== event.id ? 'none' : 'auto'
+                }} 
                 data-testid={`event-${event.id}`}
               >
                 <div className="flex items-center justify-between">
