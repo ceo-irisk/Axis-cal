@@ -409,6 +409,51 @@ export const Sidebar = ({
     });
   };
 
+  // Rule handlers
+  const handleSaveRule = async (data) => {
+    try {
+      if (editingRule) {
+        await updateRule(editingRule.id, data);
+        toast.success('Правило обновлено');
+      } else {
+        await createRule(data);
+        toast.success('Правило создано');
+      }
+      setShowRuleModal(false);
+      setEditingRule(null);
+      // Reload rules
+      const rulesRes = await getRules();
+      setDayRules(rulesRes.data || []);
+    } catch (e) {
+      console.error('Error saving rule:', e);
+      toast.error('Ошибка сохранения правила');
+    }
+  };
+
+  const handleDeleteRule = async (id) => {
+    if (!window.confirm('Удалить правило?')) return;
+    try {
+      await deleteRule(id);
+      setDayRules(prev => prev.filter(r => r.id !== id));
+      toast.success('Правило удалено');
+    } catch (e) {
+      console.error('Error deleting rule:', e);
+      toast.error('Ошибка удаления правила');
+    }
+  };
+
+  const handleToggleRule = async (rule) => {
+    try {
+      await updateRule(rule.id, { ...rule, is_active: !rule.is_active });
+      setDayRules(prev => prev.map(r => r.id === rule.id ? { ...r, is_active: !r.is_active } : r));
+      toast.success(rule.is_active ? 'Правило отключено' : 'Правило включено');
+    } catch (e) {
+      console.error('Error toggling rule:', e);
+      toast.error('Ошибка изменения правила');
+    }
+  };
+
+
   // Notify parent about hidden calendars changes
   useEffect(() => {
     onHiddenCalendarsChange?.(hiddenCalendars);
