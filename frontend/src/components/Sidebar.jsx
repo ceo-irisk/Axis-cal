@@ -1553,9 +1553,9 @@ export const Sidebar = ({
   );
 };
 
-// ==================== FORM COMPONENTS ====================
+// Forms are now imported from './sidebar/forms'
 
-const ICSSubscriptionForm = ({ onSave, onCancel }) => {
+export default Sidebar;
   const [url, setUrl] = useState('');
   const [name, setName] = useState('');
   const [color, setColor] = useState('#6366f1');
