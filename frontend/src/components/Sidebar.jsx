@@ -106,6 +106,7 @@ export const Sidebar = ({
   onDateSelect,
   events = [],
   rating,
+  ratings = {},
   violations,
   onRateDay,
   onOpenSurvey,
