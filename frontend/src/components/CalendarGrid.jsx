@@ -259,7 +259,7 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
               <div className="space-y-1">
                 {dayEvents.map((event) => {
                   const dynamicStyle = getEventDynamicStyle(event, eventTypes);
-                  const isSelected = selectedEventId === event.id;
+                  const isSelected = selectedEventIds?.includes(event.id);
                   return (
                     <div 
                       key={event.id} 
@@ -536,7 +536,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
               <div className="min-h-[24px] px-1 pb-1 space-y-0.5 overflow-hidden">
                 {getAllDayEvents(day).map(event => {
                   const dynamicStyle = getEventDynamicStyle(event, eventTypes);
-                  const isSelected = selectedEventId === event.id;
+                  const isSelected = selectedEventIds?.includes(event.id);
                   return (
                     <div 
                       key={event.id}
@@ -617,7 +617,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                   const eventTimeDisplay = event._displayStartTime || formatTime(new Date(event.start_time));
                   const dynamicStyle = getEventDynamicStyle(event, eventTypes);
                   const overlapStyle = getOverlapStyle(event, dayEvents);
-                  const isSelected = selectedEventId === event.id;
+                  const isSelected = selectedEventIds?.includes(event.id);
                   
                   // Формируем отображение времени с исходным timezone если отличается
                   let timeDisplayText = eventTimeDisplay;
