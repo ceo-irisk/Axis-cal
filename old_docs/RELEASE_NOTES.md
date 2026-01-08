@@ -207,7 +207,7 @@
 ## 🚀 Деплой
 
 Приложение развернуто и доступно по адресу:
-**https://repo-launcher-80.preview.emergentagent.com**
+**https://initial-review-1.preview.emergentagent.com**
 
 **Учетные данные:**
 - Администратор: admin@company.com / admin123
