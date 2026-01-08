@@ -153,6 +153,9 @@ export const Sidebar = ({
   const [eventTypes, setEventTypes] = useState([]);
   const [eventStatuses, setEventStatuses] = useState([]);
   const [templates, setTemplates] = useState([]);
+  const [dayRules, setDayRules] = useState([]);
+  const [surveyQuestions, setSurveyQuestions] = useState([]);
+  const [surveyResponses, setSurveyResponses] = useState([]);
   
   // Edit modals
   const [showTypeModal, setShowTypeModal] = useState(false);
