@@ -1555,3 +1555,5 @@ export const Sidebar = ({
 
 // Forms are now imported from './sidebar/forms'
 
+
+export default Sidebar;
