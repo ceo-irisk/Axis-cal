@@ -355,6 +355,7 @@ export default function CalendarPage() {
         }}
         events={selectedDateEvents}
         rating={currentRating}
+        ratings={ratings}
         violations={currentViolations}
         onRateDay={handleRateDay}
         onOpenSurvey={() => setShowSurveyModal(true)}
