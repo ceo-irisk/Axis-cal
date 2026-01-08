@@ -1187,6 +1187,55 @@ export const Sidebar = ({
                 )}
 
 
+                {/* Day Rules Sub-tab */}
+                {settingsTab === SETTINGS_TABS.DAY_RULES && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-medium">Правила дня</h3>
+                      <button className="p-1.5 rounded-lg hover:bg-accent">
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                    
+                    <div className="text-center py-8 text-muted-foreground">
+                      <AlertTriangle className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p className="text-sm">Настройка правил дня</p>
+                      <p className="text-xs mt-2">Здесь вы сможете настроить правила для контроля рабочего дня</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Surveys Sub-tab */}
+                {settingsTab === SETTINGS_TABS.SURVEYS && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-medium">Опросы</h3>
+                      <button className="p-1.5 rounded-lg hover:bg-accent">
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                    
+                    <div className="text-center py-8 text-muted-foreground">
+                      <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p className="text-sm">Настройка опросов</p>
+                      <p className="text-xs mt-2">Здесь вы сможете настроить вопросы для оценки дня</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Reports Sub-tab */}
+                {settingsTab === SETTINGS_TABS.REPORTS && (
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-medium">История оценок</h3>
+                    
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Star className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p className="text-sm">Отчеты по дням</p>
+                      <p className="text-xs mt-2">Просмотр истории оценок и анализ эффективности</p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Profile Sub-tab */}
                 {settingsTab === SETTINGS_TABS.PROFILE && (
                   <div className="space-y-4">
