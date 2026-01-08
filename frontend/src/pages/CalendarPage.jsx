@@ -347,9 +347,8 @@ export default function CalendarPage() {
     return format(currentDate, 'LLLL yyyy', { locale: ru });
   };
 
-  // Mobile version - temporarily disabled due to production issues
-  // Using responsive desktop version instead
-  if (isMobile && false) { // Disabled for now
+  // Mobile version
+  if (isMobile) {
     return (
       <MobileErrorBoundary>
         <MobileCalendarPage 
