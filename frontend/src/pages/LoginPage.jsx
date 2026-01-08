@@ -54,18 +54,10 @@ export default function LoginPage() {
         <div className="card-glass rounded-3xl p-8">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-24 h-24 mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
-                <path fill="#B0B0B0" d="
-                  M 120 456
-                  L 240 56
-                  Q 256 36 272 56
-                  L 392 456
-                  L 330 456
-                  L 256 216
-                  L 182 456
-                  Z
-                "/>
-                <circle cx="292" cy="272" r="44" fill="#085C53"/>
+              <svg width="100%" height="100%" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M111.554 459.996L237.004 73.9961H274.949L400.387 459.996H354.328L256.018 153.538L155.081 459.996H111.554Z" fill="#B0B0B0"/>
+                <path d="M317.402 294.189H256V312.189H317.402V294.189Z" fill="#B0B0B0"/>
+                <path d="M256 330.689C271.188 330.689 283.5 318.377 283.5 303.189C283.5 288.001 271.188 275.689 256 275.689C240.812 275.689 228.5 288.001 228.5 303.189C228.5 318.377 240.812 330.689 256 330.689Z" fill="#085C53"/>
               </svg>
             </div>
             <h1 className="text-2xl font-semibold tracking-tight mb-2 text-[var(--primary-text)]">
