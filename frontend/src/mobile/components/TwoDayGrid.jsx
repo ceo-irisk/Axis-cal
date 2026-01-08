@@ -1,0 +1,192 @@
+import { useState, useRef, useEffect } from 'react';
+import { format, addDays, subDays, startOfDay, isSameDay } from 'date-fns';
+import { ru } from 'date-fns/locale';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+export const TwoDayGrid = ({ 
+  currentDate, 
+  onDateChange, 
+  events = [], 
+  onEventClick,
+  onCreateEvent,
+  getEventTypeColor 
+}) => {
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const containerRef = useRef(null);
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      // Swipe left = next days
+      onDateChange(addDays(currentDate, 2));
+    }
+    if (isRightSwipe) {
+      // Swipe right = previous days
+      onDateChange(subDays(currentDate, 2));
+    }
+  };
+
+  // Get two days to display
+  const day1 = startOfDay(currentDate);
+  const day2 = addDays(day1, 1);
+  const days = [day1, day2];
+
+  // Group events by day
+  const getEventsForDay = (day) => {
+    return events.filter(event => {
+      const eventDate = new Date(event.start_time);
+      return isSameDay(eventDate, day);
+    }).sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+  };
+
+  // Generate time slots (24 hours)
+  const hours = Array.from({ length: 24 }, (_, i) => i);
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Header with navigation */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background sticky top-0 z-10">
+        <button 
+          onClick={() => onDateChange(subDays(currentDate, 2))}
+          className="p-2 rounded-lg hover:bg-accent"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        
+        <div className="flex gap-4">
+          {days.map(day => (
+            <div key={day.toString()} className="text-center">
+              <div className="text-xs text-muted-foreground">
+                {format(day, 'EEE', { locale: ru })}
+              </div>
+              <div className="text-lg font-semibold">
+                {format(day, 'd')}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button 
+          onClick={() => onDateChange(addDays(currentDate, 2))}
+          className="p-2 rounded-lg hover:bg-accent"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Two-day grid with swipe support */}
+      <div 
+        ref={containerRef}
+        className="flex-1 overflow-y-auto pb-20"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        <div className="grid grid-cols-[auto_1fr_1fr] gap-px bg-border">
+          {/* Time column */}
+          <div className="bg-background">
+            <div className="h-12 border-b border-border" /> {/* Header spacer */}
+            {hours.map(hour => (
+              <div key={hour} className="h-16 px-2 py-1 text-xs text-muted-foreground border-b border-border">
+                {String(hour).padStart(2, '0')}:00
+              </div>
+            ))}
+          </div>
+
+          {/* Day 1 & Day 2 columns */}
+          {days.map((day, dayIndex) => {
+            const dayEvents = getEventsForDay(day);
+            
+            return (
+              <div key={day.toString()} className="bg-background relative">
+                {/* Day header */}
+                <div className="h-12 flex items-center justify-center border-b border-border sticky top-0 bg-background z-5">
+                  <span className="text-sm font-medium">
+                    {format(day, 'd MMM', { locale: ru })}
+                  </span>
+                </div>
+
+                {/* Time slots */}
+                <div className="relative">
+                  {hours.map(hour => (
+                    <div 
+                      key={hour} 
+                      className="h-16 border-b border-border hover:bg-accent/30 cursor-pointer transition-colors"
+                      onClick={() => onCreateEvent(day, hour)}
+                    />
+                  ))}
+
+                  {/* Events overlay */}
+                  {dayEvents.map(event => {
+                    const startTime = new Date(event.start_time);
+                    const endTime = new Date(event.end_time);
+                    const startHour = startTime.getHours();
+                    const startMinute = startTime.getMinutes();
+                    const duration = (endTime - startTime) / (1000 * 60); // minutes
+                    
+                    const top = (startHour + startMinute / 60) * 64; // 64px per hour
+                    const height = (duration / 60) * 64;
+                    const eventColor = getEventTypeColor(event);
+
+                    const isUnconfirmed = event.status === 'tentative';
+                    const isTemplate = event.status === 'template';
+
+                    return (
+                      <button
+                        key={event.id}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEventClick(event);
+                        }}
+                        className={`absolute left-1 right-1 rounded-lg px-2 py-1 text-left overflow-hidden ${
+                          isUnconfirmed || isTemplate
+                            ? 'border-2 bg-transparent'
+                            : 'shadow-sm'
+                        } ${
+                          isTemplate ? 'border-solid' : isUnconfirmed ? 'border-dashed' : ''
+                        }`}
+                        style={{
+                          top: `${top}px`,
+                          height: `${Math.max(height, 32)}px`,
+                          ...(isUnconfirmed || isTemplate
+                            ? { borderColor: eventColor }
+                            : { 
+                                backgroundColor: `${eventColor}20`,
+                                borderLeft: `4px solid ${eventColor}`
+                              })
+                        }}
+                      >
+                        <div className="text-xs font-medium truncate">{event.title}</div>
+                        <div className="text-[10px] text-muted-foreground">
+                          {format(startTime, 'HH:mm')} - {format(endTime, 'HH:mm')}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
