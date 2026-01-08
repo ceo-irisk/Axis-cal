@@ -362,13 +362,14 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
   // Calculate horizontal positions for overlapping events
   const getOverlapStyle = (event, dayEvents) => {
     try {
-      const eventStart = new Date(event.start_time).getTime();
-      const eventEnd = new Date(event.end_time).getTime();
+      // ВАЖНО: Используем _localStartTime и _localEndTime для правильного определения наложения
+      const eventStart = event._localStartTime ? event._localStartTime.getTime() : new Date(event.start_time).getTime();
+      const eventEnd = event._localEndTime ? event._localEndTime.getTime() : new Date(event.end_time).getTime();
       
       // Find all events that overlap with this one
       const overlapping = dayEvents.filter(e => {
-        const eStart = new Date(e.start_time).getTime();
-        const eEnd = new Date(e.end_time).getTime();
+        const eStart = e._localStartTime ? e._localStartTime.getTime() : new Date(e.start_time).getTime();
+        const eEnd = e._localEndTime ? e._localEndTime.getTime() : new Date(e.end_time).getTime();
         return (eStart < eventEnd && eEnd > eventStart);
       });
       
@@ -378,12 +379,12 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
       // 3. By title (alphabetically)
       // 4. By id (alphabetically) as last resort
       overlapping.sort((a, b) => {
-        const aStart = new Date(a.start_time).getTime();
-        const bStart = new Date(b.start_time).getTime();
+        const aStart = a._localStartTime ? a._localStartTime.getTime() : new Date(a.start_time).getTime();
+        const bStart = b._localStartTime ? b._localStartTime.getTime() : new Date(b.start_time).getTime();
         if (aStart !== bStart) return aStart - bStart;
         
-        const aEnd = new Date(a.end_time).getTime();
-        const bEnd = new Date(b.end_time).getTime();
+        const aEnd = a._localEndTime ? a._localEndTime.getTime() : new Date(a.end_time).getTime();
+        const bEnd = b._localEndTime ? b._localEndTime.getTime() : new Date(b.end_time).getTime();
         if (aEnd !== bEnd) return aEnd - bEnd;
         
         const aTitle = (a.title || '').toLowerCase();
