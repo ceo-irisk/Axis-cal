@@ -20,6 +20,7 @@ import { Menu } from 'lucide-react';
 
 // Mobile imports
 import { MobileCalendarPage } from '../mobile';
+import { MobileErrorBoundary } from '../mobile/components/MobileErrorBoundary';
 import { useIsMobile } from '../mobile/hooks';
 
 // Main view types
