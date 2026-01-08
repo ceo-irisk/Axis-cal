@@ -1251,8 +1251,9 @@ export const Sidebar = ({
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-medium">Правила дня</h3>
                       <button 
-                        onClick={() => { setEditingRule(null); setShowRuleModal(true); }}
+                        onClick={(e) => { e.stopPropagation(); e.preventDefault(); setEditingRule(null); setShowRuleModal(true); }}
                         className="p-1.5 rounded-lg hover:bg-accent"
+                        type="button"
                       >
                         <Plus className="w-4 h-4" />
                       </button>
