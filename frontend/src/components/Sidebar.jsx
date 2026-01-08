@@ -1527,6 +1527,22 @@ export const Sidebar = ({
           </DialogHeader>
           <div className="space-y-4 py-4">
             <p className="text-sm">Шаблон: <strong>{selectedTemplateForApply?.name}</strong></p>
+
+
+      {/* Day Rule Modal */}
+      <Dialog open={showRuleModal} onOpenChange={setShowRuleModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingRule ? 'Редактировать правило' : 'Новое правило дня'}</DialogTitle>
+          </DialogHeader>
+          <DayRuleForm 
+            initialData={editingRule} 
+            onSave={handleSaveRule}
+            onCancel={() => { setShowRuleModal(false); setEditingRule(null); }}
+          />
+        </DialogContent>
+      </Dialog>
+
             <div>
               <Label>Дата применения</Label>
               <Input 
