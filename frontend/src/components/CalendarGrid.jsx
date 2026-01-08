@@ -155,7 +155,7 @@ const TemplateSelector = ({ day, templates, appliedTemplates, onApplyTemplate, o
   );
 };
 
-export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, templates, appliedTemplates = [], overloadedDays, ratings, view, onDateClick, onCellDoubleClick, onEventClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, onEventDelete, selectedEventId, onEventSelect, loading, selectedTimezone, onTimezoneChange, eventTypes = [] }) => {
+export const CalendarGrid = ({ currentDate, selectedDate, events, calendars, templates, appliedTemplates = [], overloadedDays, ratings, view, onDateClick, onCellDoubleClick, onEventClick, onEventUpdate, onApplyTemplate, onRemoveTemplate, onEventDelete, selectedEventIds, onEventSelect, loading, selectedTimezone, onTimezoneChange, eventTypes = [] }) => {
   
   // Конвертируем события из UTC в выбранный timezone
   const eventsInTimezone = useMemo(() => {
