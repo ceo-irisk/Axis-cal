@@ -233,6 +233,7 @@ export default function CalendarPage() {
 
   const handleDateClick = (date) => {
     setSelectedDate(date);
+    setSelectedEventIds([]); // Снять выделение при клике мимо события
   };
 
   const handleCellDoubleClick = (date, hour) => {
