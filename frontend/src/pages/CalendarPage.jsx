@@ -350,12 +350,32 @@ export default function CalendarPage() {
   // Mobile version
   if (isMobile) {
     return (
-      <SimpleMobileView 
-        onOpenDesktopVersion={() => {
-          // Force desktop view
-          window.location.href = window.location.href + '?forceDesktop=true';
-        }}
-      />
+      <MobileErrorBoundary>
+        <MobileCalendarPage 
+          onOpenSidebar={(view) => {
+            setSidebarOpen(true);
+          }}
+          onEventClick={handleEventClick}
+          onCreateEvent={handleCreateEvent}
+          eventTypes={eventTypes}
+        />
+        
+        {/* Event Modal */}
+        {showEventModal && (
+          <EventModal
+            event={selectedEvent}
+            onClose={() => {
+              setShowEventModal(false);
+              setSelectedEvent(null);
+            }}
+            onSave={handleSaveEvent}
+            onDelete={handleDeleteEventById}
+            defaultTime={defaultEventTime}
+            eventTypes={eventTypes}
+            selectedTimezone={selectedTimezone}
+          />
+        )}
+      </MobileErrorBoundary>
     );
   }
 
