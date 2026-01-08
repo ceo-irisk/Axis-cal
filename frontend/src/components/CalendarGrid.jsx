@@ -645,9 +645,10 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                       onClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventSelect?.(event.id, e.shiftKey); }}
                       onDoubleClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventClick(event); }}
                       className={`
-                        absolute px-1 py-1 rounded-md text-xs ${event.is_busy ? 'cursor-default' : 'cursor-pointer'}
-                        hover:opacity-90 transition-opacity overflow-hidden group
+                        absolute px-1 py-1 rounded-md text-xs ${event.is_busy ? 'cursor-default' : 'cursor-move'}
+                        hover:opacity-90 transition-all overflow-hidden group
                         ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
+                        ${draggedEvent?.id === event.id ? 'opacity-50 scale-95' : ''}
                       `} 
                       style={{...getEventStyle(event), ...overlapStyle, ...(dynamicStyle || {})}} 
                       data-testid={`event-${event.id}`}
