@@ -9,7 +9,7 @@ import {
   getICSSubscriptions, createICSSubscription, deleteICSSubscription,
   getUsers
 } from '../lib/api';
-import { utcToLocal, formatTime, getTimezoneById, formatDate } from '../lib/timezones';
+import { utcToLocal, formatTime, getTimezoneById, formatDate, TIMEZONES } from '../lib/timezones';
 import { 
   Sun, Moon, LogOut, Plus, Trash2, Eye, EyeOff, ChevronLeft, ChevronRight, ChevronUp, ChevronDown,
   Calendar, LayoutGrid, Settings, Star, AlertTriangle, Clock, MapPin, FileText,
