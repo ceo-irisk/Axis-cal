@@ -781,11 +781,21 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
     e.preventDefault();
     if (!draggedEvent || !onEventUpdate) return;
     
+    // Получаем точную позицию мыши внутри ячейки
+    const rect = e.currentTarget.getBoundingClientRect();
+    const offsetY = e.clientY - rect.top;
+    const cellHeight = 60; // высота ячейки в px (1 час = 60px)
+    
+    // Вычисляем минуты с точностью до 15 минут
+    const totalMinutes = Math.floor((offsetY / cellHeight) * 60);
+    const roundedMinutes = Math.round(totalMinutes / 15) * 15; // округление до 15 минут
+    
     const start = parseISO(draggedEvent.start_time);
     const end = parseISO(draggedEvent.end_time);
     const duration = end - start;
     
-    const newStart = setMinutes(setHours(date, hour), 0);
+    // Создаём новое время начала с учётом минут
+    const newStart = setMinutes(setHours(date, hour), roundedMinutes);
     const newEnd = new Date(newStart.getTime() + duration);
     
     onEventUpdate({
