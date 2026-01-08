@@ -1520,6 +1520,25 @@ const TemplateForm = ({ initialData, eventTypes, onSave, onCancel }) => {
       </div>
       
       <div>
+        <Label>Часовой пояс шаблона</Label>
+        <Select value={timezone} onValueChange={setTimezone}>
+          <SelectTrigger className="mt-1">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {TIMEZONES.map(tz => (
+              <SelectItem key={tz.id} value={tz.id}>
+                {tz.name} (GMT{tz.offset >= 0 ? '+' : ''}{tz.offset})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground mt-1">
+          Все события в этом шаблоне будут использовать этот часовой пояс
+        </p>
+      </div>
+      
+      <div>
         <div className="flex items-center justify-between mb-2">
           <Label>События ({events.length})</Label>
           <Button type="button" size="sm" variant="outline" onClick={() => setShowEventForm(true)}>
