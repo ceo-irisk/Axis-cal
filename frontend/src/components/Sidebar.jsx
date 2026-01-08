@@ -1006,6 +1006,24 @@ export const Sidebar = ({
                     Справочники
                   </button>
                   <button 
+                    onClick={() => setSettingsTab(SETTINGS_TABS.DAY_RULES)} 
+                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.DAY_RULES ? 'bg-[#085C53] text-white' : 'text-muted-foreground hover:bg-accent'}`}
+                  >
+                    Правила дня
+                  </button>
+                  <button 
+                    onClick={() => setSettingsTab(SETTINGS_TABS.SURVEYS)} 
+                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.SURVEYS ? 'bg-[#085C53] text-white' : 'text-muted-foreground hover:bg-accent'}`}
+                  >
+                    Опросы
+                  </button>
+                  <button 
+                    onClick={() => setSettingsTab(SETTINGS_TABS.REPORTS)} 
+                    className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.REPORTS ? 'bg-[#085C53] text-white' : 'text-muted-foreground hover:bg-accent'}`}
+                  >
+                    Отчеты
+                  </button>
+                  <button 
                     onClick={() => setSettingsTab(SETTINGS_TABS.PROFILE)} 
                     className={`px-3 py-1.5 rounded-md text-xs transition-colors ${settingsTab === SETTINGS_TABS.PROFILE ? 'bg-[#085C53] text-white' : 'text-muted-foreground hover:bg-accent'}`}
                   >
