@@ -1245,16 +1245,46 @@ export const Sidebar = ({
                 {settingsTab === SETTINGS_TABS.SURVEYS && (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-medium">Опросы</h3>
-                      <button className="p-1.5 rounded-lg hover:bg-accent">
-                        <Plus className="w-4 h-4" />
-                      </button>
+                      <h3 className="text-sm font-medium">Вопросы опроса</h3>
                     </div>
                     
-                    <div className="text-center py-8 text-muted-foreground">
-                      <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                      <p className="text-sm">Настройка опросов</p>
-                      <p className="text-xs mt-2">Здесь вы сможете настроить вопросы для оценки дня</p>
+                    {surveyQuestions.length === 0 ? (
+                      <p className="text-xs text-muted-foreground py-4 text-center">Нет вопросов</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {surveyQuestions.sort((a, b) => a.order - b.order).map(question => (
+                          <div key={question.id} className="p-3 rounded-lg bg-accent/50">
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-muted-foreground font-mono">{question.order}.</span>
+                                <p className="text-sm">{question.question}</p>
+                              </div>
+                              <div className={`px-2 py-1 rounded text-xs ${question.is_active ? 'bg-green-500/20 text-green-600' : 'bg-gray-500/20 text-gray-600'}`}>
+                                {question.is_active ? 'Активен' : 'Неактивен'}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-muted-foreground">
+                                Тип: {question.question_type === 'scale' ? 'Шкала' : question.question_type === 'text' ? 'Текст' : question.question_type}
+                              </span>
+                              {question.options && question.options.length > 0 && (
+                                <span className="text-xs text-muted-foreground">
+                                  • Варианты: {question.options.join(', ')}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                      <div className="flex items-start gap-2">
+                        <FileText className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs text-blue-600 dark:text-blue-400">
+                          Эти вопросы задаются при нажатии кнопки "Завершить день" во вкладке "Дашборд"
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
