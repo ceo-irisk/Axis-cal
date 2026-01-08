@@ -481,8 +481,9 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
     e.preventDefault();
     
     const startY = e.clientY;
-    const eventStart = new Date(event.start_time);
-    const eventEnd = new Date(event.end_time);
+    // ВАЖНО: Используем _localStartTime и _localEndTime для корректного вычисления длительности
+    const eventStart = event._localStartTime || new Date(event.start_time);
+    const eventEnd = event._localEndTime || new Date(event.end_time);
     const originalDuration = (eventEnd - eventStart) / 60000; // minutes
     
     const handleMouseMove = (moveEvent) => {
