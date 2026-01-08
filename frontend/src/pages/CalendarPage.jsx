@@ -72,6 +72,7 @@ export default function CalendarPage() {
     
     try {
       const targetDateStr = format(selectedDate, 'yyyy-MM-dd');
+      const newEvents = [];
       
       for (const event of copiedEvents) {
         // Create new event based on copied event
@@ -85,16 +86,18 @@ export default function CalendarPage() {
           timezone: selectedTimezone
         };
         
-        await createEvent(newEventData);
+        const createdEvent = await createEvent(newEventData);
+        newEvents.push(createdEvent);
       }
       
+      // Update events locally
+      setEvents(prev => [...prev, ...newEvents]);
       toast.success(`Вставлено событий: ${copiedEvents.length}`);
-      fetchData(); // Refresh events
     } catch (error) {
       console.error('Error pasting events:', error);
       toast.error('Ошибка вставки событий');
     }
-  }, [copiedEvents, selectedDate, selectedTimezone, fetchData]);
+  }, [copiedEvents, selectedDate, selectedTimezone]);
 
   // Handle keyboard events for deleting selected event
   useEffect(() => {
