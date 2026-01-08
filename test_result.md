@@ -210,6 +210,18 @@ frontend:
         agent: "testing"
         comment: "✅ BUG FIXED: Calendar hide/show functionality is now working correctly. Tested with admin@company.com login. All core features work: 1) Eye icon toggles to EyeOff when calendar is hidden 2) Calendar text gets line-through styling when hidden 3) Icon and text return to normal state when shown again 4) Events from hidden calendars are filtered from view. Minor issue: React warning 'Cannot update a component while rendering' appears when hiding calendar - this is non-critical and doesn't affect functionality. The warning is caused by calling onHiddenCalendarsChange inside setState callback in Sidebar.toggleCalendarVisibility (line 449). Recommendation: Move the parent state update outside the setState callback using useEffect to eliminate the warning."
 
+  - task: "Day Rules Management UI"
+    implemented: true
+    working: false
+    file: "frontend/src/components/Sidebar.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL BUG: Day Rules management UI has a critical bug. Tested with admin@company.com login. WORKING FEATURES: ✅ Settings tab (4th tab) opens correctly ✅ 'Правила дня' sub-tab displays correctly ✅ 3 default rules are displayed: 'Максимум встреч' (8 встреч), 'Минимальный перерыв' (15 минут), 'Максимум рабочих часов' (10 часов) ✅ '+' button is visible in the Day Rules section. CRITICAL BUG: ❌ When clicking the '+' button in the Day Rules section (line 1254-1258 in Sidebar.jsx), it opens 'Новое событие' (New Event) modal instead of 'Новое правило дня' (New Day Rule) modal. The button should call setShowRuleModal(true) but instead it's triggering the Event creation modal. This prevents users from creating new day rules through the UI. ROOT CAUSE: The '+' button click handler is not properly isolated or there's a conflicting event handler that's intercepting the click. UNABLE TO TEST: Due to this bug, could not test: rule creation form, rule editing, rule deletion, rule toggle (Eye button), hover action buttons. FIX REQUIRED: Debug why the '+' button in Day Rules section opens Event modal instead of Rule modal. Check for event propagation issues or conflicting click handlers."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
