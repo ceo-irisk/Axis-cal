@@ -1294,11 +1294,37 @@ export const Sidebar = ({
                   <div className="space-y-4">
                     <h3 className="text-sm font-medium">История оценок</h3>
                     
-                    <div className="text-center py-8 text-muted-foreground">
-                      <Star className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                      <p className="text-sm">Отчеты по дням</p>
-                      <p className="text-xs mt-2">Просмотр истории оценок и анализ эффективности</p>
-                    </div>
+                    {Object.keys(ratings || {}).length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Star className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                        <p className="text-sm">Нет оценок</p>
+                        <p className="text-xs mt-2">Оценки дней будут отображаться здесь</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {Object.entries(ratings)
+                          .sort(([dateA], [dateB]) => dateB.localeCompare(dateA))
+                          .map(([date, ratingData]) => (
+                            <div key={date} className="p-3 rounded-lg bg-accent/50">
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="text-sm font-medium">{format(new Date(date + 'T00:00:00'), 'd MMMM, EEEE', { locale: ru })}</p>
+                                <div className="flex gap-0.5">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star 
+                                      key={star} 
+                                      className={`w-3 h-3 ${star <= ratingData.rating ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground'}`} 
+                                      strokeWidth={1.5} 
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                              {ratingData.notes && (
+                                <p className="text-xs text-muted-foreground mt-1">{ratingData.notes}</p>
+                              )}
+                            </div>
+                          ))}
+                      </div>
+                    )}
                   </div>
                 )}
 
