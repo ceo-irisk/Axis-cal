@@ -807,7 +807,7 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
           <div className="space-y-1">
             {allDayEvents.map(event => {
               const dynamicStyle = getEventDynamicStyle(event, eventTypes);
-              const isSelected = selectedEventId === event.id;
+              const isSelected = selectedEventIds?.includes(event.id);
               return (
                 <div 
                   key={event.id}
@@ -867,7 +867,7 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
             const eventTimeDisplay = event._displayStartTime || formatTime(new Date(event.start_time));
             const dynamicStyle = getEventDynamicStyle(event, eventTypes);
             const overlapStyle = getOverlapStyle(event);
-            const isSelected = selectedEventId === event.id;
+            const isSelected = selectedEventIds?.includes(event.id);
             
             // Формируем отображение времени с исходным timezone если отличается
             let timeDisplayText = eventTimeDisplay;
