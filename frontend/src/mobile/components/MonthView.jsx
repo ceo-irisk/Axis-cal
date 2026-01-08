@@ -10,19 +10,38 @@ export const MonthView = ({
   events = [],
   getEventTypeColor 
 }) => {
-  const monthStart = startOfMonth(currentMonth);
-  const monthEnd = endOfMonth(currentMonth);
-  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
-  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+  let monthStart, monthEnd, calendarStart, calendarEnd, calendarDays;
   
-  const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+  try {
+    monthStart = startOfMonth(currentMonth);
+    monthEnd = endOfMonth(currentMonth);
+    calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+    calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+    calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+  } catch (e) {
+    console.error('Month calculation error:', e);
+    // Fallback to current month
+    const now = new Date();
+    monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    calendarDays = [];
+    for (let i = 1; i <= monthEnd.getDate(); i++) {
+      calendarDays.push(new Date(now.getFullYear(), now.getMonth(), i));
+    }
+  }
+  
   const weekDayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
   const getEventsForDay = (day) => {
-    return events.filter(event => {
-      const eventDate = new Date(event.start_time);
-      return isSameDay(eventDate, day);
-    });
+    try {
+      return events.filter(event => {
+        const eventDate = new Date(event.start_time);
+        return isSameDay(eventDate, day);
+      });
+    } catch (e) {
+      console.error('Events filter error:', e);
+      return [];
+    }
   };
 
   return (
