@@ -453,8 +453,14 @@ export const Sidebar = ({
     });
   }, [events, selectedTimezone]);
   
+  // Separate all-day and timed events
   const allDayEvents = eventsInTimezone.filter(e => e.is_all_day);
-  const timedEvents = eventsInTimezone.filter(e => !e.is_all_day);
+  const timedEvents = eventsInTimezone.filter(e => !e.is_all_day).sort((a, b) => {
+    // Sort timed events by start time using _localStartTime
+    const aStart = a._localStartTime ? a._localStartTime.getTime() : new Date(a.start_time).getTime();
+    const bStart = b._localStartTime ? b._localStartTime.getTime() : new Date(b.start_time).getTime();
+    return aStart - bStart;
+  });
 
   // Calculate total event hours for dashboard (исключаем all-day события)
   const totalMinutes = timedEvents.reduce((acc, event) => {
