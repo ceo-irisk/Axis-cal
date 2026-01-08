@@ -1459,6 +1459,7 @@ const EventStatusForm = ({ initialData, onSave, onCancel }) => {
 const TemplateForm = ({ initialData, eventTypes, onSave, onCancel }) => {
   const [name, setName] = useState(initialData?.name || '');
   const [templateType, setTemplateType] = useState(initialData?.template_type || 'day');
+  const [timezone, setTimezone] = useState(initialData?.timezone || 'Europe/Moscow');
   const [events, setEvents] = useState(initialData?.events || []);
   const [showEventForm, setShowEventForm] = useState(false);
   const [editingEventIdx, setEditingEventIdx] = useState(null);
@@ -1487,7 +1488,7 @@ const TemplateForm = ({ initialData, eventTypes, onSave, onCancel }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name.trim()) return;
-    onSave({ name: name.trim(), template_type: templateType, events });
+    onSave({ name: name.trim(), template_type: templateType, timezone, events });
   };
 
   if (showEventForm) {
