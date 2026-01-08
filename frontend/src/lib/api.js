@@ -122,22 +122,8 @@ export const getSurveyResponse = (date) => api.get(`/survey/responses/${date}`);
 
 // Rules
 export const getRules = () => api.get('/rules');
-export const createRule = (name, description, ruleType, value) => {
-  const params = new URLSearchParams();
-  params.append('name', name);
-  params.append('description', description);
-  params.append('rule_type', ruleType);
-  params.append('value', value);
-  return api.post(`/rules?${params.toString()}`);
-};
-export const updateRule = (id, name, description, ruleType, value) => {
-  const params = new URLSearchParams();
-  params.append('name', name);
-  params.append('description', description);
-  params.append('rule_type', ruleType);
-  params.append('value', value);
-  return api.put(`/rules/${id}?${params.toString()}`);
-};
+export const createRule = (data) => api.post('/rules', data);
+export const updateRule = (id, data) => api.put(`/rules/${id}`, data);
 export const deleteRule = (id) => api.delete(`/rules/${id}`);
 export const checkDayRules = (date) => api.get(`/rules/check/${date}`);
 
