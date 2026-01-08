@@ -36,18 +36,36 @@ export const TwoDayGrid = ({
 
     if (isLeftSwipe) {
       // Swipe left = next days
-      onDateChange(addDays(currentDate, 2));
+      try {
+        onDateChange(addDays(currentDate, 2));
+      } catch (e) {
+        console.error('Date change error:', e);
+      }
     }
     if (isRightSwipe) {
       // Swipe right = previous days
-      onDateChange(subDays(currentDate, 2));
+      try {
+        onDateChange(subDays(currentDate, 2));
+      } catch (e) {
+        console.error('Date change error:', e);
+      }
     }
   };
 
   // Get two days to display
-  const day1 = startOfDay(currentDate);
-  const day2 = addDays(day1, 1);
-  const days = [day1, day2];
+  let day1, day2, days;
+  try {
+    day1 = startOfDay(currentDate);
+    day2 = addDays(day1, 1);
+    days = [day1, day2];
+  } catch (e) {
+    console.error('Date calculation error:', e);
+    // Fallback to simple dates
+    day1 = new Date(currentDate);
+    day2 = new Date(currentDate);
+    day2.setDate(day2.getDate() + 1);
+    days = [day1, day2];
+  }
 
   // Group events by day
   const getEventsForDay = (day) => {
