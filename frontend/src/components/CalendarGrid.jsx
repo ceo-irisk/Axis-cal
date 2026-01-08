@@ -263,7 +263,7 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
                   return (
                     <div 
                       key={event.id} 
-                      onClick={(e) => { e.stopPropagation(); onEventSelect?.(event.id); }} 
+                      onClick={(e) => { e.stopPropagation(); onEventSelect?.(event.id, e.shiftKey); }} 
                       onDoubleClick={(e) => { e.stopPropagation(); onEventClick(event); }}
                       className={`px-2 py-0.5 rounded text-xs truncate cursor-pointer hover:opacity-80 ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
                       style={dynamicStyle || {}}
@@ -540,8 +540,8 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                   return (
                     <div 
                       key={event.id}
-                      onClick={() => onEventSelect?.(event.id)}
-                      onDoubleClick={() => onEventClick(event)}
+                      onClick={(e) => onEventSelect?.(event.id, e.shiftKey)}
+                      onDoubleClick={(e) => onEventClick(event)}
                       className={`px-2 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
                       style={dynamicStyle || {}}
                     >
@@ -631,7 +631,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                       key={event.id} 
                       draggable={!event.is_busy}
                       onDragStart={(e) => !event.is_busy && handleDragStart(e, event)}
-                      onClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventSelect?.(event.id); }}
+                      onClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventSelect?.(event.id, e.shiftKey); }}
                       onDoubleClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventClick(event); }}
                       className={`
                         absolute px-1 py-1 rounded-md text-xs ${event.is_busy ? 'cursor-default' : 'cursor-pointer'}
@@ -811,8 +811,8 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
               return (
                 <div 
                   key={event.id}
-                  onClick={() => onEventSelect?.(event.id)}
-                  onDoubleClick={() => onEventClick(event)}
+                  onClick={(e) => onEventSelect?.(event.id, e.shiftKey)}
+                  onDoubleClick={(e) => onEventClick(event)}
                   className={`px-3 py-1.5 rounded text-sm cursor-pointer hover:opacity-80 ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
                   style={dynamicStyle || {}}
                 >
@@ -881,7 +881,7 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
                 key={event.id}
                 draggable={!event.is_busy}
                 onDragStart={(e) => !event.is_busy && handleDragStart(e, event)}
-                onClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventSelect?.(event.id); }}
+                onClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventSelect?.(event.id, e.shiftKey); }}
                 onDoubleClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventClick(event); }}
                 className={`
                   absolute px-2 py-1.5 rounded-lg ${event.is_busy ? 'cursor-default' : 'cursor-pointer'}
