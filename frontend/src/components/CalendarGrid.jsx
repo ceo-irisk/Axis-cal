@@ -650,7 +650,12 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                         ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
                         ${draggedEvent?.id === event.id ? 'opacity-50 scale-95' : ''}
                       `} 
-                      style={{...getEventStyle(event), ...overlapStyle, ...(dynamicStyle || {})}} 
+                      style={{
+                        ...getEventStyle(event), 
+                        ...overlapStyle, 
+                        ...(dynamicStyle || {}),
+                        pointerEvents: draggedEvent && draggedEvent.id !== event.id ? 'none' : 'auto'
+                      }} 
                       data-testid={`event-${event.id}`}
                     >
                       <div className="flex items-start justify-between gap-1 h-full">
