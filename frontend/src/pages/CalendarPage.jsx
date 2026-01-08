@@ -346,6 +346,41 @@ export default function CalendarPage() {
     return format(currentDate, 'LLLL yyyy', { locale: ru });
   };
 
+  // Mobile version
+  if (isMobile) {
+    return (
+      <>
+        <MobileCalendarPage 
+          onOpenSidebar={(view) => {
+            // Handle sidebar opening on mobile
+            // For now, we'll handle this later
+            setSidebarOpen(true);
+          }}
+          onEventClick={handleEventClick}
+          onCreateEvent={handleCreateEvent}
+          eventTypes={eventTypes}
+        />
+        
+        {/* Event Modal */}
+        {showEventModal && (
+          <EventModal
+            event={selectedEvent}
+            onClose={() => {
+              setShowEventModal(false);
+              setSelectedEvent(null);
+            }}
+            onSave={handleSaveEvent}
+            onDelete={handleDeleteEventById}
+            defaultTime={defaultEventTime}
+            eventTypes={eventTypes}
+            selectedTimezone={selectedTimezone}
+          />
+        )}
+      </>
+    );
+  }
+
+  // Desktop version
   return (
     <div className="flex min-h-screen bg-background" data-testid="calendar-page">
       <Sidebar 
