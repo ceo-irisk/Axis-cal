@@ -18,6 +18,10 @@ import { format, startOfMonth, endOfMonth, addMonths, subMonths, addWeeks, subWe
 import { ru } from 'date-fns/locale';
 import { Menu } from 'lucide-react';
 
+// Mobile imports
+import { MobileCalendarPage } from '../mobile';
+import { useIsMobile } from '../mobile/hooks';
+
 // Main view types
 const MAIN_VIEW = {
   CALENDAR: 'calendar',
