@@ -19,7 +19,8 @@ import { ru } from 'date-fns/locale';
 import { Menu } from 'lucide-react';
 
 // Mobile imports
-import { SimpleMobileView } from '../mobile/components/SimpleMobileView';
+import { MobileCalendarPage } from '../mobile';
+import { MobileErrorBoundary } from '../mobile/components/MobileErrorBoundary';
 import { useIsMobile } from '../mobile/hooks';
 
 // Main view types
