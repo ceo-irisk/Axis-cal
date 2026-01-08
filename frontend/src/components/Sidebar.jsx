@@ -2055,3 +2055,4 @@ const DayRuleForm = ({ initialData, onSave, onCancel }) => {
 };
 
 export default Sidebar;
+export default Sidebar;
