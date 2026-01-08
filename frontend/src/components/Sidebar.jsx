@@ -726,20 +726,24 @@ export const Sidebar = ({
                               key={event.id} 
                               onClick={() => onEventClick?.(event)} 
                               className={`w-full text-left p-3 rounded-xl transition-colors ${
-                                isUnconfirmed 
-                                  ? 'border-2 border-dashed bg-transparent hover:bg-accent/10'
+                                isUnconfirmed || isTemplate
+                                  ? 'border-2 bg-transparent hover:bg-accent/10'
                                   : 'bg-accent hover:bg-border'
-                              }`}
-                              style={isUnconfirmed ? { borderColor: eventColor } : {}}
+                              } ${isTemplate ? 'border-solid' : isUnconfirmed ? 'border-dashed' : ''}`}
+                              style={
+                                isUnconfirmed || isTemplate
+                                  ? { borderColor: eventColor }
+                                  : {}
+                              }
                               data-testid={`sidebar-event-${event.id}`}
                             >
                               <div className="flex items-start justify-between gap-2">
                                 <div className="flex items-center gap-2">
                                   <div 
-                                    className={`w-2 h-2 rounded-full ${isUnconfirmed ? 'border' : ''}`} 
+                                    className={`w-2 h-2 rounded-full ${isUnconfirmed || isTemplate ? 'border' : ''}`} 
                                     style={{ 
-                                      backgroundColor: isUnconfirmed ? 'transparent' : (event.is_busy ? '#6b7280' : eventColor),
-                                      borderColor: isUnconfirmed ? eventColor : 'transparent'
+                                      backgroundColor: (isUnconfirmed || isTemplate) ? 'transparent' : (event.is_busy ? '#6b7280' : eventColor),
+                                      borderColor: (isUnconfirmed || isTemplate) ? eventColor : 'transparent'
                                     }}
                                   />
                                   <p className="font-medium text-sm truncate">{event.title}</p>
