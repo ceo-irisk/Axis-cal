@@ -350,7 +350,7 @@ export default function CalendarPage() {
   // Mobile version
   if (isMobile) {
     return (
-      <>
+      <MobileErrorBoundary>
         <MobileCalendarPage 
           onOpenSidebar={(view) => {
             // Handle sidebar opening on mobile
@@ -377,7 +377,7 @@ export default function CalendarPage() {
             selectedTimezone={selectedTimezone}
           />
         )}
-      </>
+      </MobileErrorBoundary>
     );
   }
 
