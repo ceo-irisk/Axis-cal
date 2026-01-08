@@ -687,11 +687,15 @@ export const Sidebar = ({
                               key={event.id} 
                               onClick={() => onEventClick?.(event)} 
                               className={`w-full text-left p-3 rounded-xl transition-colors ${
-                                isUnconfirmed 
-                                  ? 'border-2 border-dashed bg-transparent hover:bg-accent/10'
+                                isUnconfirmed || isTemplate
+                                  ? 'border-2 bg-transparent hover:bg-accent/10'
                                   : 'bg-accent/50 hover:bg-accent'
-                              }`}
-                              style={isUnconfirmed ? { borderColor: eventColor } : { borderLeft: `4px solid ${eventColor}` }}
+                              } ${isTemplate ? 'border-solid' : isUnconfirmed ? 'border-dashed' : ''}`}
+                              style={
+                                isUnconfirmed || isTemplate
+                                  ? { borderColor: eventColor }
+                                  : { borderLeft: `4px solid ${eventColor}` }
+                              }
                               data-testid={`sidebar-event-${event.id}`}
                             >
                               <div className="flex items-center justify-between gap-2">
