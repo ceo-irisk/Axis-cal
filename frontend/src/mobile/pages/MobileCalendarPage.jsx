@@ -28,10 +28,13 @@ export const MobileCalendarPage = ({
   useEffect(() => {
     const loadEvents = async () => {
       try {
+        setLoading(true);
         const res = await getEvents();
         setEvents(res.data || []);
       } catch (e) {
         console.error('Error loading events:', e);
+      } finally {
+        setLoading(false);
       }
     };
     loadEvents();
