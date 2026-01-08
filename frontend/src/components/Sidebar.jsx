@@ -1278,21 +1278,24 @@ export const Sidebar = ({
                               </div>
                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button
-                                  onClick={() => handleToggleRule(rule)}
+                                  onClick={(e) => { e.stopPropagation(); handleToggleRule(rule); }}
                                   className={`p-1.5 rounded hover:bg-background transition-colors ${rule.is_active ? 'text-green-600' : 'text-gray-500'}`}
                                   title={rule.is_active ? 'Отключить' : 'Включить'}
+                                  type="button"
                                 >
                                   {rule.is_active ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                                 </button>
                                 <button
-                                  onClick={() => { setEditingRule(rule); setShowRuleModal(true); }}
+                                  onClick={(e) => { e.stopPropagation(); setEditingRule(rule); setShowRuleModal(true); }}
                                   className="p-1.5 rounded hover:bg-background"
+                                  type="button"
                                 >
                                   <Edit2 className="w-3.5 h-3.5" />
                                 </button>
                                 <button
-                                  onClick={() => handleDeleteRule(rule.id)}
+                                  onClick={(e) => { e.stopPropagation(); handleDeleteRule(rule.id); }}
                                   className="p-1.5 rounded hover:bg-red-500/20"
+                                  type="button"
                                 >
                                   <Trash2 className="w-3.5 h-3.5 text-red-500" />
                                 </button>
