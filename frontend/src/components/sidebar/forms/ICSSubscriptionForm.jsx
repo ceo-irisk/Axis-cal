@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Button } from '../ui/button';
-import { DialogFooter } from '../ui/dialog';
+import { Input } from '../../ui/input';
+import { Label } from '../../ui/label';
+import { Button } from '../../ui/button';
+import { DialogFooter } from '../../ui/dialog';
 
 export const ICSSubscriptionForm = ({ onSave, onCancel }) => {
   const [url, setUrl] = useState('');
