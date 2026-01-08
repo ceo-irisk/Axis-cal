@@ -100,12 +100,20 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
     template_timezone_id = template.get("timezone", "Europe/Moscow")
     
     for event_template in template.get("events", []):
-        # Parse relative time
-        start_time_str = event_template.get("start_time", "09:00")
-        end_time_str = event_template.get("end_time", "10:00")
-        
-        start_hour, start_minute = map(int, start_time_str.split(":"))
-        end_hour, end_minute = map(int, end_time_str.split(":"))
+        # Parse relative time from template
+        # Template может хранить либо старый формат (start_time: "09:00") 
+        # либо новый формат (start_hour: 9, start_minute: 0)
+        if "start_hour" in event_template:
+            start_hour = event_template.get("start_hour", 9)
+            start_minute = event_template.get("start_minute", 0)
+            end_hour = event_template.get("end_hour", 10)
+            end_minute = event_template.get("end_minute", 0)
+        else:
+            # Старый формат
+            start_time_str = event_template.get("start_time", "09:00")
+            end_time_str = event_template.get("end_time", "10:00")
+            start_hour, start_minute = map(int, start_time_str.split(":"))
+            end_hour, end_minute = map(int, end_time_str.split(":"))
         
         # Создаём naive datetime с указанным временем
         naive_start = target_dt.replace(hour=start_hour, minute=start_minute, second=0, microsecond=0)
