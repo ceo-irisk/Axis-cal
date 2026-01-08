@@ -16,7 +16,6 @@ import SurveyModal from '../components/SurveyModal';
 import UsersPanel from '../components/UsersPanel';
 import { format, startOfMonth, endOfMonth, addMonths, subMonths, addWeeks, subWeeks, addDays, subDays } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { toast } from 'sonner';
 import { Menu } from 'lucide-react';
 
 // Main view types
