@@ -53,8 +53,42 @@ export default function LoginPage() {
       <div className="relative w-full max-w-md animate-fade-in">
         <div className="card-glass rounded-3xl p-8">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-36 h-20 mb-4 overflow-hidden">
-              <img src="/logo.png" alt="Axis" className="w-auto h-[200%] object-cover" />
+            <div className="inline-flex items-center justify-center w-24 h-24 mb-4">
+              <svg
+                width="100%"
+                height="100%"
+                viewBox="0 0 512 512"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* Левая ножка A */}
+                <path
+                  d="M156 448 L256 64 L296 64 L196 448 Z"
+                  fill="#B0B0B0"
+                />
+
+                {/* Правая ножка A */}
+                <path
+                  d="M256 64 L356 448 L316 448 L216 64 Z"
+                  fill="#B0B0B0"
+                />
+
+                {/* Короткая перекладина */}
+                <rect
+                  x="256"
+                  y="260"
+                  width="80"
+                  height="20"
+                  fill="#B0B0B0"
+                />
+
+                {/* Акцентная точка */}
+                <circle
+                  cx="256"
+                  cy="270"
+                  r="32"
+                  fill="#085C53"
+                />
+              </svg>
             </div>
             <h1 className="text-2xl font-semibold tracking-tight mb-2 text-[var(--primary-text)]">
               Axis
