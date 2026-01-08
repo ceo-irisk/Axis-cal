@@ -30,6 +30,7 @@ const MAIN_VIEW = {
 
 export default function CalendarPage() {
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   const [mainView, setMainView] = useState(MAIN_VIEW.CALENDAR);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState('week'); // По умолчанию неделя
