@@ -6,6 +6,7 @@ import uuid
 class TemplateBase(BaseModel):
     name: str
     template_type: str  # day, week
+    timezone: str = "Europe/Moscow"  # Timezone для всех событий шаблона
     events: List[Dict[str, Any]] = []  # relative times and event templates
     is_active: bool = True
 
