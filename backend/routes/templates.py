@@ -95,6 +95,10 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
     
     # Prepare events to create
     created_events = []
+    
+    # Получаем timezone шаблона
+    template_timezone_id = template.get("timezone", "Europe/Moscow")
+    
     for event_template in template.get("events", []):
         # Parse relative time
         start_time_str = event_template.get("start_time", "09:00")
@@ -103,16 +107,30 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
         start_hour, start_minute = map(int, start_time_str.split(":"))
         end_hour, end_minute = map(int, end_time_str.split(":"))
         
-        # Use target_dt date but with specified time
-        event_start = target_dt.replace(hour=start_hour, minute=start_minute, second=0, microsecond=0)
-        event_end = target_dt.replace(hour=end_hour, minute=end_minute, second=0, microsecond=0)
+        # Создаём naive datetime с указанным временем
+        naive_start = target_dt.replace(hour=start_hour, minute=start_minute, second=0, microsecond=0)
+        naive_end = target_dt.replace(hour=end_hour, minute=end_minute, second=0, microsecond=0)
+        
+        # Привязываем к timezone шаблона
+        try:
+            tz = pytz.timezone(template_timezone_id)
+            local_start = tz.localize(naive_start)
+            local_end = tz.localize(naive_end)
+            
+            # Конвертируем в UTC
+            utc_start = local_start.astimezone(pytz.UTC)
+            utc_end = local_end.astimezone(pytz.UTC)
+        except Exception as e:
+            logger.warning(f"Failed to convert timezone {template_timezone_id}: {e}. Using naive datetime.")
+            utc_start = naive_start.replace(tzinfo=timezone.utc)
+            utc_end = naive_end.replace(tzinfo=timezone.utc)
         
         event_dict = {
             "id": str(uuid.uuid4()),
             "title": event_template.get("title", "Untitled"),
             "description": event_template.get("description", ""),
-            "start_time": event_start.isoformat(),
-            "end_time": event_end.isoformat(),
+            "start_time": utc_start.isoformat(),
+            "end_time": utc_end.isoformat(),
             "event_type": event_template.get("event_type", "meeting"),
             "status": "template",
             "created_by": user["id"],
@@ -120,12 +138,12 @@ async def apply_template(template_id: str, target_date: str, user: dict = Depend
             "attendees": [],
             "location": event_template.get("location", ""),
             "is_all_day": False,
-            "is_urgent": False,
-            "is_blocked": False,
-            "is_completed": False,
-            "is_video_call": False,
+            "is_urgent": event_template.get("is_urgent", False),
+            "is_blocked": event_template.get("is_blocked", False),
+            "is_completed": event_template.get("is_completed", False),
+            "is_video_call": event_template.get("is_video_call", False),
             "recurrence_type": "none",
-            "timezone": user.get("timezone", "Europe/Moscow"),
+            "timezone": template_timezone_id,  # Используем timezone шаблона
             "created_at": datetime.now(timezone.utc).isoformat(),
             "updated_at": datetime.now(timezone.utc).isoformat(),
             # ✨ Template tracking
