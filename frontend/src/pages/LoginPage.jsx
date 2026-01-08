@@ -55,7 +55,6 @@ export default function LoginPage() {
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-24 h-24 mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
-                {/* A */}
                 <path fill="#B0B0B0" d="
                   M 120 456
                   L 240 56
@@ -66,8 +65,6 @@ export default function LoginPage() {
                   L 182 456
                   Z
                 "/>
-
-                {/* акцент */}
                 <circle cx="292" cy="272" r="44" fill="#085C53"/>
               </svg>
             </div>
