@@ -8,7 +8,7 @@ import {
   getTemplates, createTemplate, updateTemplate, deleteTemplate, applyTemplate,
   getICSSubscriptions, createICSSubscription, deleteICSSubscription,
   getUsers,
-  getRules, createRule, updateRule, deleteRule,
+  getRules, createRule, updateRule, deleteRule, toggleRule,
   getSurveyQuestions, createSurveyQuestion, updateSurveyQuestion, deleteSurveyQuestion,
   getSurveyResponses
 } from '../lib/api';
@@ -42,6 +42,24 @@ import {
   DialogFooter,
 } from './ui/dialog';
 import CalendarPermissionsModal from './CalendarPermissionsModal';
+
+// Import refactored components
+import { EventIcons } from './sidebar/EventIcons';
+import { CALENDAR_ICONS, CALENDAR_COLORS, TABS, SETTINGS_TABS } from './sidebar/constants';
+import { 
+  ICSSubscriptionForm, 
+  EventTypeForm, 
+  EventStatusForm, 
+  TemplateForm, 
+  DayRuleForm 
+} from './sidebar/forms';
+import { 
+  TemplatesSettings, 
+  DictionariesSettings, 
+  DayRulesSettings, 
+  SurveysSettings, 
+  ReportsSettings 
+} from './sidebar/settings';
 
 // Available calendar icons
 const CALENDAR_ICONS = {
