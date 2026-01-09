@@ -424,8 +424,8 @@ export const Sidebar = ({
     onHiddenCalendarsChange?.(hiddenCalendars);
   }, [hiddenCalendars, onHiddenCalendarsChange]);
 
-  const myCalendars = calendars.filter(c => !c.owner); // Own calendars
-  const sharedCalendars = calendars.filter(c => c.owner); // Calendars shared with me
+  const myCalendars = calendars.filter(c => c.is_own !== false); // Own calendars
+  const sharedCalendars = calendars.filter(c => c.is_own === false); // Calendars shared with me
   const externalCalendars = calendars.filter(c => c.provider !== 'custom');
 
   const handleLogout = () => { logout(); };
