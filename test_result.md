@@ -279,6 +279,7 @@ test_plan:
     - "Backend Refactoring - Dictionaries Routes"
   test_all: false
   test_priority: "high_first"
+  last_tested: "Event Type Creation UI"
 
 agent_communication:
   - agent: "testing"
