@@ -84,7 +84,7 @@ export const DayRulesSettings = ({
         <div className="flex items-start gap-2">
           <AlertTriangle className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-blue-600 dark:text-blue-400">
-            Правила дня автоматически проверяются для каждого дня. Нарушения отображаются во вкладке "Дашборд"
+            Правила дня автоматически проверяются для каждого дня. Нарушения отображаются во вкладке &ldquo;Дашборд&rdquo;
           </p>
         </div>
       </div>
