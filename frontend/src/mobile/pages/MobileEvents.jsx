@@ -1,4 +1,4 @@
-import { EventIcons } from '../EventIcons';
+import { EventIcons } from '../../components/sidebar/EventIcons';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
