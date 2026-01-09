@@ -127,3 +127,7 @@ websockets==15.0.1
 yarl==1.22.0
 zipp==3.23.0
 redis==5.2.0
+# Push notifications for mobile apps
+# aioapns==3.3.0  # Uncomment when ready to implement iOS push notifications
+# firebase-admin==6.3.0  # Uncomment when ready to implement Android push notifications
+
