@@ -21,6 +21,15 @@ async def get_calendars(user: dict = Depends(get_current_user)):
     # Get user's own calendars
     calendars = await db.calendars.find({"user_id": user["id"]}, {"_id": 0}).to_list(100)
     
+    # Add current user as owner for own calendars
+    for cal in calendars:
+        cal["owner"] = {
+            "id": user["id"],
+            "name": user["name"],
+            "email": user["email"]
+        }
+        cal["is_own"] = True
+    
     # Get calendars where user has permissions
     permissions = await db.calendar_permissions.find({"user_id": user["id"]}, {"_id": 0}).to_list(100)
     permitted_calendar_ids = [p["calendar_id"] for p in permissions]
@@ -43,6 +52,7 @@ async def get_calendars(user: dict = Depends(get_current_user)):
         # Attach owner info to shared calendars
         for cal in shared_calendars:
             cal["owner"] = user_map.get(cal["user_id"])
+            cal["is_own"] = False
         
         calendars.extend(shared_calendars)
     
