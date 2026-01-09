@@ -96,9 +96,6 @@ export const MobileCalendarPage = ({
           <header className="flex items-center justify-between px-4 py-3 border-b border-border bg-background sticky top-0 z-10">
             <div>
               <h1 className="text-lg font-bold">Axis Calendar</h1>
-              <p className="text-xs text-muted-foreground">
-                {format(currentDate, 'd MMMM yyyy', { locale: ru })}
-              </p>
             </div>
 
             {/* View mode toggle */}
