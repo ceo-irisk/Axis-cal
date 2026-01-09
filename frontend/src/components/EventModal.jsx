@@ -461,8 +461,8 @@ export const EventModal = ({
                 <SelectContent position="popper" sideOffset={4}>
                   {/* Group calendars by ownership */}
                   {(() => {
-                    const ownCalendars = calendars.filter(cal => !cal.is_shared);
-                    const sharedCalendars = calendars.filter(cal => cal.is_shared);
+                    const ownCalendars = calendars.filter(cal => cal.is_own !== false);
+                    const sharedCalendars = calendars.filter(cal => cal.is_own === false);
                     
                     return (
                       <>
@@ -495,16 +495,15 @@ export const EventModal = ({
                             </div>
                             {sharedCalendars.map(cal => {
                               const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
+                              const ownerName = cal.owner?.name || 'Неизвестный';
                               return (
                                 <SelectItem key={cal.id} value={cal.id}>
                                   <div className="flex items-center gap-2">
                                     <Users className="w-3.5 h-3.5 text-muted-foreground" />
                                     <span>{cal.name}</span>
-                                    {cal.permission_level && (
-                                      <span className="text-xs text-muted-foreground ml-1">
-                                        ({cal.permission_level})
-                                      </span>
-                                    )}
+                                    <span className="text-xs text-muted-foreground">
+                                      ({ownerName})
+                                    </span>
                                   </div>
                                 </SelectItem>
                               );
