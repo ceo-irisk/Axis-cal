@@ -265,11 +265,14 @@ const MonthView = ({ currentDate, selectedDate, events, overloadedDays, ratings,
                       key={event.id} 
                       onClick={(e) => { e.stopPropagation(); onEventSelect?.(event.id, e.shiftKey); }} 
                       onDoubleClick={(e) => { e.stopPropagation(); onEventClick(event); }}
-                      className={`px-2 py-0.5 rounded text-xs truncate cursor-pointer hover:opacity-80 ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
+                      className={`px-2 py-0.5 rounded cursor-pointer hover:opacity-80 ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
                       style={dynamicStyle || {}}
                       data-testid={`event-${event.id}`}
+                      title={event.title}
                     >
-                      {event.title}
+                      <div className="text-xs font-medium truncate leading-tight">
+                        {event.title}
+                      </div>
                     </div>
                   );
                 })}
