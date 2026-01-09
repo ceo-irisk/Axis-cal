@@ -95,9 +95,9 @@ export const TwoDayGrid = ({
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="absolute inset-0 flex flex-col">
       {/* Header with navigation */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background sticky top-0 z-10">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background z-10">
         <button 
           onClick={() => onDateChange(subDays(currentDate, 2))}
           className="p-2 rounded-lg hover:bg-accent"
