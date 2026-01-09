@@ -173,11 +173,7 @@ export const reorderEventTypes = (typeIds) => api.put('/dictionaries/event-types
 // Dictionaries - Event Statuses
 export const getEventStatuses = () => api.get('/dictionaries/event-statuses');
 export const createEventStatus = (name, label, color) => {
-  const params = new URLSearchParams();
-  params.append('name', name);
-  params.append('label', label);
-  params.append('color', color);
-  return api.post(`/dictionaries/event-statuses?${params.toString()}`);
+  return api.post('/dictionaries/event-statuses', { name, label, color });
 };
 export const updateEventStatus = (id, name, label, color, order = 0, isActive = true) => {
   const params = new URLSearchParams();
