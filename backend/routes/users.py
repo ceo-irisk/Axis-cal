@@ -85,7 +85,15 @@ async def update_user(user_id: str, user_data: UserBase, admin: dict = Depends(r
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    update_data = user_data.model_dump()
+    update_data = user_data.model_dump(exclude_unset=True)
+    
+    # Hash password if it's being updated
+    if "password" in update_data and update_data["password"]:
+        update_data["password"] = hash_password(update_data["password"])
+    else:
+        # Don't update password if not provided
+        update_data.pop("password", None)
+    
     await db.users.update_one({"id": user_id}, {"$set": update_data})
     
     updated = await db.users.find_one({"id": user_id}, {"_id": 0, "password": 0})
