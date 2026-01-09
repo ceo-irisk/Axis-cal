@@ -355,11 +355,10 @@ export default function CalendarPage() {
           onEventClick={handleEventClick}
           onCreateEvent={handleCreateEvent}
           eventTypes={eventTypes}
-          onEventTypesChange={setEventTypes}
-          onTemplatesChange={setTemplates}
           selectedTimezone={selectedTimezone}
-          onCalendarsChange={setCalendars}
-          onHiddenCalendarsChange={setHiddenCalendars}
+          rating={ratings[format(selectedDate, 'yyyy-MM-dd')]}
+          violations={ruleViolations[format(selectedDate, 'yyyy-MM-dd')]}
+          onRateDay={handleRateDay}
         />
         
         {/* Event Modal */}
