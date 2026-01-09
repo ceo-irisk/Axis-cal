@@ -45,7 +45,7 @@ export const MonthView = ({
   };
 
   return (
-    <div className="flex flex-col h-full pb-20">
+    <div className="absolute inset-0 flex flex-col">
       {/* Month header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background sticky top-0 z-10">
         <button 
