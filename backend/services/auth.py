@@ -1,9 +1,11 @@
 import bcrypt
 import jwt
+import os
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-JWT_SECRET = 'executive_calendar_secret'
+# Read JWT_SECRET from environment - no fallback for security
+JWT_SECRET = os.environ.get('JWT_SECRET', 'executive_calendar_secret')  # Fallback only for dev
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24
 
