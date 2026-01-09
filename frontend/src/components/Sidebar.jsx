@@ -1224,7 +1224,7 @@ export const Sidebar = ({
                       <div className="flex items-start gap-2">
                         <FileText className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
                         <p className="text-xs text-blue-600 dark:text-blue-400">
-                          Эти вопросы задаются при нажатии кнопки "Завершить день" во вкладке "Дашборд"
+                          Эти вопросы задаются при нажатии кнопки &ldquo;Завершить день&rdquo; во вкладке &ldquo;Дашборд&rdquo;
                         </p>
                       </div>
                     </div>
