@@ -1,10 +1,13 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './lib/auth';
 import { ThemeProvider } from './lib/theme';
 import { Toaster } from './components/ui/sonner';
+import { NetworkStatusBanner } from './components/NetworkStatusBanner';
 import LoginPage from './pages/LoginPage';
 import CalendarPage from './pages/CalendarPage';
 import NotFoundPage from './pages/NotFoundPage';
+import { useEffect, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 import './App.css';
 
 // Protected Route component
@@ -71,10 +74,22 @@ function AppRoutes() {
 }
 
 function App() {
+  const [isNative, setIsNative] = useState(false);
+
+  useEffect(() => {
+    // Определяем, запущено ли приложение как нативное
+    setIsNative(Capacitor.isNativePlatform());
+    
+    // Логируем платформу для отладки
+    console.log('🔍 Platform:', Capacitor.getPlatform());
+    console.log('🔍 Is Native:', Capacitor.isNativePlatform());
+  }, []);
+
   return (
-    <BrowserRouter>
+    <HashRouter>
       <ThemeProvider>
         <AuthProvider>
+          <NetworkStatusBanner />
           <AppRoutes />
           <Toaster 
             position="top-right"
@@ -84,7 +99,7 @@ function App() {
           />
         </AuthProvider>
       </ThemeProvider>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

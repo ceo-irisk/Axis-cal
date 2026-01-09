@@ -115,3 +115,71 @@ async def toggle_user_active(user_id: str, admin: dict = Depends(require_admin))
     new_status = not user.get("is_active", True)
     await db.users.update_one({"id": user_id}, {"$set": {"is_active": new_status}})
     return {"is_active": new_status}
+
+# 📱 Mobile App - Push Notifications
+from pydantic import BaseModel
+
+class PushTokenData(BaseModel):
+    userId: str
+    token: str
+    platform: str
+
+@router.post("/push-token")
+async def save_push_token(data: PushTokenData, current_user: dict = Depends(get_current_user)):
+    """
+    Сохранить push-токен для мобильного приложения
+    
+    Args:
+        data: userId, token, platform (ios/android)
+    
+    Returns:
+        Подтверждение сохранения токена
+    """
+    try:
+        # Проверяем что пользователь сохраняет свой токен или админ
+        if current_user["id"] != data.userId and current_user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="Can only save your own push token")
+        
+        # Обновляем или создаем запись с push-токеном
+        await db.users.update_one(
+            {"id": data.userId},
+            {
+                "$set": {
+                    "push_token": data.token,
+                    "push_platform": data.platform,
+                    "push_token_updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        logger.info(f"✅ Push token saved for user {data.userId} on {data.platform}")
+        return {"message": "Push token saved successfully"}
+    
+    except Exception as e:
+        logger.error(f"❌ Error saving push token: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to save push token")
+
+@router.delete("/push-token")
+async def delete_push_token(current_user: dict = Depends(get_current_user)):
+    """
+    Удалить push-токен пользователя (при logout из мобильного приложения)
+    """
+    try:
+        await db.users.update_one(
+            {"id": current_user["id"]},
+            {
+                "$unset": {
+                    "push_token": "",
+                    "push_platform": "",
+                    "push_token_updated_at": ""
+                }
+            }
+        )
+        
+        logger.info(f"✅ Push token deleted for user {current_user['id']}")
+        return {"message": "Push token deleted successfully"}
+    
+    except Exception as e:
+        logger.error(f"❌ Error deleting push token: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete push token")
+
