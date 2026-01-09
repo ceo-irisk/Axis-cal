@@ -448,18 +448,61 @@ export const EventModal = ({
                   <SelectValue placeholder="Выберите календарь" />
                 </SelectTrigger>
                 <SelectContent position="popper" sideOffset={4}>
-                  {calendars.map(cal => {
-                    const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
+                  {/* Group calendars by ownership */}
+                  {(() => {
+                    const ownCalendars = calendars.filter(cal => !cal.is_shared);
+                    const sharedCalendars = calendars.filter(cal => cal.is_shared);
+                    
                     return (
-                      <SelectItem key={cal.id} value={cal.id}>
-                        <div className="flex items-center gap-2">
-                          <IconComponent className="w-3.5 h-3.5" />
-                          {cal.name}
-                          {cal.is_shared && <span className="text-xs text-muted-foreground">({cal.permission_level})</span>}
-                        </div>
-                      </SelectItem>
+                      <>
+                        {ownCalendars.length > 0 && (
+                          <>
+                            <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                              Мои календари
+                            </div>
+                            {ownCalendars.map(cal => {
+                              const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
+                              return (
+                                <SelectItem key={cal.id} value={cal.id}>
+                                  <div className="flex items-center gap-2">
+                                    <IconComponent className="w-3.5 h-3.5" style={{ color: cal.color }} />
+                                    <span className="font-medium">{cal.name}</span>
+                                  </div>
+                                </SelectItem>
+                              );
+                            })}
+                          </>
+                        )}
+                        
+                        {sharedCalendars.length > 0 && (
+                          <>
+                            {ownCalendars.length > 0 && (
+                              <div className="my-1 border-t border-border" />
+                            )}
+                            <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                              Общие календари
+                            </div>
+                            {sharedCalendars.map(cal => {
+                              const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
+                              return (
+                                <SelectItem key={cal.id} value={cal.id}>
+                                  <div className="flex items-center gap-2">
+                                    <Users className="w-3.5 h-3.5 text-muted-foreground" />
+                                    <span>{cal.name}</span>
+                                    {cal.permission_level && (
+                                      <span className="text-xs text-muted-foreground ml-1">
+                                        ({cal.permission_level})
+                                      </span>
+                                    )}
+                                  </div>
+                                </SelectItem>
+                              );
+                            })}
+                          </>
+                        )}
+                      </>
                     );
-                  })}
+                  })()}
                 </SelectContent>
               </Select>
             )}
