@@ -89,17 +89,20 @@ export const TwoDayGrid = ({
           <ChevronLeft className="w-5 h-5" />
         </button>
         
-        <div className="flex gap-4">
-          {days.map(day => (
-            <div key={day.toString()} className="text-center">
-              <div className="text-xs text-muted-foreground">
-                {format(day, 'EEE', { locale: ru })}
+        <div className="flex gap-6">
+          {days.map(day => {
+            const isToday = isSameDay(day, new Date());
+            return (
+              <div key={day.toString()} className="text-center">
+                <div className="text-xs text-muted-foreground uppercase mb-1">
+                  {format(day, 'EEE', { locale: ru })}
+                </div>
+                <div className={`text-2xl font-bold ${isToday ? 'text-[#085C53]' : ''}`}>
+                  {format(day, 'd')}
+                </div>
               </div>
-              <div className="text-lg font-semibold">
-                {format(day, 'd')}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <button 
