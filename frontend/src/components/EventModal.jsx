@@ -364,7 +364,7 @@ export const EventModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose} data-testid="event-modal-overlay">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" data-testid="event-modal-overlay" style={{ pointerEvents: 'auto' }}>
       <div 
         className="bg-card rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto" 
         onClick={(e) => e.stopPropagation()} 
