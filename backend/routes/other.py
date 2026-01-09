@@ -350,10 +350,3 @@ async def get_event_counts(
         current_date += timedelta(days=1)
     
     return dict(counts)
-
-    user_events = [
-        e for e in filtered_events
-        if e.get("calendar_id") in target_calendar_ids or e.get("created_by") == user_id
-    ]
-    
-    return user_events
