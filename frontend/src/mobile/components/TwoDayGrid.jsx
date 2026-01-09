@@ -15,8 +15,8 @@ export const TwoDayGrid = ({
   const [touchEnd, setTouchEnd] = useState(null);
   const containerRef = useRef(null);
 
-  // Minimum swipe distance (in px)
-  const minSwipeDistance = 50;
+  // Minimum swipe distance (in px) - increased for better UX
+  const minSwipeDistance = 80;
 
   const onTouchStart = (e) => {
     setTouchEnd(null);
