@@ -240,6 +240,21 @@ frontend:
         agent: "testing"
         comment: "✅ MOBILE CALENDAR TESTED (85.7% scenarios passing): Протестировал мобильную версию календаря на устройстве 375px. WORKING FEATURES (12/14): ✅ Login admin@company.com/admin123 ✅ Calendar loads correctly ✅ Current day (9 января) highlighted in GREEN ✅ Weekday headers (ПТН, СУБ) displayed ✅ Bottom navigation with 4 tabs ✅ Дашборд tab opens (slides from bottom) ✅ События tab opens ✅ Календари tab opens ✅ Настройки tab opens with settings list ✅ Сетка button returns to calendar ✅ Month view (Месяц) button works ✅ Clicking date in month view returns to 2-day grid ✅ Navigation arrows work. Minor Issues: 1) Event creation by clicking time slot has overlay interception (bottom nav blocks clicks) - requires force clicks or coordinate-based interaction 2) Event ТЕСТ not found on Jan 8 at 03:10 for edit testing. Overall mobile calendar is functional with minor UI interaction issues that don't block core functionality."
 
+  - task: "Event Type Creation UI"
+    implemented: true
+    working: true
+    file: "frontend/src/components/Sidebar.jsx, frontend/src/components/sidebar/forms/EventTypeForm.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Testing event type creation flow: Settings > Справочники > Типы событий > + button > form fill > save"
+      - working: true
+        agent: "testing"
+        comment: "✅ EVENT TYPE CREATION FULLY WORKING (13/13 scenarios - 100%): Протестировал создание нового типа события 'test_meeting' / 'Тестовая встреча' / '#ff5733'. ALL PASSED: 1) Login admin@company.com/admin123 ✅ 2) Sidebar visible on desktop ✅ 3) Clicked 'Настройки' tab (4th tab) ✅ 4) Clicked 'Справочники' sub-tab ✅ 5) Found 'Типы событий' section (6 existing types) ✅ 6) Clicked '+' button ✅ 7) Correct modal 'Новый тип события' opened ✅ 8) Filled Код='test_meeting' ✅ 9) Filled Название='Тестовая встреча' ✅ 10) Set Цвет='#ff5733' ✅ 11) Clicked 'Сохранить' ✅ 12) Modal closed ✅ 13) New type appears in list with correct code ✅. BACKEND VERIFIED: Event type saved correctly with id=7d791d8e-f10b-4016-b3b8-a3978ac6382b, all fields match input. No errors. Feature is production-ready."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
