@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { format, addDays, subDays, startOfDay, isSameDay } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -16,7 +16,6 @@ export const TwoDayGrid = ({
   const [touchStartY, setTouchStartY] = useState(null);
   const containerRef = useRef(null);
 
-  // Minimum swipe distance (in px) - increased for better UX
   const minSwipeDistance = 80;
 
   const onTouchStart = (e) => {
@@ -33,9 +32,8 @@ export const TwoDayGrid = ({
     if (!touchStart || !touchEnd || !touchStartY) return;
     
     const distanceX = touchStart - touchEnd;
-    const distanceY = touchStartY - (touchEnd || touchStart); // Approximate Y distance
+    const distanceY = touchStartY - (touchEnd || touchStart);
     
-    // Only trigger swipe if horizontal movement is dominant
     const isHorizontalSwipe = Math.abs(distanceX) > Math.abs(distanceY) * 2;
     
     if (isHorizontalSwipe) {
@@ -44,7 +42,6 @@ export const TwoDayGrid = ({
 
       if (isLeftSwipe || isRightSwipe) {
         if (isLeftSwipe) {
-          // Swipe left = next days
           try {
             onDateChange(addDays(currentDate, 2));
           } catch (e) {
@@ -52,7 +49,6 @@ export const TwoDayGrid = ({
           }
         }
         if (isRightSwipe) {
-          // Swipe right = previous days
           try {
             onDateChange(subDays(currentDate, 2));
           } catch (e) {
@@ -62,13 +58,11 @@ export const TwoDayGrid = ({
       }
     }
     
-    // Reset touch state
     setTouchStart(null);
     setTouchEnd(null);
     setTouchStartY(null);
   };
 
-  // Get two days to display
   let day1, day2, days;
   try {
     day1 = startOfDay(currentDate);
@@ -76,14 +70,12 @@ export const TwoDayGrid = ({
     days = [day1, day2];
   } catch (e) {
     console.error('Date calculation error:', e);
-    // Fallback to simple dates
     day1 = new Date(currentDate);
     day2 = new Date(currentDate);
     day2.setDate(day2.getDate() + 1);
     days = [day1, day2];
   }
 
-  // Group events by day
   const getEventsForDay = (day) => {
     return events.filter(event => {
       const eventDate = new Date(event.start_time);
@@ -91,13 +83,12 @@ export const TwoDayGrid = ({
     }).sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
   };
 
-  // Generate time slots (24 hours)
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
   return (
-    <div className="absolute inset-0 flex flex-col">
+    <>
       {/* Header with navigation */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background z-10">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background">
         <button 
           onClick={() => onDateChange(subDays(currentDate, 2))}
           className="p-2 rounded-lg hover:bg-accent"
@@ -132,7 +123,7 @@ export const TwoDayGrid = ({
       {/* Two-day grid with swipe support */}
       <div 
         ref={containerRef}
-        className="flex-1 overflow-y-scroll"
+        className="flex-1 overflow-y-auto"
         style={{ WebkitOverflowScrolling: 'touch', paddingBottom: '80px' }}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
@@ -141,27 +132,19 @@ export const TwoDayGrid = ({
         <div className="grid grid-cols-[auto_1fr_1fr] gap-px bg-border">
           {/* Time column */}
           <div className="bg-background">
-            <div className="h-12 border-b border-border" /> {/* Header spacer */}
             {hours.map(hour => (
-              <div key={hour} className="h-16 px-2 py-1 text-xs text-muted-foreground border-b border-border">
+              <div key={hour} className="h-16 px-2 py-1 text-xs text-muted-foreground border-b border-border flex items-start">
                 {String(hour).padStart(2, '0')}:00
               </div>
             ))}
           </div>
 
-          {/* Day 1 & Day 2 columns */}
-          {days.map((day, dayIndex) => {
+          {/* Day columns */}
+          {days.map((day) => {
             const dayEvents = getEventsForDay(day);
             
             return (
               <div key={day.toString()} className="bg-background relative">
-                {/* Day header */}
-                <div className="h-12 flex items-center justify-center border-b border-border sticky top-0 bg-background z-5">
-                  <span className="text-sm font-medium">
-                    {format(day, 'd MMM', { locale: ru })}
-                  </span>
-                </div>
-
                 {/* Time slots */}
                 <div className="relative">
                   {hours.map(hour => (
@@ -178,9 +161,9 @@ export const TwoDayGrid = ({
                     const endTime = new Date(event.end_time);
                     const startHour = startTime.getHours();
                     const startMinute = startTime.getMinutes();
-                    const duration = (endTime - startTime) / (1000 * 60); // minutes
+                    const duration = (endTime - startTime) / (1000 * 60);
                     
-                    const top = (startHour + startMinute / 60) * 64; // 64px per hour
+                    const top = (startHour + startMinute / 60) * 64;
                     const height = (duration / 60) * 64;
                     const eventColor = getEventTypeColor(event);
 
@@ -225,6 +208,6 @@ export const TwoDayGrid = ({
           })}
         </div>
       </div>
-    </div>
+    </>
   );
 };
