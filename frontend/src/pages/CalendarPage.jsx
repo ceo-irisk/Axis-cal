@@ -352,12 +352,14 @@ export default function CalendarPage() {
     return (
       <MobileErrorBoundary>
         <MobileCalendarPage 
-          onOpenSidebar={(view) => {
-            setSidebarOpen(true);
-          }}
           onEventClick={handleEventClick}
           onCreateEvent={handleCreateEvent}
           eventTypes={eventTypes}
+          onEventTypesChange={setEventTypes}
+          onTemplatesChange={setTemplates}
+          selectedTimezone={selectedTimezone}
+          onCalendarsChange={setCalendars}
+          onHiddenCalendarsChange={setHiddenCalendars}
         />
         
         {/* Event Modal */}
