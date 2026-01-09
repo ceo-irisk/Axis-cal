@@ -50,3 +50,31 @@ async def login(credentials: LoginRequest):
 @router.get("/me", response_model=UserResponse)
 async def get_me(user: dict = Depends(get_current_user)):
     return UserResponse(**user)
+
+
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str
+
+@router.post("/change-password")
+async def change_password(request: ChangePasswordRequest, user: dict = Depends(get_current_user)):
+    """Change password for current user"""
+    from services.auth import hash_password
+    
+    # Verify old password
+    current_user = await db.users.find_one({"id": user["id"]})
+    if not current_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if not verify_password(request.old_password, current_user["password"]):
+        raise HTTPException(status_code=400, detail="Неверный текущий пароль")
+    
+    # Hash and update new password
+    new_password_hash = hash_password(request.new_password)
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"password": new_password_hash}}
+    )
+    
+    return {"message": "Пароль успешно изменён"}
+
