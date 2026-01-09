@@ -64,8 +64,8 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      {/* All other routes redirect to main page */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* 404 page for all other routes */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
