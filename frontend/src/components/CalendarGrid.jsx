@@ -678,13 +678,24 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                         pointerEvents: draggedEvent && draggedEvent.id !== event.id ? 'none' : 'auto'
                       }} 
                       data-testid={`event-${event.id}`}
+                      title={`${event.title} (${eventTimeDisplay})`}
                     >
                       <div className="flex items-start justify-between gap-1 h-full">
                         <div className="flex-1 min-w-0 flex flex-col">
-                          <span className="text-[10px] font-mono opacity-70 truncate">
-                            {timeDisplayText}
-                          </span>
-                          <span className={`font-medium leading-tight ${isLong ? 'text-[11px]' : 'text-[10px]'}`}>
+                          {/* Показываем время только для событий >= 1 часа */}
+                          {duration >= 1 && (
+                            <span className="text-[10px] font-mono opacity-70 truncate">
+                              {timeDisplayText}
+                            </span>
+                          )}
+                          {/* Для коротких событий - только название с переносом слов */}
+                          <span 
+                            className={`font-medium leading-tight ${isLong ? 'text-[11px]' : 'text-[10px]'}`}
+                            style={{ 
+                              wordBreak: duration < 1 ? 'break-word' : 'normal',
+                              overflowWrap: duration < 1 ? 'break-word' : 'normal'
+                            }}
+                          >
                             {event.title}
                           </span>
                         </div>
