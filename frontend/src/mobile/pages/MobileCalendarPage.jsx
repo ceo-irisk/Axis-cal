@@ -153,7 +153,7 @@ export const MobileCalendarPage = ({
         </header>
 
         {/* Main content area */}
-        <main className="flex-1">
+        <main className="flex-1 relative">
           {viewMode === 'two-day' ? (
             <TwoDayGrid 
               currentDate={currentDate}
