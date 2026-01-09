@@ -70,7 +70,7 @@ export const MonthView = ({
       </div>
 
       {/* Calendar grid */}
-      <div className="flex-1 overflow-auto p-4">
+      <div className="flex-1 overflow-auto p-4" style={{ paddingBottom: '80px' }}>
         {/* Week days header */}
         <div className="grid grid-cols-7 gap-1 mb-2">
           {weekDayNames.map(day => (
