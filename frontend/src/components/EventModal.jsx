@@ -121,16 +121,27 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars, selected
     // Parse ISO dates - используем _localStartTime если доступно (уже конвертировано в CalendarGrid)
     let startDateTime, endDateTime;
     
+    console.log('📊 Event data:', {
+      title: event.title,
+      has_localStartTime: !!event._localStartTime,
+      start_time: event.start_time,
+      _localStartTime: event._localStartTime,
+      timezone: event.timezone
+    });
+    
     if (event._localStartTime && event._localEndTime) {
       // Используем уже сконвертированное локальное время из CalendarGrid
+      console.log('✅ Using _localStartTime');
       startDateTime = event._localStartTime;
       endDateTime = event._localEndTime;
     } else if (event.start_time && event.timezone) {
       // Событие имеет timezone - конвертируем из UTC в выбранный timezone
+      console.log('⚠️ Converting from UTC, timezone:', event.timezone);
       startDateTime = utcToLocal(event.start_time, userTimezone);
       endDateTime = event.end_time ? utcToLocal(event.end_time, userTimezone) : startDateTime;
     } else {
       // Старый формат без timezone - используем как есть
+      console.log('⚠️ Using raw date');
       startDateTime = event.start_time ? new Date(event.start_time) : new Date();
       endDateTime = event.end_time ? new Date(event.end_time) : new Date();
     }
