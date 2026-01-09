@@ -901,7 +901,6 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
             <div 
               key={hour} 
               className="h-[60px] border-b border-dashed border-border/20 hover:bg-accent/10" 
-              onClick={() => onDateClick?.(date)}
               onDoubleClick={() => onCellDoubleClick(date, hour)}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, hour)}
