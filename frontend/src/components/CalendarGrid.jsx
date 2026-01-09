@@ -570,10 +570,13 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                       key={event.id}
                       onClick={(e) => onEventSelect?.(event.id, e.shiftKey)}
                       onDoubleClick={(e) => onEventClick(event)}
-                      className={`px-2 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
+                      className={`px-2 py-0.5 rounded cursor-pointer hover:opacity-80 ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
                       style={dynamicStyle || {}}
+                      title={event.title}
                     >
-                      {event.title}
+                      <div className="text-[10px] font-medium truncate leading-tight">
+                        {event.title}
+                      </div>
                     </div>
                   );
                 })}
