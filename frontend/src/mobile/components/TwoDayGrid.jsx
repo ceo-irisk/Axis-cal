@@ -13,6 +13,7 @@ export const TwoDayGrid = ({
 }) => {
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+  const [touchStartY, setTouchStartY] = useState(null);
   const containerRef = useRef(null);
 
   // Minimum swipe distance (in px) - increased for better UX
@@ -21,6 +22,7 @@ export const TwoDayGrid = ({
   const onTouchStart = (e) => {
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
+    setTouchStartY(e.targetTouches[0].clientY);
   };
 
   const onTouchMove = (e) => {
@@ -28,28 +30,34 @@ export const TwoDayGrid = ({
   };
 
   const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+    if (!touchStart || !touchEnd || !touchStartY) return;
     
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
+    const distanceX = touchStart - touchEnd;
+    const distanceY = touchStartY - (touchEnd || touchStart); // Approximate Y distance
+    
+    // Only trigger swipe if horizontal movement is dominant
+    const isHorizontalSwipe = Math.abs(distanceX) > Math.abs(distanceY) * 2;
+    
+    if (isHorizontalSwipe) {
+      const isLeftSwipe = distanceX > minSwipeDistance;
+      const isRightSwipe = distanceX < -minSwipeDistance;
 
-    // Only handle horizontal swipes (not vertical scrolls)
-    if (isLeftSwipe || isRightSwipe) {
-      if (isLeftSwipe) {
-        // Swipe left = next days
-        try {
-          onDateChange(addDays(currentDate, 2));
-        } catch (e) {
-          console.error('Date change error:', e);
+      if (isLeftSwipe || isRightSwipe) {
+        if (isLeftSwipe) {
+          // Swipe left = next days
+          try {
+            onDateChange(addDays(currentDate, 2));
+          } catch (e) {
+            console.error('Date change error:', e);
+          }
         }
-      }
-      if (isRightSwipe) {
-        // Swipe right = previous days
-        try {
-          onDateChange(subDays(currentDate, 2));
-        } catch (e) {
-          console.error('Date change error:', e);
+        if (isRightSwipe) {
+          // Swipe right = previous days
+          try {
+            onDateChange(subDays(currentDate, 2));
+          } catch (e) {
+            console.error('Date change error:', e);
+          }
         }
       }
     }
@@ -57,6 +65,7 @@ export const TwoDayGrid = ({
     // Reset touch state
     setTouchStart(null);
     setTouchEnd(null);
+    setTouchStartY(null);
   };
 
   // Get two days to display
