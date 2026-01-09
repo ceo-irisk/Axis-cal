@@ -89,6 +89,7 @@ function App() {
     <HashRouter>
       <ThemeProvider>
         <AuthProvider>
+          <NetworkStatusBanner />
           <AppRoutes />
           <Toaster 
             position="top-right"
