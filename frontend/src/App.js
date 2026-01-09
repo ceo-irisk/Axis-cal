@@ -4,6 +4,7 @@ import { ThemeProvider } from './lib/theme';
 import { Toaster } from './components/ui/sonner';
 import LoginPage from './pages/LoginPage';
 import CalendarPage from './pages/CalendarPage';
+import NotFoundPage from './pages/NotFoundPage';
 import './App.css';
 
 // Protected Route component
