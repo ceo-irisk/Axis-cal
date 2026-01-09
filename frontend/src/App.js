@@ -73,8 +73,19 @@ function AppRoutes() {
 }
 
 function App() {
+  const [isNative, setIsNative] = useState(false);
+
+  useEffect(() => {
+    // Определяем, запущено ли приложение как нативное
+    setIsNative(Capacitor.isNativePlatform());
+    
+    // Логируем платформу для отладки
+    console.log('🔍 Platform:', Capacitor.getPlatform());
+    console.log('🔍 Is Native:', Capacitor.isNativePlatform());
+  }, []);
+
   return (
-    <BrowserRouter>
+    <HashRouter>
       <ThemeProvider>
         <AuthProvider>
           <AppRoutes />
@@ -86,7 +97,7 @@ function App() {
           />
         </AuthProvider>
       </ThemeProvider>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
