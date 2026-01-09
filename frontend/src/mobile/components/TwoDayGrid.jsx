@@ -132,8 +132,8 @@ export const TwoDayGrid = ({
       {/* Two-day grid with swipe support */}
       <div 
         ref={containerRef}
-        className="flex-1 overflow-y-scroll pb-20"
-        style={{ WebkitOverflowScrolling: 'touch' }}
+        className="flex-1 overflow-y-scroll"
+        style={{ WebkitOverflowScrolling: 'touch', paddingBottom: '80px' }}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
