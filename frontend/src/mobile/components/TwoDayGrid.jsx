@@ -34,22 +34,29 @@ export const TwoDayGrid = ({
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
 
-    if (isLeftSwipe) {
-      // Swipe left = next days
-      try {
-        onDateChange(addDays(currentDate, 2));
-      } catch (e) {
-        console.error('Date change error:', e);
+    // Only handle horizontal swipes (not vertical scrolls)
+    if (isLeftSwipe || isRightSwipe) {
+      if (isLeftSwipe) {
+        // Swipe left = next days
+        try {
+          onDateChange(addDays(currentDate, 2));
+        } catch (e) {
+          console.error('Date change error:', e);
+        }
+      }
+      if (isRightSwipe) {
+        // Swipe right = previous days
+        try {
+          onDateChange(subDays(currentDate, 2));
+        } catch (e) {
+          console.error('Date change error:', e);
+        }
       }
     }
-    if (isRightSwipe) {
-      // Swipe right = previous days
-      try {
-        onDateChange(subDays(currentDate, 2));
-      } catch (e) {
-        console.error('Date change error:', e);
-      }
-    }
+    
+    // Reset touch state
+    setTouchStart(null);
+    setTouchEnd(null);
   };
 
   // Get two days to display
