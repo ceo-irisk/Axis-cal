@@ -97,7 +97,7 @@ export const TwoDayGrid = ({
                 <div className="text-xs text-muted-foreground uppercase mb-1">
                   {format(day, 'EEE', { locale: ru })}
                 </div>
-                <div className={`text-2xl font-bold ${isToday ? 'text-[#085C53]' : ''}`}>
+                <div className={`text-2xl font-bold ${isToday ? 'text-green-500' : ''}`}>
                   {format(day, 'd')}
                 </div>
               </div>
