@@ -118,10 +118,14 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars, selected
   if (event) {
     let status = event.status || 'confirmed';
     
-    // Parse ISO dates - события приходят в UTC, конвертируем в локальное время
+    // Parse ISO dates - используем _localStartTime если доступно (уже конвертировано в CalendarGrid)
     let startDateTime, endDateTime;
     
-    if (event.start_time && event.timezone) {
+    if (event._localStartTime && event._localEndTime) {
+      // Используем уже сконвертированное локальное время из CalendarGrid
+      startDateTime = event._localStartTime;
+      endDateTime = event._localEndTime;
+    } else if (event.start_time && event.timezone) {
       // Событие имеет timezone - конвертируем из UTC в выбранный timezone
       startDateTime = utcToLocal(event.start_time, userTimezone);
       endDateTime = event.end_time ? utcToLocal(event.end_time, userTimezone) : startDateTime;
