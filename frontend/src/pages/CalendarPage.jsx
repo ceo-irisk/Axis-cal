@@ -242,9 +242,9 @@ export default function CalendarPage() {
     setSelectedEventIds([]); // Снять выделение при клике мимо события
   };
 
-  const handleCellDoubleClick = (date, hour) => {
+  const handleCellDoubleClick = (date, hour, minute) => {
     setSelectedDate(date);
-    setDefaultEventTime(hour);
+    setDefaultEventTime({ hour, minute: minute || 0 });
     setSelectedEvent(null);
     setShowEventModal(true);
   };
