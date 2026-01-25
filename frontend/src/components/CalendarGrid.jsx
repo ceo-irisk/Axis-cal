@@ -1012,7 +1012,7 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
       )}
 
       {/* Time grid */}
-      <div className="grid grid-cols-[50px_1fr_50px] max-h-[calc(100vh-260px)] overflow-y-auto">
+      <div ref={gridRef} className="grid grid-cols-[50px_1fr_50px] max-h-[calc(100vh-260px)] overflow-y-auto">
         {/* Left time column */}
         <div className="border-r border-border/20">
           {hours.map(hour => (
