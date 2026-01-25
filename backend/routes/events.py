@@ -232,26 +232,25 @@ async def delete_event(event_id: str, user: dict = Depends(get_current_user)):
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     
-    # Check if user is the creator
-    if event["created_by"] != user["id"]:
-        # Check if user has full permissions to the calendar
-        calendar_id = event.get("calendar_id")
-        if calendar_id:
-            # Check if user owns the calendar
-            calendar = await db.calendars.find_one({"id": calendar_id})
-            is_calendar_owner = calendar and calendar.get("user_id") == user["id"]
-            
-            if not is_calendar_owner:
-                # Not calendar owner, check explicit permissions
-                permission = await db.calendar_permissions.find_one({
-                    "calendar_id": calendar_id,
-                    "user_id": user["id"],
-                    "permission_level": "full"
-                })
-                if not permission:
-                    raise HTTPException(status_code=403, detail="Недостаточно прав")
-        else:
-            raise HTTPException(status_code=403, detail="Недостаточно прав")
+    # Check permissions - ALWAYS check, even for event creator
+    calendar_id = event.get("calendar_id")
+    if calendar_id:
+        # Check if user owns the calendar
+        calendar = await db.calendars.find_one({"id": calendar_id})
+        is_calendar_owner = calendar and calendar.get("user_id") == user["id"]
+        
+        if not is_calendar_owner:
+            # Not calendar owner, check explicit permissions - need FULL access for delete
+            permission = await db.calendar_permissions.find_one({
+                "calendar_id": calendar_id,
+                "user_id": user["id"],
+                "permission_level": "full"
+            })
+            if not permission:
+                raise HTTPException(status_code=403, detail="Недостаточно прав для удаления")
+    elif event["created_by"] != user["id"]:
+        # No calendar and not creator - deny
+        raise HTTPException(status_code=403, detail="Недостаточно прав")
     
     await db.events.delete_one({"id": event_id})
     return {"message": "Event deleted"}
