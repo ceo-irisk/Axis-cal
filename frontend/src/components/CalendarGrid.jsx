@@ -444,42 +444,50 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
     e.dataTransfer.effectAllowed = 'move';
     setDraggedEvent(event);
     setDragPreviewTime(null);
+    setIsDragging(true);
   };
   
   const handleDrag = (e) => {
-    if (!draggedEvent || !gridRef.current) return;
+    // Note: onDrag in HTML5 often has e.clientY === 0
+    // We'll use document-level mousemove instead
+  };
+  
+  // Track mouse movement during drag
+  useEffect(() => {
+    if (!isDragging || !draggedEvent || !gridRef.current) return;
     
-    // Get grid position
-    const gridRect = gridRef.current.getBoundingClientRect();
-    const mouseY = e.clientY - gridRect.top;
-    
-    if (mouseY < 0 || e.clientY === 0) return; // Mouse outside grid or no coords
-    
-    // Calculate hour and minute from Y position
-    const cellHeight = 60;
-    const totalHours = mouseY / cellHeight;
-    const hour = Math.floor(totalHours);
-    const minutesFraction = (totalHours - hour) * 60;
-    const roundedMinutes = Math.round(minutesFraction / 10) * 10; // 10-min snap
-    
-    // Calculate duration
-    const start = new Date(draggedEvent.start_time);
-    const end = new Date(draggedEvent.end_time);
-    const durationMs = end - start;
-    
-    // Preview time
-    const previewStart = new Date();
-    previewStart.setHours(hour, Math.min(roundedMinutes, 50), 0, 0);
-    const previewEnd = new Date(previewStart.getTime() + durationMs);
-    
-    const newPreview = {
-      start: `${String(previewStart.getHours()).padStart(2, '0')}:${String(previewStart.getMinutes()).padStart(2, '0')}`,
-      end: `${String(previewEnd.getHours()).padStart(2, '0')}:${String(previewEnd.getMinutes()).padStart(2, '0')}`
+    const handleMouseMove = (e) => {
+      const gridRect = gridRef.current.getBoundingClientRect();
+      const mouseY = e.clientY - gridRect.top;
+      
+      if (mouseY < 0) return;
+      
+      const cellHeight = 60;
+      const totalHours = mouseY / cellHeight;
+      const hour = Math.floor(totalHours);
+      const minutesFraction = (totalHours - hour) * 60;
+      const roundedMinutes = Math.round(minutesFraction / 10) * 10;
+      
+      const start = new Date(draggedEvent.start_time);
+      const end = new Date(draggedEvent.end_time);
+      const durationMs = end - start;
+      
+      const previewStart = new Date();
+      previewStart.setHours(hour, Math.min(roundedMinutes, 50), 0, 0);
+      const previewEnd = new Date(previewStart.getTime() + durationMs);
+      
+      setDragPreviewTime({
+        start: `${String(previewStart.getHours()).padStart(2, '0')}:${String(previewStart.getMinutes()).padStart(2, '0')}`,
+        end: `${String(previewEnd.getHours()).padStart(2, '0')}:${String(previewEnd.getMinutes()).padStart(2, '0')}`
+      });
     };
     
-    console.log('🔄 Drag preview:', newPreview);
-    setDragPreviewTime(newPreview);
-  };
+    document.addEventListener('mousemove', handleMouseMove);
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [isDragging, draggedEvent]);
 
   const handleDragOver = (e) => {
     e.preventDefault();
