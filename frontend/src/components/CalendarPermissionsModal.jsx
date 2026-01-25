@@ -18,7 +18,10 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
   const [permissions, setPermissions] = useState([]);
   const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState('');
-  const [newPermissionLevel, setNewPermissionLevel] = useState('read');
+  // Default to view_busy for private calendars, read for public
+  const [newPermissionLevel, setNewPermissionLevel] = useState(
+    calendar.is_public === false ? 'view_busy' : 'read'
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
