@@ -818,6 +818,8 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
   });
   
   const [draggedEvent, setDraggedEvent] = useState(null);
+  const [dragPreviewTime, setDragPreviewTime] = useState(null); // { start: 'HH:MM', end: 'HH:MM' }
+  const gridRef = useRef(null);
 
   const getEventStyle = (event) => {
     try {
