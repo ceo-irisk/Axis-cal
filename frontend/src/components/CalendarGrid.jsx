@@ -653,6 +653,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                 {hours.map(hour => (
                   <div 
                     key={hour} 
+                    data-hour={hour}
                     className="h-[60px] border-b border-dashed border-border/20 hover:bg-accent/10" 
                     onClick={() => onDateClick?.(day)}
                     onDoubleClick={() => onCellDoubleClick(day, hour)}
