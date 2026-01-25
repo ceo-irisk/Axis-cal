@@ -679,7 +679,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                         pointerEvents: draggedEvent && draggedEvent.id !== event.id ? 'none' : 'auto'
                       }} 
                       data-testid={`event-${event.id}`}
-                      title={`${event.title} (${eventTimeDisplay})`}
+                      title={`${event.title} (${eventStartTime} - ${eventEndTime})`}
                     >
                       <div className="flex items-start justify-between gap-1 h-full">
                         <div className="flex-1 min-w-0 flex flex-col">
