@@ -824,16 +824,16 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                     >
                       <div className="flex items-start justify-between gap-1 h-full">
                         <div className="flex-1 min-w-0 flex flex-col">
-                          {/* Показываем preview время при drag or обычное время */}
+                          {/* Показываем preview время при drag/resize или обычное время */}
                           {duration >= 1 && (
                             <span className="text-[10px] font-mono opacity-70 truncate">
-                              {draggedEvent?.id === event.id && dragPreviewTime 
+                              {(draggedEvent?.id === event.id || resizingEvent?.id === event.id) && dragPreviewTime 
                                 ? `${dragPreviewTime.start} - ${dragPreviewTime.end}` 
                                 : timeDisplayText}
                             </span>
                           )}
-                          {/* Для коротких событий - показываем preview если dragged */}
-                          {duration < 1 && draggedEvent?.id === event.id && dragPreviewTime && (
+                          {/* Для коротких событий - показываем preview если dragged или resizing */}
+                          {duration < 1 && (draggedEvent?.id === event.id || resizingEvent?.id === event.id) && dragPreviewTime && (
                             <span className="text-[10px] font-mono opacity-70 truncate">
                               {dragPreviewTime.start} - {dragPreviewTime.end}
                             </span>
