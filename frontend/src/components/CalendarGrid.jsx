@@ -617,10 +617,10 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
       const deltaMinutes = Math.round((deltaY / 60) * 60 / 10) * 10; // 10-minute snap
       const newDuration = Math.max(10, originalDuration + deltaMinutes); // minimum 10 minutes
       
-      // Calculate preview end time
+      // Calculate preview end time - ВАЖНО: используем UTC методы для _localStartTime
       const previewEnd = new Date(eventStart.getTime() + newDuration * 60000);
-      const startTime = `${String(eventStart.getHours()).padStart(2, '0')}:${String(eventStart.getMinutes()).padStart(2, '0')}`;
-      const endTime = `${String(previewEnd.getHours()).padStart(2, '0')}:${String(previewEnd.getMinutes()).padStart(2, '0')}`;
+      const startTime = `${String(eventStart.getUTCHours()).padStart(2, '0')}:${String(eventStart.getUTCMinutes()).padStart(2, '0')}`;
+      const endTime = `${String(previewEnd.getUTCHours()).padStart(2, '0')}:${String(previewEnd.getUTCMinutes()).padStart(2, '0')}`;
       
       setDragPreviewTime({
         start: startTime,
