@@ -510,7 +510,7 @@ export const EventModal = ({
 
           {/* Date and Time - hidden if all day */}
           {!formData.is_all_day && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {/* Date row */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
