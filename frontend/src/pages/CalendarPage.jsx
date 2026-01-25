@@ -343,7 +343,11 @@ export default function CalendarPage() {
   const getTitle = () => {
     if (mainView === MAIN_VIEW.USERS) return 'Пользователи';
     if (view === 'day') return format(selectedDate, 'd MMMM yyyy', { locale: ru });
-    if (view === 'week') return `${format(selectedDate, 'd MMM', { locale: ru })} — ${format(addDays(selectedDate, 6), 'd MMM yyyy', { locale: ru })}`;
+    if (view === 'week') {
+      const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
+      const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 });
+      return `${format(weekStart, 'd MMM', { locale: ru })} — ${format(weekEnd, 'd MMM yyyy', { locale: ru })}`;
+    }
     return format(currentDate, 'LLLL yyyy', { locale: ru });
   };
 
