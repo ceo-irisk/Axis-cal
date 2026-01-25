@@ -442,6 +442,33 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
   // Drag handlers
   const handleDragStart = (e, event) => {
     e.dataTransfer.effectAllowed = 'move';
+    
+    // Create custom drag image with event info
+    const dragImage = document.createElement('div');
+    dragImage.style.cssText = `
+      position: absolute;
+      top: -1000px;
+      padding: 8px 12px;
+      background: ${getEventDynamicStyle(event, eventTypes)?.backgroundColor || '#085C53'};
+      color: white;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      white-space: nowrap;
+      z-index: 9999;
+    `;
+    dragImage.id = 'drag-preview-temp';
+    dragImage.textContent = event.title;
+    document.body.appendChild(dragImage);
+    
+    e.dataTransfer.setDragImage(dragImage, 10, 10);
+    
+    setTimeout(() => {
+      const el = document.getElementById('drag-preview-temp');
+      if (el) el.remove();
+    }, 0);
+    
     setDraggedEvent(event);
     setDragPreviewTime(null);
     setIsDragging(true);
