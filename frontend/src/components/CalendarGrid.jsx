@@ -992,6 +992,12 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
     setDragPreviewTime(null);
   };
 
+  const handleDragEnd = (e) => {
+    // Clean up drag state when drag ends (including cancelled drags)
+    setDraggedEvent(null);
+    setDragPreviewTime(null);
+  };
+
   return (
     <div className="card-glass overflow-hidden" data-testid="day-view">
       {/* Header */}
