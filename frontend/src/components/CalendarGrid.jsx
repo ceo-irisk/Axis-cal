@@ -507,12 +507,22 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
         start: `${String(previewStart.getHours()).padStart(2, '0')}:${String(previewStart.getMinutes()).padStart(2, '0')}`,
         end: `${String(previewEnd.getHours()).padStart(2, '0')}:${String(previewEnd.getMinutes()).padStart(2, '0')}`
       });
+      
+      // Update custom drag preview element if exists
+      const dragPreview = document.getElementById('custom-drag-preview');
+      if (dragPreview) {
+        dragPreview.style.left = `${e.clientX + 10}px`;
+        dragPreview.style.top = `${e.clientY + 10}px`;
+        dragPreview.textContent = `${previewStart.getHours()}:${String(previewStart.getMinutes()).padStart(2, '0')} - ${previewEnd.getHours()}:${String(previewEnd.getMinutes()).padStart(2, '0')} | ${draggedEvent.title}`;
+      }
     };
     
     document.addEventListener('mousemove', handleMouseMove);
     
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
+      const preview = document.getElementById('custom-drag-preview');
+      if (preview) preview.remove();
     };
   }, [isDragging, draggedEvent]);
 
