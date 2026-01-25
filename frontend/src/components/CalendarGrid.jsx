@@ -561,7 +561,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
               </div>
               
               {/* All-day events row */}
-              <div className="min-h-[24px] px-1 pb-1 space-y-0.5 overflow-hidden">
+              <div className="h-[48px] px-1 pb-1 space-y-0.5 overflow-y-auto">
                 {getAllDayEvents(day).map(event => {
                   const dynamicStyle = getEventDynamicStyle(event, eventTypes);
                   const isSelected = selectedEventIds?.includes(event.id);
