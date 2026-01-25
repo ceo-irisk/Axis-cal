@@ -901,6 +901,39 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
   const handleDragStart = (e, event) => {
     e.dataTransfer.effectAllowed = 'move';
     setDraggedEvent(event);
+    setDragPreviewTime(null);
+  };
+  
+  const handleDrag = (e) => {
+    if (!draggedEvent || !gridRef.current) return;
+    
+    // Get grid position
+    const gridRect = gridRef.current.getBoundingClientRect();
+    const mouseY = e.clientY - gridRect.top;
+    
+    if (mouseY < 0) return; // Mouse outside grid
+    
+    // Calculate hour and minute from Y position
+    const cellHeight = 60;
+    const totalHours = mouseY / cellHeight;
+    const hour = Math.floor(totalHours);
+    const minutesFraction = (totalHours - hour) * 60;
+    const roundedMinutes = Math.round(minutesFraction / 5) * 5; // 5-min snap for day view
+    
+    // Calculate duration
+    const start = new Date(draggedEvent.start_time);
+    const end = new Date(draggedEvent.end_time);
+    const durationMs = end - start;
+    
+    // Preview time
+    const previewStart = new Date();
+    previewStart.setHours(hour, Math.min(roundedMinutes, 55), 0, 0);
+    const previewEnd = new Date(previewStart.getTime() + durationMs);
+    
+    setDragPreviewTime({
+      start: `${String(previewStart.getHours()).padStart(2, '0')}:${String(previewStart.getMinutes()).padStart(2, '0')}`,
+      end: `${String(previewEnd.getHours()).padStart(2, '0')}:${String(previewEnd.getMinutes()).padStart(2, '0')}`
+    });
   };
 
   const handleDragOver = (e) => {
