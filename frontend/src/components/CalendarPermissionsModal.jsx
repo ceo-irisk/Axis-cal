@@ -161,6 +161,11 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
               
               <div>
                 <Label className="text-xs text-muted-foreground">Уровень доступа</Label>
+                {!calendar.is_public && (
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 mb-2">
+                    💡 Для закрытого календаря рекомендуется "Только занятость"
+                  </p>
+                )}
                 <Select value={newPermissionLevel} onValueChange={setNewPermissionLevel}>
                   <SelectTrigger className="mt-1">
                     <SelectValue />
