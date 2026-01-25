@@ -646,16 +646,17 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                 {dayEvents.map(event => {
                   const duration = getEventDuration(event);
                   const isLong = duration >= 1;
-                  const eventTimeDisplay = event._displayStartTime || formatTime(new Date(event.start_time));
+                  const eventStartTime = event._displayStartTime || formatTime(new Date(event.start_time));
+                  const eventEndTime = event._displayEndTime || formatTime(new Date(event.end_time));
                   const dynamicStyle = getEventDynamicStyle(event, eventTypes);
                   const overlapStyle = getOverlapStyle(event, dayEvents);
                   const isSelected = selectedEventIds?.includes(event.id);
                   
-                  // Формируем отображение времени с исходным timezone если отличается
-                  let timeDisplayText = eventTimeDisplay;
+                  // Формируем отображение времени: начало - конец
+                  let timeDisplayText = `${eventStartTime} - ${eventEndTime}`;
                   if (event._originalStartTime && event._originalTimezone) {
                     const offset = event._timezoneOffset >= 0 ? `+${event._timezoneOffset}` : event._timezoneOffset;
-                    timeDisplayText = `${eventTimeDisplay} (${event._originalStartTime} ${offset})`;
+                    timeDisplayText = `${eventStartTime} - ${eventEndTime} (${event._originalStartTime} ${offset})`;
                   }
                   
                   return (
