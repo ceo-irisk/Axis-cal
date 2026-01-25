@@ -220,6 +220,15 @@ async def update_event(event_id: str, event_data: EventCreate, user: dict = Depe
         raise HTTPException(status_code=403, detail="Недостаточно прав")
     
     update_dict = event_data.model_dump()
+    
+    # Validate: start_time must be before end_time
+    if update_dict.get("start_time") and update_dict.get("end_time"):
+        start = update_dict["start_time"] if isinstance(update_dict["start_time"], datetime) else datetime.fromisoformat(update_dict["start_time"].replace('Z', '+00:00'))
+        end = update_dict["end_time"] if isinstance(update_dict["end_time"], datetime) else datetime.fromisoformat(update_dict["end_time"].replace('Z', '+00:00'))
+        
+        if start >= end:
+            raise HTTPException(status_code=400, detail="Время начала должно быть раньше времени окончания")
+    
     update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
     
     # Convert datetime objects to ISO strings
