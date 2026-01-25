@@ -183,7 +183,6 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
               </Button>
             </form>
           </div>
-        )}
       </div>
     </div>
   );
