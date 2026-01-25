@@ -606,20 +606,31 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
     e.preventDefault();
     
     const startY = e.clientY;
-    // ВАЖНО: Используем _localStartTime и _localEndTime для корректного вычисления длительности
     const eventStart = event._localStartTime || new Date(event.start_time);
     const eventEnd = event._localEndTime || new Date(event.end_time);
     const originalDuration = (eventEnd - eventStart) / 60000; // minutes
     
+    setResizingEvent(event);
+    
     const handleMouseMove = (moveEvent) => {
       const deltaY = moveEvent.clientY - startY;
-      const deltaMinutes = Math.round(deltaY / 60 * 60); // 60px = 1 hour = 60 minutes
-      const newDuration = Math.max(15, originalDuration + deltaMinutes); // minimum 15 minutes
+      const deltaMinutes = Math.round((deltaY / 60) * 60 / 10) * 10; // 10-minute snap
+      const newDuration = Math.max(10, originalDuration + deltaMinutes); // minimum 10 minutes
       
-      // Visual feedback - update the event element height
+      // Calculate preview end time
+      const previewEnd = new Date(eventStart.getTime() + newDuration * 60000);
+      const startTime = `${String(eventStart.getHours()).padStart(2, '0')}:${String(eventStart.getMinutes()).padStart(2, '0')}`;
+      const endTime = `${String(previewEnd.getHours()).padStart(2, '0')}:${String(previewEnd.getMinutes()).padStart(2, '0')}`;
+      
+      setDragPreviewTime({
+        start: startTime,
+        end: endTime
+      });
+      
+      // Visual feedback - update height
       const eventEl = document.querySelector(`[data-testid="event-${event.id}"]`);
       if (eventEl) {
-        eventEl.style.height = `${Math.max(newDuration, 15)}px`;
+        eventEl.style.height = `${Math.max(newDuration, 10)}px`;
       }
     };
     
@@ -630,16 +641,21 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
       if (!onEventUpdate) return;
       
       const deltaY = upEvent.clientY - startY;
-      const deltaMinutes = Math.round(deltaY / 60 * 60);
-      const newDuration = Math.max(15, originalDuration + deltaMinutes);
+      const deltaMinutes = Math.round((deltaY / 60) * 60 / 10) * 10; // 10-minute snap
+      const newDuration = Math.max(10, originalDuration + deltaMinutes);
       
-      const newEnd = new Date(eventStart.getTime() + newDuration * 60000);
+      // ВАЖНО: Используем оригинальное start_time (UTC) и добавляем длительность
+      const originalStart = new Date(event.start_time);
+      const newEnd = new Date(originalStart.getTime() + newDuration * 60000);
       
       onEventUpdate({
         ...event,
-        start_time: event.start_time,
-        end_time: newEnd.toISOString()
+        start_time: event.start_time, // Не меняем start
+        end_time: newEnd.toISOString() // Новый end в UTC
       });
+      
+      setResizingEvent(null);
+      setDragPreviewTime(null);
     };
     
     document.addEventListener('mousemove', handleMouseMove);
