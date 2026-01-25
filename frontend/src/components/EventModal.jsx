@@ -58,55 +58,15 @@ const WEEKDAYS = [
 
 // Time picker component
 const TimePicker = ({ value, onChange, label }) => {
-  const [hours, minutes] = value ? value.split(':').map(Number) : [9, 0];
-  
-  const updateTime = (newHours, newMinutes) => {
-    const h = Math.max(0, Math.min(23, newHours));
-    const m = Math.max(0, Math.min(59, newMinutes));
-    onChange(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
-  };
-
-  const incrementHour = () => updateTime(hours + 1, minutes);
-  const decrementHour = () => updateTime(hours - 1, minutes);
-  const incrementMinute = () => updateTime(hours, minutes + 15 - (minutes % 15));
-  const decrementMinute = () => updateTime(hours, minutes - 15 + (minutes % 15 === 0 ? 0 : 15 - (minutes % 15)));
-
   return (
-    <div className="space-y-1.5">
-      <Label className="text-xs text-muted-foreground">{label}</Label>
-      <div className="flex items-center gap-1">
-        {/* Hours */}
-        <div className="flex flex-col items-center">
-          <button type="button" onClick={incrementHour} className="p-0.5 hover:bg-accent rounded">
-            <ChevronUp className="w-4 h-4" />
-          </button>
-          <input
-            type="text"
-            value={String(hours).padStart(2, '0')}
-            onChange={(e) => updateTime(parseInt(e.target.value) || 0, minutes)}
-            className="w-10 h-8 text-center text-lg font-mono bg-accent rounded border-0 focus:ring-2 focus:ring-[#085C53]"
-          />
-          <button type="button" onClick={decrementHour} className="p-0.5 hover:bg-accent rounded">
-            <ChevronDown className="w-4 h-4" />
-          </button>
-        </div>
-        <span className="text-xl font-bold text-muted-foreground">:</span>
-        {/* Minutes */}
-        <div className="flex flex-col items-center">
-          <button type="button" onClick={incrementMinute} className="p-0.5 hover:bg-accent rounded">
-            <ChevronUp className="w-4 h-4" />
-          </button>
-          <input
-            type="text"
-            value={String(minutes).padStart(2, '0')}
-            onChange={(e) => updateTime(hours, parseInt(e.target.value) || 0)}
-            className="w-10 h-8 text-center text-lg font-mono bg-accent rounded border-0 focus:ring-2 focus:ring-[#085C53]"
-          />
-          <button type="button" onClick={decrementMinute} className="p-0.5 hover:bg-accent rounded">
-            <ChevronDown className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
+    <div>
+      <Label className="text-xs text-muted-foreground mb-1 block">{label}</Label>
+      <input
+        type="time"
+        value={value || '09:00'}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full h-9 px-3 text-sm font-mono bg-accent rounded-lg border-0 focus:ring-2 focus:ring-[#085C53] focus:outline-none"
+      />
     </div>
   );
 };
