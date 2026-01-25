@@ -80,8 +80,10 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
         </div>
 
         {calendar.is_default && !calendar.is_public && (
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 mb-4">
-            <p className="text-sm text-amber-600 dark:text-amber-400">🔒 Закрытый календарь нельзя расшарить</p>
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-4">
+            <p className="text-sm text-blue-600 dark:text-blue-400">
+              🔒 Закрытый календарь: можно делиться только занятостью (другие не увидят детали событий)
+            </p>
           </div>
         )}
 
