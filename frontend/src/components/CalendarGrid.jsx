@@ -968,6 +968,7 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
     });
     
     setDraggedEvent(null);
+    setDragPreviewTime(null);
   };
 
   return (
