@@ -33,6 +33,7 @@ async def get_calendars(user: dict = Depends(get_current_user)):
     # Get calendars where user has permissions
     permissions = await db.calendar_permissions.find({"user_id": user["id"]}, {"_id": 0}).to_list(100)
     permitted_calendar_ids = [p["calendar_id"] for p in permissions]
+    permission_map = {p["calendar_id"]: p["permission_level"] for p in permissions}
     
     # Get shared calendars
     if permitted_calendar_ids:
@@ -49,10 +50,11 @@ async def get_calendars(user: dict = Depends(get_current_user)):
         ).to_list(100)
         user_map = {u["id"]: u for u in users}
         
-        # Attach owner info to shared calendars
+        # Attach owner info and permission level to shared calendars
         for cal in shared_calendars:
             cal["owner"] = user_map.get(cal["user_id"])
             cal["is_own"] = False
+            cal["permission_level"] = permission_map.get(cal["id"], "read")
         
         calendars.extend(shared_calendars)
     
