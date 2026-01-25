@@ -443,31 +443,33 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
   const handleDragStart = (e, event) => {
     e.dataTransfer.effectAllowed = 'move';
     
-    // Create floating preview element
-    const preview = document.createElement('div');
-    preview.id = 'custom-drag-preview';
-    preview.style.cssText = `
-      position: fixed;
+    // Create custom drag image that looks like the event
+    const dragImage = document.createElement('div');
+    const eventColor = getEventDynamicStyle(event, eventTypes)?.backgroundColor || '#085C53';
+    dragImage.style.cssText = `
+      position: absolute;
+      top: -1000px;
+      left: -1000px;
       padding: 8px 12px;
-      background: linear-gradient(135deg, #085C53 0%, #074a44 100%);
+      background: ${eventColor};
       color: white;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      pointer-events: none;
-      z-index: 10000;
       white-space: nowrap;
+      min-width: 150px;
     `;
-    preview.textContent = event.title;
-    document.body.appendChild(preview);
-    
-    // Create invisible drag image
-    const dragImage = document.createElement('div');
-    dragImage.style.cssText = 'position: absolute; top: -1000px; opacity: 0;';
+    dragImage.id = 'drag-image-temp';
+    dragImage.innerHTML = `<div>${event.title}</div><div style="font-size: 11px; opacity: 0.9; margin-top: 2px;">⏰ Перемещение...</div>`;
     document.body.appendChild(dragImage);
-    e.dataTransfer.setDragImage(dragImage, 0, 0);
-    setTimeout(() => dragImage.remove(), 0);
+    
+    e.dataTransfer.setDragImage(dragImage, 50, 20);
+    
+    setTimeout(() => {
+      const el = document.getElementById('drag-image-temp');
+      if (el) el.remove();
+    }, 100);
     
     setDraggedEvent(event);
     setDragPreviewTime(null);
