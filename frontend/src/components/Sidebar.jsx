@@ -1104,7 +1104,6 @@ export const Sidebar = ({
                           <span className="text-xs text-muted-foreground">is_video_call</span>
                         </div>
                       </div>
-                      <p className="text-xs text-amber-500 mt-3 text-center">Редактирование флагов — скоро</p>
                     </div>
 
                   </div>
