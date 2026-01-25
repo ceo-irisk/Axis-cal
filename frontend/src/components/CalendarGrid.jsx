@@ -842,6 +842,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                     className="h-[60px] border-b border-dashed border-border/20 hover:bg-accent/10" 
                     onClick={() => onDateClick?.(day)}
                     onDoubleClick={() => onCellDoubleClick(day, hour)}
+                    onMouseDown={(e) => handleCellMouseDown(e, day, hour)}
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, day, hour)}
                   />
