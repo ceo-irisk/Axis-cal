@@ -301,9 +301,9 @@ const TimezoneSelector = ({ selectedTimezone, onTimezoneChange }) => {
   
   return (
     <Select value={selectedTimezone} onValueChange={onTimezoneChange}>
-      <SelectTrigger className="w-[200px] h-7 text-xs gap-1">
+      <SelectTrigger className="w-full h-7 text-xs gap-1">
         <Globe className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-        <span className="truncate">{selectedTz?.label || 'UTC'}</span>
+        <span className="truncate text-[10px]">{selectedTz?.label || 'UTC'}</span>
       </SelectTrigger>
       <SelectContent className="max-h-[300px]">
         {TIMEZONES.map(tz => (
