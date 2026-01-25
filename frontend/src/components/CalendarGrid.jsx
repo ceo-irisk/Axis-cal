@@ -541,7 +541,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
           {days.map((day, idx) => (
             <div 
               key={day.toISOString()} 
-              className={`group border-r border-border/30 ${isSameDay(day, date) ? 'bg-[#085C53]/10' : ''}`}
+              className={`group border-r border-border/30 overflow-hidden ${isSameDay(day, date) ? 'bg-[#085C53]/10' : ''}`}
             >
               {/* Day header - centered, fixed layout */}
               <div className="p-2 text-center relative">
