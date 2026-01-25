@@ -14,7 +14,7 @@ import CalendarGrid from '../components/CalendarGrid';
 import EventModal from '../components/EventModal';
 import SurveyModal from '../components/SurveyModal';
 import UsersPanel from '../components/UsersPanel';
-import { format, startOfMonth, endOfMonth, addMonths, subMonths, addWeeks, subWeeks, addDays, subDays } from 'date-fns';
+import { format, startOfMonth, endOfMonth, addMonths, subMonths, addWeeks, subWeeks, addDays, subDays, startOfWeek, endOfWeek } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Menu } from 'lucide-react';
 
