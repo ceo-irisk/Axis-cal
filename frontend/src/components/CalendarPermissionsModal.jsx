@@ -127,13 +127,12 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
           )}
         </div>
 
-        {/* Add new permission */}
-        {(!calendar.is_default || calendar.is_public) && (
-          <div>
-            <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-              <UserPlus className="w-4 h-4" />
-              Добавить пользователя
-            </h3>
+        {/* Add new permission - allow for all calendars */}
+        <div>
+          <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
+            <UserPlus className="w-4 h-4" />
+            Добавить пользователя
+          </h3>
             
             <form onSubmit={handleGrant} className="space-y-3">
               <div>
