@@ -554,6 +554,13 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
     setIsDragging(false);
   };
 
+  const handleDragEnd = (e) => {
+    // Clean up drag state when drag ends (including cancelled drags)
+    setDraggedEvent(null);
+    setDragPreviewTime(null);
+    setIsDragging(false);
+  };
+
   // Resize handlers
   const handleResizeStart = (e, event, day) => {
     e.stopPropagation();
