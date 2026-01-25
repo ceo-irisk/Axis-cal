@@ -447,6 +447,34 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
   const handleDragOver = (e) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
+    
+    if (!draggedEvent) return;
+    
+    // Calculate preview time during drag
+    const rect = e.currentTarget.getBoundingClientRect();
+    const offsetY = e.clientY - rect.top;
+    const cellHeight = 60;
+    const totalMinutes = Math.floor((offsetY / cellHeight) * 60);
+    const roundedMinutes = Math.round(totalMinutes / 10) * 10; // 10-minute snap
+    
+    const hour = parseInt(e.currentTarget.getAttribute('data-hour') || '0');
+    const previewStartHour = hour;
+    const previewStartMinute = Math.min(roundedMinutes, 50);
+    
+    // Calculate duration
+    const start = new Date(draggedEvent.start_time);
+    const end = new Date(draggedEvent.end_time);
+    const durationMs = end - start;
+    
+    // Preview end time
+    const previewStart = new Date();
+    previewStart.setHours(previewStartHour, previewStartMinute, 0, 0);
+    const previewEnd = new Date(previewStart.getTime() + durationMs);
+    
+    setDragPreviewTime({
+      start: `${String(previewStart.getHours()).padStart(2, '0')}:${String(previewStart.getMinutes()).padStart(2, '0')}`,
+      end: `${String(previewEnd.getHours()).padStart(2, '0')}:${String(previewEnd.getMinutes()).padStart(2, '0')}`
+    });
   };
 
   const handleDrop = (e, day, hour) => {
