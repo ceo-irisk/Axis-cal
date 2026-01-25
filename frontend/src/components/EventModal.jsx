@@ -146,7 +146,12 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars, selected
   
   const startDate = defaultDate || new Date();
   const dateStr = format(startDate, 'yyyy-MM-dd');
-  const startHour = defaultHour ?? 9;
+  
+  // defaultHour может быть числом или объектом { hour, minute }
+  const startHour = typeof defaultHour === 'object' ? defaultHour.hour : (defaultHour ?? 9);
+  const startMinute = typeof defaultHour === 'object' ? defaultHour.minute : 0;
+  const endHour = startHour + 1;
+  const endMinute = startMinute;
   
   // Find "Открытый" calendar or use first available
   const defaultCalendar = calendars.find(c => c.name === 'Открытый') || calendars[0];
@@ -155,9 +160,9 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars, selected
     title: '',
     description: '',
     start_date: dateStr,
-    start_time_val: `${String(startHour).padStart(2, '0')}:00`,
+    start_time_val: `${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`,
     end_date: dateStr,
-    end_time_val: `${String(startHour + 1).padStart(2, '0')}:00`,
+    end_time_val: `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`,
     event_type: 'meeting',
     status: 'confirmed',
     location: '',
