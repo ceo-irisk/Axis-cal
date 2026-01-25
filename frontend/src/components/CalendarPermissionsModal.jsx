@@ -171,17 +171,26 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="z-[100]" position="popper" sideOffset={5}>
-                    {PERMISSION_LEVELS.map(level => (
-                      <SelectItem key={level.value} value={level.value}>
-                        <div className="flex items-start gap-2">
-                          <level.icon className="w-4 h-4 mt-0.5" />
-                          <div>
-                            <p className="font-medium">{level.label}</p>
-                            <p className="text-xs text-muted-foreground">{level.description}</p>
+                    {PERMISSION_LEVELS
+                      .filter(level => {
+                        // Для закрытого календаря - только view_busy
+                        if (!calendar.is_public) {
+                          return level.value === 'view_busy';
+                        }
+                        // Для открытого - все уровни
+                        return true;
+                      })
+                      .map(level => (
+                        <SelectItem key={level.value} value={level.value}>
+                          <div className="flex items-start gap-2">
+                            <level.icon className="w-4 h-4 mt-0.5" />
+                            <div>
+                              <p className="font-medium">{level.label}</p>
+                              <p className="text-xs text-muted-foreground">{level.description}</p>
+                            </div>
                           </div>
-                        </div>
-                      </SelectItem>
-                    ))}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
