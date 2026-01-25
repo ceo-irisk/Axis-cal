@@ -335,7 +335,8 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
   // Drag state
   const [draggedEvent, setDraggedEvent] = useState(null);
   const [resizingEvent, setResizingEvent] = useState(null);
-  const [dragPreviewTime, setDragPreviewTime] = useState(null); // { start: 'HH:MM', end: 'HH:MM' }
+  const [dragPreviewTime, setDragPreviewTime] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const getEventStyle = (event) => {
     try {
