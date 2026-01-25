@@ -237,6 +237,15 @@ export const EventModal = ({
     const localStartStr = `${formData.start_date}T${formData.start_time_val}`;
     const localEndStr = `${formData.end_date}T${formData.end_time_val}`;
     
+    // Validate: start must be before end
+    const startLocal = new Date(localStartStr);
+    const endLocal = new Date(localEndStr);
+    
+    if (startLocal >= endLocal) {
+      toast.error('Время начала должно быть раньше времени окончания');
+      return;
+    }
+    
     // Convert local time to UTC
     const startDateTimeUTC = localToUTC(localStartStr, finalTimezone);
     const endDateTimeUTC = localToUTC(localEndStr, finalTimezone);
