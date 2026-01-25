@@ -551,6 +551,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
     
     setDraggedEvent(null);
     setDragPreviewTime(null);
+    setIsDragging(false);
   };
 
   // Resize handlers
