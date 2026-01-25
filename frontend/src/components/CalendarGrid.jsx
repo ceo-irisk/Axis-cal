@@ -486,16 +486,16 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
     const offsetY = e.clientY - rect.top;
     const cellHeight = 60; // высота ячейки в px (1 час = 60px)
     
-    // Вычисляем минуты с точностью до 5 минут для более плавного UX
+    // Вычисляем минуты с точностью до 10 минут
     const totalMinutes = Math.floor((offsetY / cellHeight) * 60);
-    const roundedMinutes = Math.round(totalMinutes / 5) * 5; // округление до 5 минут
+    const roundedMinutes = Math.round(totalMinutes / 10) * 10; // округление до 10 минут
     
     const start = parseISO(draggedEvent.start_time);
     const end = parseISO(draggedEvent.end_time);
     const duration = end - start;
     
     // Создаём новое время начала с учётом минут
-    const newStart = setMinutes(setHours(day, hour), Math.min(roundedMinutes, 55));
+    const newStart = setMinutes(setHours(day, hour), Math.min(roundedMinutes, 50));
     const newEnd = new Date(newStart.getTime() + duration);
     
     onEventUpdate({
@@ -505,6 +505,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
     });
     
     setDraggedEvent(null);
+    setDragPreviewTime(null);
   };
 
   // Resize handlers
