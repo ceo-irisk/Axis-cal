@@ -604,6 +604,77 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
     setDragPreviewTime(null);
     setIsDragging(false);
   };
+  
+  // Drag-to-create handlers
+  const handleCellMouseDown = (e, day, hour) => {
+    // Only start creating on empty cells (not on events)
+    if (e.target.getAttribute('data-testid')?.startsWith('event-')) return;
+    
+    const rect = e.currentTarget.getBoundingClientRect();
+    const offsetY = e.clientY - rect.top;
+    const cellHeight = 60;
+    const minutesFraction = (offsetY / cellHeight) * 60;
+    const minute = Math.round(minutesFraction / 10) * 10;
+    
+    setIsCreating(true);
+    setCreateStart({
+      day,
+      hour,
+      minute: Math.min(minute, 50),
+      clientY: e.clientY
+    });
+  };
+  
+  useEffect(() => {
+    if (!isCreating || !createStart || !gridRef.current) return;
+    
+    const handleMouseMove = (e) => {
+      const deltaY = e.clientY - createStart.clientY;
+      const deltaMinutes = Math.round((deltaY / 60) * 60 / 10) * 10; // 10-min snap
+      const duration = Math.max(10, deltaMinutes); // minimum 10 minutes
+      
+      // Calculate preview position and time
+      const startMinuteTotal = createStart.hour * 60 + createStart.minute;
+      const endMinuteTotal = startMinuteTotal + duration;
+      const endHour = Math.floor(endMinuteTotal / 60);
+      const endMinute = endMinuteTotal % 60;
+      
+      setCreatePreview({
+        top: startMinuteTotal,
+        height: duration,
+        startTime: `${String(createStart.hour).padStart(2, '0')}:${String(createStart.minute).padStart(2, '0')}`,
+        endTime: `${String(Math.min(endHour, 23)).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`
+      });
+    };
+    
+    const handleMouseUp = (e) => {
+      if (!createPreview || !onCellDoubleClick) {
+        setIsCreating(false);
+        setCreateStart(null);
+        setCreatePreview(null);
+        return;
+      }
+      
+      // Create event with calculated time
+      const startDate = new Date(createStart.day);
+      startDate.setHours(createStart.hour, createStart.minute, 0, 0);
+      
+      // Open create modal with prefilled time
+      onCellDoubleClick(createStart.day, createStart.hour, createStart.minute);
+      
+      setIsCreating(false);
+      setCreateStart(null);
+      setCreatePreview(null);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isCreating, createStart, createPreview, onCellDoubleClick]);
 
   // Resize handlers
   const handleResizeStart = (e, event, day) => {
