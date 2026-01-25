@@ -20,6 +20,15 @@ def init_db(database):
 @router.post("", response_model=dict)
 async def create_event(event_data: EventCreate, user: dict = Depends(get_current_user)):
     event_dict = event_data.model_dump()
+    
+    # Validate: start_time must be before end_time
+    if event_dict.get("start_time") and event_dict.get("end_time"):
+        start = event_dict["start_time"] if isinstance(event_dict["start_time"], datetime) else datetime.fromisoformat(event_dict["start_time"].replace('Z', '+00:00'))
+        end = event_dict["end_time"] if isinstance(event_dict["end_time"], datetime) else datetime.fromisoformat(event_dict["end_time"].replace('Z', '+00:00'))
+        
+        if start >= end:
+            raise HTTPException(status_code=400, detail="Время начала должно быть раньше времени окончания")
+    
     event_dict["id"] = str(uuid.uuid4())
     event_dict["created_by"] = user["id"]
     event_dict["created_at"] = datetime.now(timezone.utc).isoformat()
