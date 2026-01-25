@@ -25,6 +25,34 @@ async def create_event(event_data: EventCreate, user: dict = Depends(get_current
     event_dict["created_at"] = datetime.now(timezone.utc).isoformat()
     event_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
     
+    # Check permissions if calendar_id is provided
+    if event_dict.get("calendar_id"):
+        calendar_id = event_dict["calendar_id"]
+        
+        # Check if user owns this calendar
+        calendar = await db.calendars.find_one({"id": calendar_id})
+        if not calendar:
+            raise HTTPException(status_code=404, detail="Календарь не найден")
+        
+        is_owner = calendar.get("user_id") == user["id"]
+        
+        # If not owner, check permissions
+        if not is_owner:
+            permission = await db.calendar_permissions.find_one({
+                "calendar_id": calendar_id,
+                "user_id": user["id"]
+            })
+            
+            if not permission:
+                raise HTTPException(status_code=403, detail="Нет доступа к этому календарю")
+            
+            # view_busy and read permissions cannot create events
+            if permission.get("permission_level") in ["view_busy", "read"]:
+                raise HTTPException(
+                    status_code=403, 
+                    detail="Недостаточно прав. Для создания событий нужны права 'Редактирование' или 'Полный доступ'"
+                )
+    
     # Convert datetime objects to ISO strings (pydantic converts strings to datetime)
     if isinstance(event_dict.get("start_time"), datetime):
         event_dict["start_time"] = event_dict["start_time"].isoformat()
