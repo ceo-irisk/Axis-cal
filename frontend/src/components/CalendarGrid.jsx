@@ -1087,6 +1087,7 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
                 draggable={!event.is_busy}
                 onDragStart={(e) => !event.is_busy && handleDragStart(e, event)}
                 onDrag={handleDrag}
+                onDragEnd={handleDragEnd}
                 onClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventSelect?.(event.id, e.shiftKey); }}
                 onDoubleClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventClick(event); }}
                 className={`
