@@ -452,7 +452,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
     const gridRect = gridRef.current.getBoundingClientRect();
     const mouseY = e.clientY - gridRect.top;
     
-    if (mouseY < 0) return; // Mouse outside grid
+    if (mouseY < 0 || e.clientY === 0) return; // Mouse outside grid or no coords
     
     // Calculate hour and minute from Y position
     const cellHeight = 60;
@@ -471,10 +471,13 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
     previewStart.setHours(hour, Math.min(roundedMinutes, 50), 0, 0);
     const previewEnd = new Date(previewStart.getTime() + durationMs);
     
-    setDragPreviewTime({
+    const newPreview = {
       start: `${String(previewStart.getHours()).padStart(2, '0')}:${String(previewStart.getMinutes()).padStart(2, '0')}`,
       end: `${String(previewEnd.getHours()).padStart(2, '0')}:${String(previewEnd.getMinutes()).padStart(2, '0')}`
-    });
+    };
+    
+    console.log('🔄 Drag preview:', newPreview);
+    setDragPreviewTime(newPreview);
   };
 
   const handleDragOver = (e) => {
