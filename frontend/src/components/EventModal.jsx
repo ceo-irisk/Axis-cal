@@ -462,7 +462,12 @@ export const EventModal = ({
                   {/* Group calendars by ownership */}
                   {(() => {
                     const ownCalendars = calendars.filter(cal => cal.is_own !== false);
-                    const sharedCalendars = calendars.filter(cal => cal.is_own === false);
+                    // Shared calendars - только с правами edit/full для создания событий
+                    const sharedCalendars = calendars.filter(cal => 
+                      cal.is_own === false && 
+                      cal.permission_level && 
+                      ['edit', 'full'].includes(cal.permission_level)
+                    );
                     
                     return (
                       <>
