@@ -938,6 +938,21 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                     </div>
                   );
                 })}
+                
+                {/* Drag-to-create preview */}
+                {isCreating && createPreview && isSameDay(day, createStart.day) && (
+                  <div
+                    className="absolute left-[2px] right-[2px] bg-[#085C53]/20 border-2 border-dashed border-[#085C53] rounded-md pointer-events-none z-30"
+                    style={{
+                      top: `${createPreview.top}px`,
+                      height: `${createPreview.height}px`
+                    }}
+                  >
+                    <div className="px-2 py-1 text-xs font-medium text-[#085C53]">
+                      {createPreview.startTime} - {createPreview.endTime}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
