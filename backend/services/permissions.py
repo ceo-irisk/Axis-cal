@@ -50,6 +50,7 @@ async def filter_events_by_permissions(events: List[dict], user_id: str, db) -> 
                     "title": "Занято",
                     "start_time": event["start_time"],
                     "end_time": event["end_time"],
+                    "timezone": event.get("timezone", "Europe/Moscow"),  # Сохраняем timezone!
                     "event_type": "meeting",
                     "status": "confirmed",
                     "is_busy": True,
