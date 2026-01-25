@@ -756,7 +756,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                         absolute px-1 py-1 rounded-md text-xs ${event.is_busy ? 'cursor-default' : 'cursor-move'}
                         hover:opacity-90 transition-all overflow-hidden group
                         ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
-                        ${draggedEvent?.id === event.id ? 'opacity-50 scale-95' : ''}
+                        ${draggedEvent?.id === event.id ? 'opacity-0' : ''}
                       `} 
                       style={{
                         ...getEventStyle(event), 
