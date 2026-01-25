@@ -237,13 +237,19 @@ async def delete_event(event_id: str, user: dict = Depends(get_current_user)):
         # Check if user has full permissions to the calendar
         calendar_id = event.get("calendar_id")
         if calendar_id:
-            permission = await db.calendar_permissions.find_one({
-                "calendar_id": calendar_id,
-                "user_id": user["id"],
-                "permission_level": "full"
-            })
-            if not permission:
-                raise HTTPException(status_code=403, detail="Недостаточно прав")
+            # Check if user owns the calendar
+            calendar = await db.calendars.find_one({"id": calendar_id})
+            is_calendar_owner = calendar and calendar.get("user_id") == user["id"]
+            
+            if not is_calendar_owner:
+                # Not calendar owner, check explicit permissions
+                permission = await db.calendar_permissions.find_one({
+                    "calendar_id": calendar_id,
+                    "user_id": user["id"],
+                    "permission_level": "full"
+                })
+                if not permission:
+                    raise HTTPException(status_code=403, detail="Недостаточно прав")
         else:
             raise HTTPException(status_code=403, detail="Недостаточно прав")
     
