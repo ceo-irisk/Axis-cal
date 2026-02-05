@@ -301,9 +301,9 @@ const TimezoneSelector = ({ selectedTimezone, onTimezoneChange }) => {
   
   return (
     <Select value={selectedTimezone} onValueChange={onTimezoneChange}>
-      <SelectTrigger className="w-[200px] h-7 text-xs gap-1">
+      <SelectTrigger className="w-full h-7 text-xs gap-1">
         <Globe className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-        <span className="truncate">{selectedTz?.label || 'UTC'}</span>
+        <span className="truncate text-[10px]">{selectedTz?.label || 'UTC'}</span>
       </SelectTrigger>
       <SelectContent className="max-h-[300px]">
         {TIMEZONES.map(tz => (
@@ -335,6 +335,13 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
   // Drag state
   const [draggedEvent, setDraggedEvent] = useState(null);
   const [resizingEvent, setResizingEvent] = useState(null);
+  const [dragPreviewTime, setDragPreviewTime] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  
+  // Drag-to-create state
+  const [isCreating, setIsCreating] = useState(false);
+  const [createStart, setCreateStart] = useState(null); // { day, hour, minute, clientY }
+  const [createPreview, setCreatePreview] = useState(null); // { top, height, startTime, endTime }
 
   const getEventStyle = (event) => {
     try {
@@ -440,12 +447,123 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
   // Drag handlers
   const handleDragStart = (e, event) => {
     e.dataTransfer.effectAllowed = 'move';
+    
+    // Create custom drag image that looks like the event
+    const dragImage = document.createElement('div');
+    const eventColor = getEventDynamicStyle(event, eventTypes)?.backgroundColor || '#085C53';
+    dragImage.style.cssText = `
+      position: absolute;
+      top: -1000px;
+      left: -1000px;
+      padding: 8px 12px;
+      background: ${eventColor};
+      color: white;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      white-space: nowrap;
+      min-width: 150px;
+    `;
+    dragImage.id = 'drag-image-temp';
+    dragImage.innerHTML = `<div>${event.title}</div><div style="font-size: 11px; opacity: 0.9; margin-top: 2px;">⏰ Перемещение...</div>`;
+    document.body.appendChild(dragImage);
+    
+    e.dataTransfer.setDragImage(dragImage, 50, 20);
+    
+    setTimeout(() => {
+      const el = document.getElementById('drag-image-temp');
+      if (el) el.remove();
+    }, 100);
+    
     setDraggedEvent(event);
+    setDragPreviewTime(null);
+    setIsDragging(true);
   };
+  
+  const handleDrag = (e) => {
+    // Note: onDrag in HTML5 often has e.clientY === 0
+    // We'll use document-level mousemove instead
+  };
+  
+  // Track mouse movement during drag
+  useEffect(() => {
+    if (!isDragging || !draggedEvent || !gridRef.current) return;
+    
+    const handleMouseMove = (e) => {
+      const gridRect = gridRef.current.getBoundingClientRect();
+      const mouseY = e.clientY - gridRect.top;
+      
+      if (mouseY < 0) return;
+      
+      const cellHeight = 60;
+      const totalHours = mouseY / cellHeight;
+      const hour = Math.floor(totalHours);
+      const minutesFraction = (totalHours - hour) * 60;
+      const roundedMinutes = Math.round(minutesFraction / 10) * 10;
+      
+      const start = new Date(draggedEvent.start_time);
+      const end = new Date(draggedEvent.end_time);
+      const durationMs = end - start;
+      
+      const previewStart = new Date();
+      previewStart.setHours(hour, Math.min(roundedMinutes, 50), 0, 0);
+      const previewEnd = new Date(previewStart.getTime() + durationMs);
+      
+      setDragPreviewTime({
+        start: `${String(previewStart.getHours()).padStart(2, '0')}:${String(previewStart.getMinutes()).padStart(2, '0')}`,
+        end: `${String(previewEnd.getHours()).padStart(2, '0')}:${String(previewEnd.getMinutes()).padStart(2, '0')}`
+      });
+      
+      // Update custom drag preview element if exists
+      const dragPreview = document.getElementById('custom-drag-preview');
+      if (dragPreview) {
+        dragPreview.style.left = `${e.clientX + 10}px`;
+        dragPreview.style.top = `${e.clientY + 10}px`;
+        dragPreview.textContent = `${previewStart.getHours()}:${String(previewStart.getMinutes()).padStart(2, '0')} - ${previewEnd.getHours()}:${String(previewEnd.getMinutes()).padStart(2, '0')} | ${draggedEvent.title}`;
+      }
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      const preview = document.getElementById('custom-drag-preview');
+      if (preview) preview.remove();
+    };
+  }, [isDragging, draggedEvent]);
 
   const handleDragOver = (e) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
+    
+    if (!draggedEvent) return;
+    
+    // Calculate preview time during drag
+    const rect = e.currentTarget.getBoundingClientRect();
+    const offsetY = e.clientY - rect.top;
+    const cellHeight = 60;
+    const totalMinutes = Math.floor((offsetY / cellHeight) * 60);
+    const roundedMinutes = Math.round(totalMinutes / 10) * 10; // 10-minute snap
+    
+    const hour = parseInt(e.currentTarget.getAttribute('data-hour') || '0');
+    const previewStartHour = hour;
+    const previewStartMinute = Math.min(roundedMinutes, 50);
+    
+    // Calculate duration
+    const start = new Date(draggedEvent.start_time);
+    const end = new Date(draggedEvent.end_time);
+    const durationMs = end - start;
+    
+    // Preview end time
+    const previewStart = new Date();
+    previewStart.setHours(previewStartHour, previewStartMinute, 0, 0);
+    const previewEnd = new Date(previewStart.getTime() + durationMs);
+    
+    setDragPreviewTime({
+      start: `${String(previewStart.getHours()).padStart(2, '0')}:${String(previewStart.getMinutes()).padStart(2, '0')}`,
+      end: `${String(previewEnd.getHours()).padStart(2, '0')}:${String(previewEnd.getMinutes()).padStart(2, '0')}`
+    });
   };
 
   const handleDrop = (e, day, hour) => {
@@ -457,16 +575,16 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
     const offsetY = e.clientY - rect.top;
     const cellHeight = 60; // высота ячейки в px (1 час = 60px)
     
-    // Вычисляем минуты с точностью до 5 минут для более плавного UX
+    // Вычисляем минуты с точностью до 10 минут
     const totalMinutes = Math.floor((offsetY / cellHeight) * 60);
-    const roundedMinutes = Math.round(totalMinutes / 5) * 5; // округление до 5 минут
+    const roundedMinutes = Math.round(totalMinutes / 10) * 10; // округление до 10 минут
     
     const start = parseISO(draggedEvent.start_time);
     const end = parseISO(draggedEvent.end_time);
     const duration = end - start;
     
     // Создаём новое время начала с учётом минут
-    const newStart = setMinutes(setHours(day, hour), Math.min(roundedMinutes, 55));
+    const newStart = setMinutes(setHours(day, hour), Math.min(roundedMinutes, 50));
     const newEnd = new Date(newStart.getTime() + duration);
     
     onEventUpdate({
@@ -476,7 +594,87 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
     });
     
     setDraggedEvent(null);
+    setDragPreviewTime(null);
+    setIsDragging(false);
   };
+
+  const handleDragEnd = (e) => {
+    // Clean up drag state when drag ends (including cancelled drags)
+    setDraggedEvent(null);
+    setDragPreviewTime(null);
+    setIsDragging(false);
+  };
+  
+  // Drag-to-create handlers
+  const handleCellMouseDown = (e, day, hour) => {
+    // Only start creating on empty cells (not on events)
+    if (e.target.getAttribute('data-testid')?.startsWith('event-')) return;
+    
+    const rect = e.currentTarget.getBoundingClientRect();
+    const offsetY = e.clientY - rect.top;
+    const cellHeight = 60;
+    const minutesFraction = (offsetY / cellHeight) * 60;
+    const minute = Math.round(minutesFraction / 10) * 10;
+    
+    setIsCreating(true);
+    setCreateStart({
+      day,
+      hour,
+      minute: Math.min(minute, 50),
+      clientY: e.clientY
+    });
+  };
+  
+  useEffect(() => {
+    if (!isCreating || !createStart || !gridRef.current) return;
+    
+    const handleMouseMove = (e) => {
+      const deltaY = e.clientY - createStart.clientY;
+      const deltaMinutes = Math.round((deltaY / 60) * 60 / 10) * 10; // 10-min snap
+      const duration = Math.max(10, deltaMinutes); // minimum 10 minutes
+      
+      // Calculate preview position and time
+      const startMinuteTotal = createStart.hour * 60 + createStart.minute;
+      const endMinuteTotal = startMinuteTotal + duration;
+      const endHour = Math.floor(endMinuteTotal / 60);
+      const endMinute = endMinuteTotal % 60;
+      
+      setCreatePreview({
+        top: startMinuteTotal,
+        height: duration,
+        startTime: `${String(createStart.hour).padStart(2, '0')}:${String(createStart.minute).padStart(2, '0')}`,
+        endTime: `${String(Math.min(endHour, 23)).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`
+      });
+    };
+    
+    const handleMouseUp = (e) => {
+      if (!createPreview || !onCellDoubleClick) {
+        setIsCreating(false);
+        setCreateStart(null);
+        setCreatePreview(null);
+        return;
+      }
+      
+      // Create event with calculated time
+      const startDate = new Date(createStart.day);
+      startDate.setHours(createStart.hour, createStart.minute, 0, 0);
+      
+      // Open create modal with prefilled time
+      onCellDoubleClick(createStart.day, createStart.hour, createStart.minute);
+      
+      setIsCreating(false);
+      setCreateStart(null);
+      setCreatePreview(null);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isCreating, createStart, createPreview, onCellDoubleClick]);
 
   // Resize handlers
   const handleResizeStart = (e, event, day) => {
@@ -484,20 +682,31 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
     e.preventDefault();
     
     const startY = e.clientY;
-    // ВАЖНО: Используем _localStartTime и _localEndTime для корректного вычисления длительности
     const eventStart = event._localStartTime || new Date(event.start_time);
     const eventEnd = event._localEndTime || new Date(event.end_time);
     const originalDuration = (eventEnd - eventStart) / 60000; // minutes
     
+    setResizingEvent(event);
+    
     const handleMouseMove = (moveEvent) => {
       const deltaY = moveEvent.clientY - startY;
-      const deltaMinutes = Math.round(deltaY / 60 * 60); // 60px = 1 hour = 60 minutes
-      const newDuration = Math.max(15, originalDuration + deltaMinutes); // minimum 15 minutes
+      const deltaMinutes = Math.round((deltaY / 60) * 60 / 10) * 10; // 10-minute snap
+      const newDuration = Math.max(10, originalDuration + deltaMinutes); // minimum 10 minutes
       
-      // Visual feedback - update the event element height
+      // Calculate preview end time - ВАЖНО: используем UTC методы для _localStartTime
+      const previewEnd = new Date(eventStart.getTime() + newDuration * 60000);
+      const startTime = `${String(eventStart.getUTCHours()).padStart(2, '0')}:${String(eventStart.getUTCMinutes()).padStart(2, '0')}`;
+      const endTime = `${String(previewEnd.getUTCHours()).padStart(2, '0')}:${String(previewEnd.getUTCMinutes()).padStart(2, '0')}`;
+      
+      setDragPreviewTime({
+        start: startTime,
+        end: endTime
+      });
+      
+      // Visual feedback - update height
       const eventEl = document.querySelector(`[data-testid="event-${event.id}"]`);
       if (eventEl) {
-        eventEl.style.height = `${Math.max(newDuration, 15)}px`;
+        eventEl.style.height = `${Math.max(newDuration, 10)}px`;
       }
     };
     
@@ -508,16 +717,21 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
       if (!onEventUpdate) return;
       
       const deltaY = upEvent.clientY - startY;
-      const deltaMinutes = Math.round(deltaY / 60 * 60);
-      const newDuration = Math.max(15, originalDuration + deltaMinutes);
+      const deltaMinutes = Math.round((deltaY / 60) * 60 / 10) * 10; // 10-minute snap
+      const newDuration = Math.max(10, originalDuration + deltaMinutes);
       
-      const newEnd = new Date(eventStart.getTime() + newDuration * 60000);
+      // ВАЖНО: Используем оригинальное start_time (UTC) и добавляем длительность
+      const originalStart = new Date(event.start_time);
+      const newEnd = new Date(originalStart.getTime() + newDuration * 60000);
       
       onEventUpdate({
         ...event,
-        start_time: event.start_time,
-        end_time: newEnd.toISOString()
+        start_time: event.start_time, // Не меняем start
+        end_time: newEnd.toISOString() // Новый end в UTC
       });
+      
+      setResizingEvent(null);
+      setDragPreviewTime(null);
     };
     
     document.addEventListener('mousemove', handleMouseMove);
@@ -541,7 +755,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
           {days.map((day, idx) => (
             <div 
               key={day.toISOString()} 
-              className={`group border-r border-border/30 ${isSameDay(day, date) ? 'bg-[#085C53]/10' : ''}`}
+              className={`group border-r border-border/30 overflow-hidden ${isSameDay(day, date) ? 'bg-[#085C53]/10' : ''}`}
             >
               {/* Day header - centered, fixed layout */}
               <div className="p-2 text-center relative">
@@ -561,7 +775,7 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
               </div>
               
               {/* All-day events row */}
-              <div className="min-h-[24px] px-1 pb-1 space-y-0.5 overflow-hidden">
+              <div className="h-[48px] px-1 pb-1 space-y-0.5 overflow-y-auto">
                 {getAllDayEvents(day).map(event => {
                   const dynamicStyle = getEventDynamicStyle(event, eventTypes);
                   const isSelected = selectedEventIds?.includes(event.id);
@@ -570,8 +784,8 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                       key={event.id}
                       onClick={(e) => onEventSelect?.(event.id, e.shiftKey)}
                       onDoubleClick={(e) => onEventClick(event)}
-                      className={`px-2 py-0.5 rounded cursor-pointer hover:opacity-80 ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
-                      style={dynamicStyle || {}}
+                      className={`px-2 py-0.5 rounded cursor-pointer hover:opacity-80 w-full ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1' : ''}`}
+                      style={{...dynamicStyle, maxWidth: '100%', overflow: 'hidden'}}
                       title={event.title}
                     >
                       <div className="text-[10px] font-medium truncate leading-tight">
@@ -624,9 +838,11 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                 {hours.map(hour => (
                   <div 
                     key={hour} 
+                    data-hour={hour}
                     className="h-[60px] border-b border-dashed border-border/20 hover:bg-accent/10" 
                     onClick={() => onDateClick?.(day)}
                     onDoubleClick={() => onCellDoubleClick(day, hour)}
+                    onMouseDown={(e) => handleCellMouseDown(e, day, hour)}
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, day, hour)}
                   />
@@ -646,16 +862,17 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                 {dayEvents.map(event => {
                   const duration = getEventDuration(event);
                   const isLong = duration >= 1;
-                  const eventTimeDisplay = event._displayStartTime || formatTime(new Date(event.start_time));
+                  const eventStartTime = event._displayStartTime || formatTime(new Date(event.start_time));
+                  const eventEndTime = event._displayEndTime || formatTime(new Date(event.end_time));
                   const dynamicStyle = getEventDynamicStyle(event, eventTypes);
                   const overlapStyle = getOverlapStyle(event, dayEvents);
                   const isSelected = selectedEventIds?.includes(event.id);
                   
-                  // Формируем отображение времени с исходным timezone если отличается
-                  let timeDisplayText = eventTimeDisplay;
+                  // Формируем отображение времени: начало - конец
+                  let timeDisplayText = `${eventStartTime} - ${eventEndTime}`;
                   if (event._originalStartTime && event._originalTimezone) {
                     const offset = event._timezoneOffset >= 0 ? `+${event._timezoneOffset}` : event._timezoneOffset;
-                    timeDisplayText = `${eventTimeDisplay} (${event._originalStartTime} ${offset})`;
+                    timeDisplayText = `${eventStartTime} - ${eventEndTime} (${event._originalStartTime} ${offset})`;
                   }
                   
                   return (
@@ -663,13 +880,15 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                       key={event.id} 
                       draggable={!event.is_busy}
                       onDragStart={(e) => !event.is_busy && handleDragStart(e, event)}
+                      onDrag={handleDrag}
+                      onDragEnd={handleDragEnd}
                       onClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventSelect?.(event.id, e.shiftKey); }}
                       onDoubleClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventClick(event); }}
                       className={`
                         absolute px-1 py-1 rounded-md text-xs ${event.is_busy ? 'cursor-default' : 'cursor-move'}
                         hover:opacity-90 transition-all overflow-hidden group
                         ${isSelected ? 'ring-2 ring-[#085C53] ring-offset-1 z-20' : ''}
-                        ${draggedEvent?.id === event.id ? 'opacity-50 scale-95' : ''}
+                        ${draggedEvent?.id === event.id ? 'opacity-0' : ''}
                       `} 
                       style={{
                         ...getEventStyle(event), 
@@ -678,13 +897,32 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                         pointerEvents: draggedEvent && draggedEvent.id !== event.id ? 'none' : 'auto'
                       }} 
                       data-testid={`event-${event.id}`}
+                      title={`${event.title} (${eventStartTime} - ${eventEndTime})`}
                     >
                       <div className="flex items-start justify-between gap-1 h-full">
                         <div className="flex-1 min-w-0 flex flex-col">
-                          <span className="text-[10px] font-mono opacity-70 truncate">
-                            {timeDisplayText}
-                          </span>
-                          <span className={`font-medium leading-tight ${isLong ? 'text-[11px]' : 'text-[10px]'}`}>
+                          {/* Показываем preview время при drag/resize или обычное время */}
+                          {duration >= 1 && (
+                            <span className="text-[10px] font-mono opacity-70 truncate">
+                              {(draggedEvent?.id === event.id || resizingEvent?.id === event.id) && dragPreviewTime 
+                                ? `${dragPreviewTime.start} - ${dragPreviewTime.end}` 
+                                : timeDisplayText}
+                            </span>
+                          )}
+                          {/* Для коротких событий - показываем preview если dragged или resizing */}
+                          {duration < 1 && (draggedEvent?.id === event.id || resizingEvent?.id === event.id) && dragPreviewTime && (
+                            <span className="text-[10px] font-mono opacity-70 truncate">
+                              {dragPreviewTime.start} - {dragPreviewTime.end}
+                            </span>
+                          )}
+                          {/* Название события */}
+                          <span 
+                            className={`font-medium leading-tight ${isLong ? 'text-[11px]' : 'text-[10px]'}`}
+                            style={{ 
+                              wordBreak: duration < 1 ? 'break-word' : 'normal',
+                              overflowWrap: duration < 1 ? 'break-word' : 'normal'
+                            }}
+                          >
                             {event.title}
                           </span>
                         </div>
@@ -700,6 +938,21 @@ const WeekView = ({ date, events, templates, appliedTemplates, onDateClick, onEv
                     </div>
                   );
                 })}
+                
+                {/* Drag-to-create preview */}
+                {isCreating && createPreview && isSameDay(day, createStart.day) && (
+                  <div
+                    className="absolute left-[2px] right-[2px] bg-[#085C53]/20 border-2 border-dashed border-[#085C53] rounded-md pointer-events-none z-30"
+                    style={{
+                      top: `${createPreview.top}px`,
+                      height: `${createPreview.height}px`
+                    }}
+                  >
+                    <div className="px-2 py-1 text-xs font-medium text-[#085C53]">
+                      {createPreview.startTime} - {createPreview.endTime}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -733,6 +986,8 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
   });
   
   const [draggedEvent, setDraggedEvent] = useState(null);
+  const [dragPreviewTime, setDragPreviewTime] = useState(null); // { start: 'HH:MM', end: 'HH:MM' }
+  const gridRef = useRef(null);
 
   const getEventStyle = (event) => {
     try {
@@ -814,6 +1069,39 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
   const handleDragStart = (e, event) => {
     e.dataTransfer.effectAllowed = 'move';
     setDraggedEvent(event);
+    setDragPreviewTime(null);
+  };
+  
+  const handleDrag = (e) => {
+    if (!draggedEvent || !gridRef.current) return;
+    
+    // Get grid position
+    const gridRect = gridRef.current.getBoundingClientRect();
+    const mouseY = e.clientY - gridRect.top;
+    
+    if (mouseY < 0) return; // Mouse outside grid
+    
+    // Calculate hour and minute from Y position
+    const cellHeight = 60;
+    const totalHours = mouseY / cellHeight;
+    const hour = Math.floor(totalHours);
+    const minutesFraction = (totalHours - hour) * 60;
+    const roundedMinutes = Math.round(minutesFraction / 5) * 5; // 5-min snap for day view
+    
+    // Calculate duration
+    const start = new Date(draggedEvent.start_time);
+    const end = new Date(draggedEvent.end_time);
+    const durationMs = end - start;
+    
+    // Preview time
+    const previewStart = new Date();
+    previewStart.setHours(hour, Math.min(roundedMinutes, 55), 0, 0);
+    const previewEnd = new Date(previewStart.getTime() + durationMs);
+    
+    setDragPreviewTime({
+      start: `${String(previewStart.getHours()).padStart(2, '0')}:${String(previewStart.getMinutes()).padStart(2, '0')}`,
+      end: `${String(previewEnd.getHours()).padStart(2, '0')}:${String(previewEnd.getMinutes()).padStart(2, '0')}`
+    });
   };
 
   const handleDragOver = (e) => {
@@ -848,6 +1136,13 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
     });
     
     setDraggedEvent(null);
+    setDragPreviewTime(null);
+  };
+
+  const handleDragEnd = (e) => {
+    // Clean up drag state when drag ends (including cancelled drags)
+    setDraggedEvent(null);
+    setDragPreviewTime(null);
   };
 
   return (
@@ -891,7 +1186,7 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
       )}
 
       {/* Time grid */}
-      <div className="grid grid-cols-[50px_1fr_50px] max-h-[calc(100vh-260px)] overflow-y-auto">
+      <div ref={gridRef} className="grid grid-cols-[50px_1fr_50px] max-h-[calc(100vh-260px)] overflow-y-auto">
         {/* Left time column */}
         <div className="border-r border-border/20">
           {hours.map(hour => (
@@ -944,6 +1239,8 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
                 key={event.id}
                 draggable={!event.is_busy}
                 onDragStart={(e) => !event.is_busy && handleDragStart(e, event)}
+                onDrag={handleDrag}
+                onDragEnd={handleDragEnd}
                 onClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventSelect?.(event.id, e.shiftKey); }}
                 onDoubleClick={(e) => { e.stopPropagation(); if (!event.is_busy) onEventClick(event); }}
                 className={`
@@ -963,7 +1260,9 @@ const DayView = ({ date, events, templates, appliedTemplates, onEventClick, onCe
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <span className="text-xs font-mono opacity-70 truncate">
-                      {timeDisplayText}
+                      {draggedEvent?.id === event.id && dragPreviewTime 
+                        ? `${dragPreviewTime.start} - ${dragPreviewTime.end}` 
+                        : timeDisplayText}
                     </span>
                     <span className="font-medium text-sm truncate">{event.title}</span>
                   </div>

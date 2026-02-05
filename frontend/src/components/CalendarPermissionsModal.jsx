@@ -18,7 +18,10 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
   const [permissions, setPermissions] = useState([]);
   const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState('');
-  const [newPermissionLevel, setNewPermissionLevel] = useState('read');
+  // Default to view_busy for private calendars, read for public
+  const [newPermissionLevel, setNewPermissionLevel] = useState(
+    calendar.is_public === false ? 'view_busy' : 'read'
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -80,8 +83,10 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
         </div>
 
         {calendar.is_default && !calendar.is_public && (
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 mb-4">
-            <p className="text-sm text-amber-600 dark:text-amber-400">🔒 Закрытый календарь нельзя расшарить</p>
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-4">
+            <p className="text-sm text-blue-600 dark:text-blue-400">
+              🔒 Закрытый календарь: можно делиться только занятостью (другие не увидят детали событий)
+            </p>
           </div>
         )}
 
@@ -125,13 +130,12 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
           )}
         </div>
 
-        {/* Add new permission */}
-        {(!calendar.is_default || calendar.is_public) && (
-          <div>
-            <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-              <UserPlus className="w-4 h-4" />
-              Добавить пользователя
-            </h3>
+        {/* Add new permission - allow for all calendars */}
+        <div>
+          <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
+            <UserPlus className="w-4 h-4" />
+            Добавить пользователя
+          </h3>
             
             <form onSubmit={handleGrant} className="space-y-3">
               <div>
@@ -157,22 +161,36 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
               
               <div>
                 <Label className="text-xs text-muted-foreground">Уровень доступа</Label>
+                {!calendar.is_public && (
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 mb-2">
+                    💡 Для закрытого календаря рекомендуется "Только занятость"
+                  </p>
+                )}
                 <Select value={newPermissionLevel} onValueChange={setNewPermissionLevel}>
                   <SelectTrigger className="mt-1">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="z-[100]" position="popper" sideOffset={5}>
-                    {PERMISSION_LEVELS.map(level => (
-                      <SelectItem key={level.value} value={level.value}>
-                        <div className="flex items-start gap-2">
-                          <level.icon className="w-4 h-4 mt-0.5" />
-                          <div>
-                            <p className="font-medium">{level.label}</p>
-                            <p className="text-xs text-muted-foreground">{level.description}</p>
+                    {PERMISSION_LEVELS
+                      .filter(level => {
+                        // Для закрытого календаря - только view_busy
+                        if (!calendar.is_public) {
+                          return level.value === 'view_busy';
+                        }
+                        // Для открытого - все уровни
+                        return true;
+                      })
+                      .map(level => (
+                        <SelectItem key={level.value} value={level.value}>
+                          <div className="flex items-start gap-2">
+                            <level.icon className="w-4 h-4 mt-0.5" />
+                            <div>
+                              <p className="font-medium">{level.label}</p>
+                              <p className="text-xs text-muted-foreground">{level.description}</p>
+                            </div>
                           </div>
-                        </div>
-                      </SelectItem>
-                    ))}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -182,7 +200,6 @@ export const CalendarPermissionsModal = ({ calendar, onClose, onUpdate }) => {
               </Button>
             </form>
           </div>
-        )}
       </div>
     </div>
   );

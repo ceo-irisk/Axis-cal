@@ -58,55 +58,15 @@ const WEEKDAYS = [
 
 // Time picker component
 const TimePicker = ({ value, onChange, label }) => {
-  const [hours, minutes] = value ? value.split(':').map(Number) : [9, 0];
-  
-  const updateTime = (newHours, newMinutes) => {
-    const h = Math.max(0, Math.min(23, newHours));
-    const m = Math.max(0, Math.min(59, newMinutes));
-    onChange(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
-  };
-
-  const incrementHour = () => updateTime(hours + 1, minutes);
-  const decrementHour = () => updateTime(hours - 1, minutes);
-  const incrementMinute = () => updateTime(hours, minutes + 15 - (minutes % 15));
-  const decrementMinute = () => updateTime(hours, minutes - 15 + (minutes % 15 === 0 ? 0 : 15 - (minutes % 15)));
-
   return (
-    <div className="space-y-1.5">
-      <Label className="text-xs text-muted-foreground">{label}</Label>
-      <div className="flex items-center gap-1">
-        {/* Hours */}
-        <div className="flex flex-col items-center">
-          <button type="button" onClick={incrementHour} className="p-0.5 hover:bg-accent rounded">
-            <ChevronUp className="w-4 h-4" />
-          </button>
-          <input
-            type="text"
-            value={String(hours).padStart(2, '0')}
-            onChange={(e) => updateTime(parseInt(e.target.value) || 0, minutes)}
-            className="w-10 h-8 text-center text-lg font-mono bg-accent rounded border-0 focus:ring-2 focus:ring-[#085C53]"
-          />
-          <button type="button" onClick={decrementHour} className="p-0.5 hover:bg-accent rounded">
-            <ChevronDown className="w-4 h-4" />
-          </button>
-        </div>
-        <span className="text-xl font-bold text-muted-foreground">:</span>
-        {/* Minutes */}
-        <div className="flex flex-col items-center">
-          <button type="button" onClick={incrementMinute} className="p-0.5 hover:bg-accent rounded">
-            <ChevronUp className="w-4 h-4" />
-          </button>
-          <input
-            type="text"
-            value={String(minutes).padStart(2, '0')}
-            onChange={(e) => updateTime(hours, parseInt(e.target.value) || 0)}
-            className="w-10 h-8 text-center text-lg font-mono bg-accent rounded border-0 focus:ring-2 focus:ring-[#085C53]"
-          />
-          <button type="button" onClick={decrementMinute} className="p-0.5 hover:bg-accent rounded">
-            <ChevronDown className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
+    <div>
+      <Label className="text-xs text-muted-foreground mb-1 block">{label}</Label>
+      <input
+        type="time"
+        value={value || '09:00'}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full h-9 px-3 text-sm font-mono bg-accent rounded-lg border-0 focus:ring-2 focus:ring-[#085C53] focus:outline-none"
+      />
     </div>
   );
 };
@@ -163,9 +123,9 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars, selected
       title: event.title || '',
       description: event.description || '',
       start_date: format(startDateTime, 'yyyy-MM-dd'),
-      start_time_val: format(startDateTime, 'HH:mm'),
+      start_time_val: event._displayStartTime || format(startDateTime, 'HH:mm'),
       end_date: format(endDateTime, 'yyyy-MM-dd'),
-      end_time_val: format(endDateTime, 'HH:mm'),
+      end_time_val: event._displayEndTime || format(endDateTime, 'HH:mm'),
       event_type: event.event_type || 'meeting',
       status: status,
       location: event.location || '',
@@ -186,7 +146,12 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars, selected
   
   const startDate = defaultDate || new Date();
   const dateStr = format(startDate, 'yyyy-MM-dd');
-  const startHour = defaultHour ?? 9;
+  
+  // defaultHour может быть числом или объектом { hour, minute }
+  const startHour = typeof defaultHour === 'object' ? defaultHour.hour : (defaultHour ?? 9);
+  const startMinute = typeof defaultHour === 'object' ? defaultHour.minute : 0;
+  const endHour = startHour + 1;
+  const endMinute = startMinute;
   
   // Find "Открытый" calendar or use first available
   const defaultCalendar = calendars.find(c => c.name === 'Открытый') || calendars[0];
@@ -195,9 +160,9 @@ const getInitialFormData = (event, defaultDate, defaultHour, calendars, selected
     title: '',
     description: '',
     start_date: dateStr,
-    start_time_val: `${String(startHour).padStart(2, '0')}:00`,
+    start_time_val: `${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`,
     end_date: dateStr,
-    end_time_val: `${String(startHour + 1).padStart(2, '0')}:00`,
+    end_time_val: `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`,
     event_type: 'meeting',
     status: 'confirmed',
     location: '',
@@ -276,6 +241,15 @@ export const EventModal = ({
     // Combine date and time into local datetime string
     const localStartStr = `${formData.start_date}T${formData.start_time_val}`;
     const localEndStr = `${formData.end_date}T${formData.end_time_val}`;
+    
+    // Validate: start must be before end
+    const startLocal = new Date(localStartStr);
+    const endLocal = new Date(localEndStr);
+    
+    if (startLocal >= endLocal) {
+      toast.error('Время начала должно быть раньше времени окончания');
+      return;
+    }
     
     // Convert local time to UTC
     const startDateTimeUTC = localToUTC(localStartStr, finalTimezone);
@@ -461,8 +435,13 @@ export const EventModal = ({
                 <SelectContent position="popper" sideOffset={4}>
                   {/* Group calendars by ownership */}
                   {(() => {
-                    const ownCalendars = calendars.filter(cal => !cal.is_shared);
-                    const sharedCalendars = calendars.filter(cal => cal.is_shared);
+                    const ownCalendars = calendars.filter(cal => cal.is_own !== false);
+                    // Shared calendars - только с правами edit/full для создания событий
+                    const sharedCalendars = calendars.filter(cal => 
+                      cal.is_own === false && 
+                      cal.permission_level && 
+                      ['edit', 'full'].includes(cal.permission_level)
+                    );
                     
                     return (
                       <>
@@ -495,16 +474,15 @@ export const EventModal = ({
                             </div>
                             {sharedCalendars.map(cal => {
                               const IconComponent = CALENDAR_ICONS[cal.icon] || Calendar;
+                              const ownerName = cal.owner?.name || 'Неизвестный';
                               return (
                                 <SelectItem key={cal.id} value={cal.id}>
                                   <div className="flex items-center gap-2">
                                     <Users className="w-3.5 h-3.5 text-muted-foreground" />
                                     <span>{cal.name}</span>
-                                    {cal.permission_level && (
-                                      <span className="text-xs text-muted-foreground ml-1">
-                                        ({cal.permission_level})
-                                      </span>
-                                    )}
+                                    <span className="text-xs text-muted-foreground">
+                                      ({ownerName})
+                                    </span>
                                   </div>
                                 </SelectItem>
                               );
@@ -546,7 +524,7 @@ export const EventModal = ({
 
           {/* Date and Time - hidden if all day */}
           {!formData.is_all_day && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {/* Date row */}
               <div className="grid grid-cols-2 gap-3">
                 <div>

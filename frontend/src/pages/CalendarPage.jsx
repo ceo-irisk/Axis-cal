@@ -14,7 +14,7 @@ import CalendarGrid from '../components/CalendarGrid';
 import EventModal from '../components/EventModal';
 import SurveyModal from '../components/SurveyModal';
 import UsersPanel from '../components/UsersPanel';
-import { format, startOfMonth, endOfMonth, addMonths, subMonths, addWeeks, subWeeks, addDays, subDays } from 'date-fns';
+import { format, startOfMonth, endOfMonth, addMonths, subMonths, addWeeks, subWeeks, addDays, subDays, startOfWeek, endOfWeek } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Menu } from 'lucide-react';
 
@@ -242,9 +242,9 @@ export default function CalendarPage() {
     setSelectedEventIds([]); // Снять выделение при клике мимо события
   };
 
-  const handleCellDoubleClick = (date, hour) => {
+  const handleCellDoubleClick = (date, hour, minute) => {
     setSelectedDate(date);
-    setDefaultEventTime(hour);
+    setDefaultEventTime({ hour, minute: minute || 0 });
     setSelectedEvent(null);
     setShowEventModal(true);
   };
@@ -343,7 +343,11 @@ export default function CalendarPage() {
   const getTitle = () => {
     if (mainView === MAIN_VIEW.USERS) return 'Пользователи';
     if (view === 'day') return format(selectedDate, 'd MMMM yyyy', { locale: ru });
-    if (view === 'week') return `${format(selectedDate, 'd MMM', { locale: ru })} — ${format(addDays(selectedDate, 6), 'd MMM yyyy', { locale: ru })}`;
+    if (view === 'week') {
+      const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
+      const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 });
+      return `${format(weekStart, 'd MMM', { locale: ru })} — ${format(weekEnd, 'd MMM yyyy', { locale: ru })}`;
+    }
     return format(currentDate, 'LLLL yyyy', { locale: ru });
   };
 

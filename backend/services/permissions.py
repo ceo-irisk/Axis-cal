@@ -7,6 +7,10 @@ async def filter_events_by_permissions(events: List[dict], user_id: str, db) -> 
     permissions = await db.calendar_permissions.find({"user_id": user_id}, {"_id": 0}).to_list(100)
     permitted_calendar_ids = {p["calendar_id"]: p["permission_level"] for p in permissions}
     
+    # Get user's own calendars (to check for public calendars)
+    user_calendars = await db.calendars.find({"user_id": user_id}, {"_id": 0}).to_list(100)
+    user_calendar_ids = {c["id"] for c in user_calendars}
+    
     # Batch load all calendars for events (optimize N+1 queries)
     calendar_ids = {e["calendar_id"] for e in events if e.get("calendar_id")}
     calendars_list = await db.calendars.find(
@@ -30,7 +34,12 @@ async def filter_events_by_permissions(events: List[dict], user_id: str, db) -> 
         if not calendar_id:
             continue
         
-        # 3. Has explicit permission to calendar
+        # 3. Event in user's own calendar - always show (even if created by others)
+        if calendar_id in user_calendar_ids:
+            filtered_events.append(event)
+            continue
+        
+        # 4. Has explicit permission to calendar
         if calendar_id in permitted_calendar_ids:
             permission_level = permitted_calendar_ids[calendar_id]
             
@@ -41,6 +50,7 @@ async def filter_events_by_permissions(events: List[dict], user_id: str, db) -> 
                     "title": "Занято",
                     "start_time": event["start_time"],
                     "end_time": event["end_time"],
+                    "timezone": event.get("timezone", "Europe/Moscow"),  # Сохраняем timezone!
                     "event_type": "meeting",
                     "status": "confirmed",
                     "is_busy": True,
@@ -60,7 +70,6 @@ async def filter_events_by_permissions(events: List[dict], user_id: str, db) -> 
                 filtered_events.append(event)
             continue
         
-        # 4. No permissions - hide completely
-        # (Previously checked subscriptions here - now removed)
+        # 5. No permissions - hide completely
     
     return filtered_events

@@ -20,10 +20,47 @@ def init_db(database):
 @router.post("", response_model=dict)
 async def create_event(event_data: EventCreate, user: dict = Depends(get_current_user)):
     event_dict = event_data.model_dump()
+    
+    # Validate: start_time must be before end_time
+    if event_dict.get("start_time") and event_dict.get("end_time"):
+        start = event_dict["start_time"] if isinstance(event_dict["start_time"], datetime) else datetime.fromisoformat(event_dict["start_time"].replace('Z', '+00:00'))
+        end = event_dict["end_time"] if isinstance(event_dict["end_time"], datetime) else datetime.fromisoformat(event_dict["end_time"].replace('Z', '+00:00'))
+        
+        if start >= end:
+            raise HTTPException(status_code=400, detail="Время начала должно быть раньше времени окончания")
+    
     event_dict["id"] = str(uuid.uuid4())
     event_dict["created_by"] = user["id"]
     event_dict["created_at"] = datetime.now(timezone.utc).isoformat()
     event_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    # Check permissions if calendar_id is provided
+    if event_dict.get("calendar_id"):
+        calendar_id = event_dict["calendar_id"]
+        
+        # Check if user owns this calendar
+        calendar = await db.calendars.find_one({"id": calendar_id})
+        if not calendar:
+            raise HTTPException(status_code=404, detail="Календарь не найден")
+        
+        is_owner = calendar.get("user_id") == user["id"]
+        
+        # If not owner, check permissions
+        if not is_owner:
+            permission = await db.calendar_permissions.find_one({
+                "calendar_id": calendar_id,
+                "user_id": user["id"]
+            })
+            
+            if not permission:
+                raise HTTPException(status_code=403, detail="Нет доступа к этому календарю")
+            
+            # view_busy and read permissions cannot create events
+            if permission.get("permission_level") in ["view_busy", "read"]:
+                raise HTTPException(
+                    status_code=403, 
+                    detail="Недостаточно прав. Для создания событий нужны права 'Редактирование' или 'Полный доступ'"
+                )
     
     # Convert datetime objects to ISO strings (pydantic converts strings to datetime)
     if isinstance(event_dict.get("start_time"), datetime):
@@ -162,21 +199,36 @@ async def update_event(event_id: str, event_data: EventCreate, user: dict = Depe
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     
-    # Check permissions
-    if event["created_by"] != user["id"]:
-        calendar_id = event.get("calendar_id")
-        if calendar_id:
+    # Check permissions - ALWAYS check, even for event creator
+    calendar_id = event.get("calendar_id")
+    if calendar_id:
+        # Check if user owns the calendar
+        calendar = await db.calendars.find_one({"id": calendar_id})
+        is_calendar_owner = calendar and calendar.get("user_id") == user["id"]
+        
+        if not is_calendar_owner:
+            # Not calendar owner, check explicit permissions
             permission = await db.calendar_permissions.find_one({
                 "calendar_id": calendar_id,
                 "user_id": user["id"],
                 "permission_level": {"$in": ["edit", "full"]}
             })
             if not permission:
-                raise HTTPException(status_code=403, detail="Недостаточно прав")
-        else:
-            raise HTTPException(status_code=403, detail="Недостаточно прав")
+                raise HTTPException(status_code=403, detail="Недостаточно прав для редактирования")
+    elif event["created_by"] != user["id"]:
+        # No calendar and not creator - deny
+        raise HTTPException(status_code=403, detail="Недостаточно прав")
     
     update_dict = event_data.model_dump()
+    
+    # Validate: start_time must be before end_time
+    if update_dict.get("start_time") and update_dict.get("end_time"):
+        start = update_dict["start_time"] if isinstance(update_dict["start_time"], datetime) else datetime.fromisoformat(update_dict["start_time"].replace('Z', '+00:00'))
+        end = update_dict["end_time"] if isinstance(update_dict["end_time"], datetime) else datetime.fromisoformat(update_dict["end_time"].replace('Z', '+00:00'))
+        
+        if start >= end:
+            raise HTTPException(status_code=400, detail="Время начала должно быть раньше времени окончания")
+    
     update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
     
     # Convert datetime objects to ISO strings
@@ -198,20 +250,25 @@ async def delete_event(event_id: str, user: dict = Depends(get_current_user)):
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     
-    # Check if user is the creator
-    if event["created_by"] != user["id"]:
-        # Check if user has full permissions to the calendar
-        calendar_id = event.get("calendar_id")
-        if calendar_id:
+    # Check permissions - ALWAYS check, even for event creator
+    calendar_id = event.get("calendar_id")
+    if calendar_id:
+        # Check if user owns the calendar
+        calendar = await db.calendars.find_one({"id": calendar_id})
+        is_calendar_owner = calendar and calendar.get("user_id") == user["id"]
+        
+        if not is_calendar_owner:
+            # Not calendar owner, check explicit permissions - need FULL access for delete
             permission = await db.calendar_permissions.find_one({
                 "calendar_id": calendar_id,
                 "user_id": user["id"],
                 "permission_level": "full"
             })
             if not permission:
-                raise HTTPException(status_code=403, detail="Недостаточно прав")
-        else:
-            raise HTTPException(status_code=403, detail="Недостаточно прав")
+                raise HTTPException(status_code=403, detail="Недостаточно прав для удаления")
+    elif event["created_by"] != user["id"]:
+        # No calendar and not creator - deny
+        raise HTTPException(status_code=403, detail="Недостаточно прав")
     
     await db.events.delete_one({"id": event_id})
     return {"message": "Event deleted"}
