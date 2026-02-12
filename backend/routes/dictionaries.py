@@ -57,6 +57,7 @@ async def create_event_type(type_data: Dict[str, Any] = Body(...), admin: dict =
     }
     
     await db.event_types.insert_one(type_dict)
+    type_dict.pop('_id', None)
     
     # ✨ NEW: Invalidate cache
     await cache.invalidate_event_types()
