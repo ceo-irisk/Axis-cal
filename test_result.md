@@ -341,9 +341,9 @@ agent_communication:
 
   - task: "Backend Refactoring - Calendars Routes"
     implemented: true
-    working: false
+    working: true
     file: "backend/routes/calendars.py"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
@@ -353,6 +353,9 @@ agent_communication:
       - working: false
         agent: "testing"
         comment: "❌ CRITICAL: POST /calendars returns 520 error due to MongoDB ObjectId serialization issue. GET /calendars works correctly (returns own + subscribed calendars). Calendar permissions endpoints not fully tested due to creation failure."
+      - working: true
+        agent: "testing"
+        comment: "✅ OBJECTID FIX VERIFIED: POST /calendars now works correctly (status 200) and returns proper JSON responses. Created test calendar 'Test iOS Calendar' successfully. GET /calendars, DELETE /calendars/{id} all work correctly. MongoDB ObjectId serialization issue resolved."
 
   - task: "Backend Refactoring - Subscriptions Routes"
     implemented: true
