@@ -71,6 +71,7 @@ async def create_event(event_data: EventCreate, user: dict = Depends(get_current
         event_dict["recurrence_end_date"] = event_dict["recurrence_end_date"].isoformat()
     
     await db.events.insert_one(event_dict)
+    event_dict.pop('_id', None)
     
     # Fetch clean data without _id
     created_event = await db.events.find_one({"id": event_dict["id"]}, {"_id": 0})
