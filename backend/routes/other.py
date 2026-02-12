@@ -38,6 +38,7 @@ async def create_rule(rule_data: Dict[str, Any] = Body(...), admin: dict = Depen
     }
     
     await db.day_rules.insert_one(rule_dict)
+    rule_dict.pop('_id', None)
     
     # Fetch clean data without _id
     created_rule = await db.day_rules.find_one({"id": rule_dict["id"]}, {"_id": 0})
