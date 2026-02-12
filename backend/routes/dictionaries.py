@@ -131,6 +131,7 @@ async def create_event_status(status_data: Dict[str, Any] = Body(...), admin: di
     }
     
     await db.event_statuses.insert_one(status_dict)
+    status_dict.pop('_id', None)
     
     # Fetch clean data without _id
     created_status = await db.event_statuses.find_one({"id": status_dict["id"]}, {"_id": 0})
