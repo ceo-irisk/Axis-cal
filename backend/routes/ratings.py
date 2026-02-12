@@ -96,6 +96,7 @@ async def create_survey_question(question_data: Dict[str, Any] = Body(...), admi
     }
     
     await db.survey_questions.insert_one(question_dict)
+    question_dict.pop('_id', None)
     
     # Fetch clean data without _id
     created_question = await db.survey_questions.find_one({"id": question_dict["id"]}, {"_id": 0})
