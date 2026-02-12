@@ -49,9 +49,27 @@ class APITester:
             print(f"❌ Login failed: {response.status_code} - {response.text}")
             return False
     
+    def get_existing_calendar_id(self):
+        """Get an existing calendar ID for testing"""
+        response = requests.get(f"{BASE_URL}/calendars", headers=self.headers)
+        if response.status_code == 200:
+            calendars = response.json()
+            if calendars and len(calendars) > 0:
+                return calendars[0].get('id')
+        return None
+    
     def test_create_event(self):
         """Test POST /api/events - create event with proper JSON response"""
         print("\n🎯 Testing Event Creation (POST /api/events)...")
+        
+        # Get an existing calendar ID
+        calendar_id = self.get_existing_calendar_id()
+        if not calendar_id:
+            print("❌ No existing calendar found for event creation test")
+            self.test_results["create_event"] = {"status": "FAIL", "error": "No calendar available"}
+            return None
+        
+        print(f"Using existing calendar ID: {calendar_id}")
         
         # Create test event data
         now = datetime.now()
@@ -62,7 +80,7 @@ class APITester:
             "title": "iOS App Test Event",
             "start_time": start_time.isoformat(),
             "end_time": end_time.isoformat(),
-            "calendar_id": str(uuid.uuid4()),  # Use UUID format
+            "calendar_id": calendar_id,
             "description": "Test event for ObjectId serialization fix",
             "status": "confirmed"
         }
