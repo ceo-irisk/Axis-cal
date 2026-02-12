@@ -146,6 +146,7 @@ async def create_calendar_permission(
     }
     
     await db.calendar_permissions.insert_one(permission_dict)
+    permission_dict.pop('_id', None)
     
     # Fetch clean data without _id
     created_permission = await db.calendar_permissions.find_one({"id": permission_dict["id"]}, {"_id": 0})
