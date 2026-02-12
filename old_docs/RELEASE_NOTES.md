@@ -207,7 +207,7 @@
 ## 🚀 Деплой
 
 Приложение развернуто и доступно по адресу:
-**https://timezone-fix-16.preview.emergentagent.com**
+**https://calendar-ios.preview.emergentagent.com**
 
 **Учетные данные:**
 - Администратор: admin@company.com / admin123
