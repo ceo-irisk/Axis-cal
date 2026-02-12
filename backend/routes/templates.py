@@ -28,6 +28,7 @@ async def create_template(template_data: TemplateBase, user: dict = Depends(requ
     template_dict["created_at"] = datetime.now(timezone.utc).isoformat()
     
     await db.templates.insert_one(template_dict)
+    template_dict.pop('_id', None)
     
     # Fetch clean data without _id
     created_template = await db.templates.find_one({"id": template_dict["id"]}, {"_id": 0})
