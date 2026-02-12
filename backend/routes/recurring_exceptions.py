@@ -88,6 +88,7 @@ async def create_exception(
         exception_dict["new_end_time"] = exception_dict["new_end_time"].isoformat()
     
     await db.recurring_exceptions.insert_one(exception_dict)
+    exception_dict.pop('_id', None)
     
     # Fetch clean data
     created_exception = await db.recurring_exceptions.find_one(
