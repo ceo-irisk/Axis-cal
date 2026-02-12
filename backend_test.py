@@ -170,10 +170,10 @@ class APITester:
         """Test POST /api/dictionaries/event-types - create event type with proper JSON response"""
         print("\n🏷️ Testing Event Type Creation (POST /api/dictionaries/event-types)...")
         
+        timestamp = int(datetime.now().timestamp())
         event_type_data = {
-            "code": f"ios_test_{int(datetime.now().timestamp())}",
-            "name": "iOS Test Type",
-            "label": "iOS тестовый тип",
+            "name": f"ios_test_{timestamp}",
+            "label": f"iOS Тест {timestamp}",
             "color": "#00ff00"
         }
         
@@ -190,7 +190,7 @@ class APITester:
                 data = response.json()
                 print(f"✅ Event type created successfully")
                 print(f"Event type ID: {data.get('id')}")
-                print(f"Event type code: {data.get('code')}")
+                print(f"Event type name: {data.get('name')}")
                 self.test_results["create_event_type"] = {
                     "status": "PASS",
                     "type_id": data.get('id'),
