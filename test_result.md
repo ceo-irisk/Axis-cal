@@ -323,9 +323,9 @@ agent_communication:
 
   - task: "Backend Refactoring - Events Routes"
     implemented: true
-    working: false
+    working: true
     file: "backend/routes/events.py"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
@@ -335,6 +335,9 @@ agent_communication:
       - working: false
         agent: "testing"
         comment: "❌ CRITICAL: POST /events returns 520 error due to MongoDB ObjectId serialization issue. After insert_one(event_dict), the dict contains _id field with ObjectId. GET /events works with permissions filtering. GET /events/{id}, PUT /events/{id}, DELETE /events/{id} not tested due to creation failure."
+      - working: true
+        agent: "testing"
+        comment: "✅ OBJECTID FIX VERIFIED: POST /events now works correctly and returns proper JSON responses (status 200). Created test event 'iOS App Test Event' successfully. GET /events, DELETE /events/{id} all work correctly. MongoDB ObjectId serialization issue resolved."
 
   - task: "Backend Refactoring - Calendars Routes"
     implemented: true
