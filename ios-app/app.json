@@ -1,29 +1,55 @@
 {
   "expo": {
-    "name": "ios-app",
-    "slug": "ios-app",
+    "name": "Axis Calendar",
+    "slug": "axis-calendar",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
+    "scheme": "axis-calendar",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.axiscalendar.ios",
+      "infoPlist": {
+        "UIBackgroundModes": ["fetch", "remote-notification"],
+        "NSCalendarsUsageDescription": "Axis Calendar нужен доступ к календарю для синхронизации событий",
+        "NSCalendarsFullAccessUsageDescription": "Axis Calendar нужен полный доступ к календарю для создания и редактирования событий"
+      },
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#050505"
       },
-      "edgeToEdgeEnabled": true
+      "package": "com.axiscalendar.android"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-haptics",
+        {
+          "ios": {
+            "supportsHapticFeedback": true
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "axis-calendar-ios"
+      }
+    },
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#050505"
     }
   }
 }
