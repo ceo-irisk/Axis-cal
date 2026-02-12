@@ -152,6 +152,7 @@ async def create_survey_response(
     }
     
     await db.survey_responses.insert_one(response_dict)
+    response_dict.pop('_id', None)
     
     # Fetch clean data without _id
     created_response = await db.survey_responses.find_one({"id": response_dict["id"]}, {"_id": 0})
