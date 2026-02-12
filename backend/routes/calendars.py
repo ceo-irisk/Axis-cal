@@ -69,6 +69,7 @@ async def create_calendar(calendar_data: dict = Body(...), user: dict = Depends(
     calendar_dict["created_at"] = datetime.now(timezone.utc).isoformat()
     
     await db.calendars.insert_one(calendar_dict)
+    calendar_dict.pop('_id', None)
     
     # Fetch clean data without _id
     created_calendar = await db.calendars.find_one({"id": calendar_dict["id"]}, {"_id": 0})
