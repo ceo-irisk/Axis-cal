@@ -270,16 +270,10 @@ test_plan:
     - "Backend Refactoring - Subscriptions Routes"
     - "Backend Refactoring - Templates Routes"
     - "Backend Refactoring - Dictionaries Routes"
-  stuck_tasks:
-    - "Backend Refactoring - Users Routes"
-    - "Backend Refactoring - Events Routes"
-    - "Backend Refactoring - Calendars Routes"
-    - "Backend Refactoring - Subscriptions Routes"
-    - "Backend Refactoring - Templates Routes"
-    - "Backend Refactoring - Dictionaries Routes"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
-  last_tested: "Event Type Creation UI"
+  last_tested: "Backend ObjectId Fix + iOS App Creation"
 
 agent_communication:
   - agent: "testing"
