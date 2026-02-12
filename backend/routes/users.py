@@ -61,6 +61,8 @@ async def create_user(user_data: UserCreate, admin: dict = Depends(require_admin
         }
     ]
     await db.calendars.insert_many(default_calendars)
+    for cal in default_calendars:
+        cal.pop('_id', None)
     logger.info(f"Created default calendars for user {user_dict['email']}")
     
     # Fetch clean user data without _id and password
