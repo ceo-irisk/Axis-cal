@@ -58,6 +58,7 @@ async def create_ics_subscription(subscription_data: dict = Body(...), user: dic
     }
     
     await db.ics_subscriptions.insert_one(subscription_dict)
+    subscription_dict.pop('_id', None)
     
     # Fetch clean data without _id
     created_subscription = await db.ics_subscriptions.find_one({"id": subscription_dict["id"]}, {"_id": 0})
