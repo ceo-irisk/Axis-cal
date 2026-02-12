@@ -395,9 +395,9 @@ agent_communication:
 
   - task: "Backend Refactoring - Dictionaries Routes"
     implemented: true
-    working: false
+    working: true
     file: "backend/routes/dictionaries.py"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
@@ -407,6 +407,9 @@ agent_communication:
       - working: false
         agent: "testing"
         comment: "❌ CRITICAL: POST /dictionaries/event-types returns 520 error due to MongoDB ObjectId serialization issue. GET /dictionaries/event-types, GET /dictionaries/event-statuses, and GET /dictionaries/timezones all work correctly."
+      - working: true
+        agent: "testing"
+        comment: "✅ OBJECTID FIX VERIFIED: POST /dictionaries/event-types now works correctly (status 200) and returns proper JSON responses. Created test event type successfully. GET endpoints all work correctly. MongoDB ObjectId serialization issue resolved."
 
   - task: "Backend Refactoring - Recurring Events Routes"
     implemented: true
