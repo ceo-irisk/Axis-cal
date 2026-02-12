@@ -28,7 +28,8 @@ async def create_user(user_data: UserCreate, admin: dict = Depends(require_admin
     user_dict["created_at"] = datetime.now(timezone.utc).isoformat()
     user_dict["is_active"] = True
     
-    result = await db.users.insert_one(user_dict)
+    await db.users.insert_one(user_dict)
+    user_dict.pop('_id', None)
     
     # Create default calendars for the new user
     default_calendars = [
