@@ -161,7 +161,7 @@ class APITester:
         
         response = requests.post(
             f"{BASE_URL}/dictionaries/event-types",
-            json=event_data,
+            json=event_type_data,
             headers=self.headers
         )
         
