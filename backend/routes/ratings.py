@@ -43,6 +43,7 @@ async def create_or_update_rating(
     }
     
     await db.day_ratings.insert_one(rating_dict)
+    rating_dict.pop('_id', None)
     
     # Fetch clean data without _id
     created_rating = await db.day_ratings.find_one({"id": rating_dict["id"]}, {"_id": 0})
